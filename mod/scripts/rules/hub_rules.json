@@ -1,0 +1,2535 @@
+[
+ {
+  "id": "H01-win-hook",
+  "variants": [
+   "base",
+   "kaizo",
+   "elec",
+   "violet",
+   "thorn",
+   "cyan"
+  ],
+  "entry": "gml_Object_obj_ch3_PTB02_Step_0",
+  "find": "if (con == 8)\n{\n",
+  "replace": "if (con == 8)\n{\n    knight_battle_won();\n",
+  "why": "Battle-won hook (killed or spared): records the clear and the HP the party had before the vanilla post-fight HP=1 writes."
+ },
+ {
+  "id": "H02-story-write-wrap",
+  "variants": [
+   "base",
+   "kaizo",
+   "elec",
+   "violet",
+   "thorn",
+   "cyan"
+  ],
+  "entry": "gml_Object_obj_ch3_PTB02_Step_0",
+  "find": "    scr_flag_set(1047, battle_result);\n    var iniwrite = ossafe_ini_open(\"dr.ini\");\n    ini_write_real(scr_ini_chapter(global.chapter, global.filechoice), \"UraBoss\", battle_result);\n    ossafe_ini_close();\n    ossafe_savedata_save();\n",
+  "replace": "    if (!(variable_global_exists(\"knight_run\") && global.knight_run == 1))\n    {\n        scr_flag_set(1047, battle_result);\n        var iniwrite = ossafe_ini_open(\"dr.ini\");\n        ini_write_real(scr_ini_chapter(global.chapter, global.filechoice), \"UraBoss\", battle_result);\n        ossafe_ini_close();\n        ossafe_savedata_save();\n    }\n",
+  "why": "Hub fights never write the story result or save; knight_continue_story() writes it once if the player continues."
+ },
+ {
+  "id": "H03-ghost-spawn",
+  "variants": [
+   "base",
+   "kaizo",
+   "elec",
+   "violet",
+   "thorn",
+   "cyan"
+  ],
+  "entry": "gml_Object_obj_ch3_PTB02_Step_0",
+  "find": "    scr_battle(115, 1, knight_marker, 0, 0);\n",
+  "replace": "    knight_spawn_ghosts();\n    scr_battle(115, 1, knight_marker, 0, 0);\n",
+  "why": "Create inert stand-ins for absent Kris/Susie/Ralsei before the battle objects read them."
+ },
+ {
+  "id": "H04-gameover-intercept",
+  "variants": [
+   "base",
+   "kaizo",
+   "elec",
+   "violet",
+   "thorn",
+   "cyan"
+  ],
+  "entry": "gml_GlobalScript_scr_gameover",
+  "find": "function scr_gameover()\n{\n",
+  "replace": "function scr_gameover()\n{\n    if (variable_global_exists(\"knight_run\") && global.knight_run == 1 && is_struct(global.krun) && global.flag[35] == 0)\n    {\n        knight_defeat_begin();\n        return 0;\n    }\n",
+  "why": "Hub fights end in the arena: the hub shows Rematch / Change settings / Return to Hub instead of the death room (no party edits, no story counters)."
+ },
+ {
+  "id": "H05-noheal",
+  "variants": [
+   "base",
+   "kaizo",
+   "elec",
+   "violet",
+   "thorn",
+   "cyan"
+  ],
+  "entry": "gml_GlobalScript_scr_heal",
+  "find": "function scr_heal(arg0, arg1)\n{\n",
+  "replace": "function scr_heal(arg0, arg1)\n{\n    if (knight_noheal_active())\n    {\n        abovemaxhp = 0;\n        belowzero = 0;\n        return 0;\n    }\n",
+  "why": "No-healing challenge: every HP gain (items, spells, passives, healing bullets) goes through scr_heal."
+ },
+ {
+  "id": "H06-xslash-a",
+  "variants": [
+   "base",
+   "kaizo",
+   "elec",
+   "violet",
+   "thorn",
+   "cyan"
+  ],
+  "entry": "gml_GlobalScript_scr_spellinfo",
+  "find": "stringsetloc(\"Rude Sword\", \"scr_spellinfo_slash_scr_spellinfo_gml_21_0\")",
+  "replace": "stringsetloc(\"X-Slash\", \"scr_spellinfo_slash_scr_spellinfo_gml_21_0\")",
+  "why": "Rename Rude Sword to X-Slash."
+ },
+ {
+  "id": "H06-xslash-b",
+  "variants": [
+   "base",
+   "kaizo",
+   "elec",
+   "violet",
+   "thorn",
+   "cyan"
+  ],
+  "entry": "gml_GlobalScript_scr_spellinfo",
+  "find": "stringsetloc(\"RudeSword\", \"scr_spellinfo_slash_scr_spellinfo_gml_22_0\")",
+  "replace": "stringsetloc(\"X-Slash\", \"scr_spellinfo_slash_scr_spellinfo_gml_22_0\")",
+  "why": "Rename Rude Sword to X-Slash (short name)."
+ },
+ {
+  "id": "H07-short-a",
+  "variants": [
+   "kaizo",
+   "violet"
+  ],
+  "entry": "gml_Object_obj_ch3_PTB02_Create_0",
+  "find": "var shorten = false;",
+  "replace": "var shorten = (variable_global_exists(\"knight_run\") && global.knight_run == 1);",
+  "why": "Use the short knight cutscene (con 3.1) for hub fights."
+ },
+ {
+  "id": "H07-short-b",
+  "variants": [
+   "kaizo",
+   "violet"
+  ],
+  "entry": "gml_Object_obj_ch3_PTB02_Create_0",
+  "find": "shorten = global.knight_battle_losses > 1;",
+  "replace": "shorten = shorten || global.knight_battle_losses > 1;",
+  "why": "Do not let the loss counter switch the short cutscene off again."
+ },
+ {
+  "id": "H08-guard-hero-pos",
+  "variants": [
+   "base",
+   "kaizo",
+   "elec",
+   "thorn",
+   "cyan"
+  ],
+  "entry": "gml_Object_obj_ch3_PTB02_Step_0",
+  "find": "(?m)^(\\s*)((?:obj_mainchara|kr_actor|su_actor|ra_actor)\\.(x|y)) = obj_hero(kris|susie|ralsei)\\.(?:x|y);$",
+  "replace": "\\1\\2 = (i_ex(obj_hero\\4) ? obj_hero\\4.\\3 : knight_canon_xy(\"\\4\", \"\\3\"));",
+  "why": "After the fight the hub party may lack Kris / Susie / Ralsei: reading obj_hero<missing>.x crashed (\"Unable to find any instance for object obj_herokris\"). Same guard Violet already had.",
+  "regex": true
+ },
+ {
+  "id": "H17-actors-ensure",
+  "variants": [
+   "base",
+   "kaizo",
+   "elec",
+   "violet",
+   "thorn",
+   "cyan"
+  ],
+  "entry": "gml_Object_obj_ch3_PTB02_Step_0",
+  "find": "(?m)^(\\s*)obj_mainchara\\.x = (.*);$",
+  "replace": "\\1knight_actors_ensure();\\n\\1if (instance_exists(obj_mainchara))\\n\\1{\\n\\1    obj_mainchara.x = \\2;\\n\\1}",
+  "why": "Before the after-fight scenes touch kr_actor / su_actor / ra_actor / obj_mainchara, make sure they are live instances (a write to a missing one crashed with \"Variable set failed x - read only variable?\").",
+  "regex": true
+ },
+ {
+  "id": "H17-mainchara-y",
+  "variants": [
+   "base",
+   "kaizo",
+   "elec",
+   "violet",
+   "thorn",
+   "cyan"
+  ],
+  "entry": "gml_Object_obj_ch3_PTB02_Step_0",
+  "find": "(?m)^(\\s*)obj_mainchara\\.y = (.*);$",
+  "replace": "\\1if (instance_exists(obj_mainchara))\\n\\1{\\n\\1    obj_mainchara.y = \\2;\\n\\1}",
+  "why": "Same guard for the y write.",
+  "regex": true
+ },
+ {
+  "id": "H18-scale-dealt",
+  "variants": [
+   "base",
+   "kaizo",
+   "elec",
+   "violet",
+   "thorn",
+   "cyan"
+  ],
+  "entry": "gml_GlobalScript_scr_damage_enemy",
+  "find": "function scr_damage_enemy(arg0, arg1)\n{\n",
+  "replace": "function scr_damage_enemy(arg0, arg1)\n{\n    arg1 = knight_dmg_filter(arg0, arg1);\n",
+  "why": "Every hit on the knight goes through the hub filter: party-size scaling (1.0 for the full trio), then fight pacing (the knight cannot fall past its Roaring gate before it has shown its whole attack list), the catch-up for slow parties, and the per-fight blocks (Supercharged phasing, Violet Side B finisher)."
+ },
+ {
+  "id": "H18-scale-dealt-auto",
+  "variants": [
+   "base",
+   "kaizo",
+   "elec",
+   "violet",
+   "thorn",
+   "cyan"
+  ],
+  "entry": "gml_Object_obj_heroparent_Other_10",
+  "find": "            dm.damage = damage;\n            global.hittarget[global.chartarget[myself]] += 1;\n            global.monsterhp[global.chartarget[myself]] -= damage;",
+  "replace": "            damage = knight_dmg_filter(global.chartarget[myself], damage);\n            dm.damage = damage;\n            global.hittarget[global.chartarget[myself]] += 1;\n            global.monsterhp[global.chartarget[myself]] -= damage;",
+  "why": "Same filter for the auto-Susie hit that subtracts HP directly."
+ },
+ {
+  "id": "H18-scale-taken",
+  "variants": [
+   "base",
+   "kaizo",
+   "elec",
+   "violet",
+   "thorn",
+   "cyan"
+  ],
+  "entry": "gml_GlobalScript_scr_damage_calculation",
+  "find": "    return max(_tdamage, _finaldamage);",
+  "replace": "    if (!(variable_global_exists(\"knight_calc_loop\") && global.knight_calc_loop))\n        _tdamage = knight_scale_taken(_tdamage, arg1);\n    return max(_tdamage, _finaldamage);",
+  "why": "Party-size and clone scaling of single-target damage taken (applied after defence, 1.0 for the full trio of distinct characters). All-party hit loops set global.knight_calc_loop and scale at the HP subtraction instead (their tdamage is reassigned per slot)."
+ },
+ {
+  "id": "H18-loop-calc-scr_damage",
+  "variants": [
+   "base",
+   "kaizo",
+   "elec",
+   "violet",
+   "thorn",
+   "cyan"
+  ],
+  "entry": "gml_GlobalScript_scr_damage",
+  "find": "tdamage = scr_damage_calculation(tdamage, hpi);",
+  "replace": "global.knight_calc_loop = true;\n                        tdamage = scr_damage_calculation(tdamage, hpi);\n                        global.knight_calc_loop = false;",
+  "why": "All-party hits: scaling is applied per slot at the subtraction (below), not inside the cascading tdamage."
+ },
+ {
+  "id": "H18-loop-sub-a-scr_damage",
+  "variants": [
+   "base",
+   "kaizo",
+   "elec",
+   "violet",
+   "thorn",
+   "cyan"
+  ],
+  "entry": "gml_GlobalScript_scr_damage",
+  "find": "(?m)^( {24})global\\.hp\\[chartarget\\] -= ceil\\(\\(3 \\* tdamage\\) / 4\\);",
+  "replace": "\\1global.hp[chartarget] -= knight_scale_taken(ceil((3 * tdamage) / 4), hpi);",
+  "why": "All-party hit (defending): size scaling plus clone split, per slot.",
+  "regex": true
+ },
+ {
+  "id": "H18-loop-sub-b-scr_damage",
+  "variants": [
+   "base",
+   "kaizo",
+   "elec",
+   "violet",
+   "thorn",
+   "cyan"
+  ],
+  "entry": "gml_GlobalScript_scr_damage",
+  "find": "(?m)^( {24})global\\.hp\\[chartarget\\] -= tdamage;",
+  "replace": "\\1global.hp[chartarget] -= knight_scale_taken(tdamage, hpi);",
+  "why": "All-party hit: size scaling plus clone split, per slot (clones share one HP bar, so each clone slot takes its share).",
+  "regex": true
+ },
+ {
+  "id": "H18-loop-calc-scr_damage_fixed",
+  "variants": [
+   "base",
+   "kaizo",
+   "elec",
+   "violet",
+   "thorn",
+   "cyan"
+  ],
+  "entry": "gml_GlobalScript_scr_damage_fixed",
+  "find": "tdamage = scr_damage_calculation(tdamage, hpi);",
+  "replace": "global.knight_calc_loop = true;\n                        tdamage = scr_damage_calculation(tdamage, hpi);\n                        global.knight_calc_loop = false;",
+  "why": "All-party hits: scaling is applied per slot at the subtraction (below), not inside the cascading tdamage."
+ },
+ {
+  "id": "H18-loop-sub-a-scr_damage_fixed",
+  "variants": [
+   "base",
+   "kaizo",
+   "elec",
+   "violet",
+   "thorn",
+   "cyan"
+  ],
+  "entry": "gml_GlobalScript_scr_damage_fixed",
+  "find": "(?m)^( {24})global\\.hp\\[chartarget\\] -= ceil\\(\\(3 \\* tdamage\\) / 4\\);",
+  "replace": "\\1global.hp[chartarget] -= knight_scale_taken(ceil((3 * tdamage) / 4), hpi);",
+  "why": "All-party hit (defending): size scaling plus clone split, per slot.",
+  "regex": true
+ },
+ {
+  "id": "H18-loop-sub-b-scr_damage_fixed",
+  "variants": [
+   "base",
+   "kaizo",
+   "elec",
+   "violet",
+   "thorn",
+   "cyan"
+  ],
+  "entry": "gml_GlobalScript_scr_damage_fixed",
+  "find": "(?m)^( {24})global\\.hp\\[chartarget\\] -= tdamage;",
+  "replace": "\\1global.hp[chartarget] -= knight_scale_taken(tdamage, hpi);",
+  "why": "All-party hit: size scaling plus clone split, per slot (clones share one HP bar, so each clone slot takes its share).",
+  "regex": true
+ },
+ {
+  "id": "H18-loop-calc-scr_damage_maxhp",
+  "variants": [
+   "base",
+   "kaizo",
+   "elec",
+   "violet",
+   "thorn",
+   "cyan"
+  ],
+  "entry": "gml_GlobalScript_scr_damage_maxhp",
+  "find": "tdamage = scr_damage_calculation(tdamage, hpi);",
+  "replace": "global.knight_calc_loop = true;\n                        tdamage = scr_damage_calculation(tdamage, hpi);\n                        global.knight_calc_loop = false;",
+  "why": "All-party hits: scaling is applied per slot at the subtraction (below), not inside the cascading tdamage."
+ },
+ {
+  "id": "H18-loop-sub-a-scr_damage_maxhp",
+  "variants": [
+   "base",
+   "kaizo",
+   "elec",
+   "violet",
+   "thorn",
+   "cyan"
+  ],
+  "entry": "gml_GlobalScript_scr_damage_maxhp",
+  "find": "(?m)^( {24})global\\.hp\\[chartarget\\] -= ceil\\(\\(3 \\* tdamage\\) / 4\\);",
+  "replace": "\\1global.hp[chartarget] -= knight_scale_taken(ceil((3 * tdamage) / 4), hpi);",
+  "why": "All-party hit (defending): size scaling plus clone split, per slot.",
+  "regex": true
+ },
+ {
+  "id": "H18-loop-sub-b-scr_damage_maxhp",
+  "variants": [
+   "base",
+   "kaizo",
+   "elec",
+   "violet",
+   "thorn",
+   "cyan"
+  ],
+  "entry": "gml_GlobalScript_scr_damage_maxhp",
+  "find": "(?m)^( {24})global\\.hp\\[chartarget\\] -= tdamage;",
+  "replace": "\\1global.hp[chartarget] -= knight_scale_taken(tdamage, hpi);",
+  "why": "All-party hit: size scaling plus clone split, per slot (clones share one HP bar, so each clone slot takes its share).",
+  "regex": true
+ },
+ {
+  "id": "H18-loop-calc-scr_damage_sneo_final_attack",
+  "variants": [
+   "base",
+   "kaizo",
+   "elec",
+   "violet",
+   "thorn",
+   "cyan"
+  ],
+  "entry": "gml_GlobalScript_scr_damage_sneo_final_attack",
+  "find": "tdamage = scr_damage_calculation(tdamage, hpi);",
+  "replace": "global.knight_calc_loop = true;\n                        tdamage = scr_damage_calculation(tdamage, hpi);\n                        global.knight_calc_loop = false;",
+  "why": "All-party hits: scaling is applied per slot at the subtraction (below), not inside the cascading tdamage."
+ },
+ {
+  "id": "H18-loop-sub-a-scr_damage_sneo_final_attack",
+  "variants": [
+   "base",
+   "kaizo",
+   "elec",
+   "violet",
+   "thorn",
+   "cyan"
+  ],
+  "entry": "gml_GlobalScript_scr_damage_sneo_final_attack",
+  "find": "(?m)^( {24})global\\.hp\\[chartarget\\] -= ceil\\(\\(3 \\* tdamage\\) / 4\\);",
+  "replace": "\\1global.hp[chartarget] -= knight_scale_taken(ceil((3 * tdamage) / 4), hpi);",
+  "why": "All-party hit (defending): size scaling plus clone split, per slot.",
+  "regex": true
+ },
+ {
+  "id": "H18-loop-sub-b-scr_damage_sneo_final_attack",
+  "variants": [
+   "base",
+   "kaizo",
+   "elec",
+   "violet",
+   "thorn",
+   "cyan"
+  ],
+  "entry": "gml_GlobalScript_scr_damage_sneo_final_attack",
+  "find": "(?m)^( {24})global\\.hp\\[chartarget\\] -= tdamage;",
+  "replace": "\\1global.hp[chartarget] -= knight_scale_taken(tdamage, hpi);",
+  "why": "All-party hit: size scaling plus clone split, per slot (clones share one HP bar, so each clone slot takes its share).",
+  "regex": true
+ },
+ {
+  "id": "H19-guard-knight-enemy",
+  "variants": [
+   "base",
+   "kaizo",
+   "elec",
+   "thorn",
+   "cyan"
+  ],
+  "entry": "gml_Object_obj_ch3_PTB02_Step_0",
+  "find": "(?m)^(\\s*)roaring_knight\\.x = obj_knight_enemy\\.x;\\n\\s*roaring_knight\\.ystart = obj_knight_enemy\\.y;",
+  "replace": "\\1if (i_ex(obj_knight_enemy))\\n\\1{\\n\\1    roaring_knight.x = obj_knight_enemy.x;\\n\\1    roaring_knight.ystart = obj_knight_enemy.y;\\n\\1}",
+  "why": "After the battle the knight enemy object can already be gone (\"Unable to find any instance for object obj_knight_enemy\"); Violet already guarded this, the others read it unguarded.",
+  "regex": true
+ },
+ {
+  "id": "H09-xslash-text",
+  "variants": [
+   "base",
+   "kaizo",
+   "elec",
+   "violet",
+   "thorn",
+   "cyan"
+  ],
+  "entry": "gml_GlobalScript_scr_spelltext",
+  "find": "\"* ~1 cast RUDE BUSTER!/%\", global.charname[global.char[caster]], \"scr_spelltext_slash_scr_spelltext_gml_14_0\"",
+  "replace": "\"* ~1 used X-Slash!/%\", global.charname[global.char[caster]], \"scr_spelltext_slash_scr_spelltext_gml_14_0\"",
+  "why": "Spell 1 announced itself as RUDE BUSTER; it is X-Slash."
+ },
+ {
+  "id": "H10-xslash-cost",
+  "variants": [
+   "base",
+   "kaizo",
+   "elec",
+   "violet",
+   "thorn",
+   "cyan"
+  ],
+  "entry": "gml_GlobalScript_scr_spellinfo",
+  "find": "(scr_spellinfo_gml_24_0\"\\);\\n\\s+spelltarget = 2;\\n\\s+cost = )125;",
+  "replace": "\\g<1>62;",
+  "why": "X-Slash costs 62 TP like the X-Slash ACT in the Spamton NEO fight.",
+  "regex": true
+ },
+ {
+  "id": "H10-xslash-desc",
+  "variants": [
+   "base",
+   "kaizo",
+   "elec",
+   "violet",
+   "thorn",
+   "cyan"
+  ],
+  "entry": "gml_GlobalScript_scr_spellinfo",
+  "find": "stringsetloc(\"Rude#Damage#\", \"scr_spellinfo_slash_scr_spellinfo_gml_23_0\")",
+  "replace": "stringsetloc(\"Physical#damage\", \"scr_spellinfo_slash_scr_spellinfo_gml_23_0\")",
+  "why": "X-Slash battle description (as the Spamton NEO ACT)."
+ },
+ {
+  "id": "H10-xslash-desc2",
+  "variants": [
+   "base",
+   "kaizo",
+   "elec",
+   "violet",
+   "thorn",
+   "cyan"
+  ],
+  "entry": "gml_GlobalScript_scr_spellinfo",
+  "find": "stringsetloc(\"Deals moderate Rude-elemental damage to#one foe. Depends on Attack & Magic.\", \"scr_spellinfo_slash_scr_spellinfo_gml_24_0\")",
+  "replace": "stringsetloc(\"Two quick slashes at#one foe. Depends on Attack.\", \"scr_spellinfo_slash_scr_spellinfo_gml_24_0\")",
+  "why": "X-Slash menu description."
+ },
+ {
+  "id": "H11-xslash-cast",
+  "variants": [
+   "base",
+   "kaizo",
+   "elec",
+   "violet",
+   "thorn",
+   "cyan"
+  ],
+  "entry": "gml_GlobalScript_scr_spell",
+  "find": "damage = ceil\\(\\(global\\.battleat\\[arg1\\] \\* 10\\) - \\(global\\.monsterdf\\[star\\] \\* 3\\)\\);\\n(\\s+)if \\(global\\.automiss\\[star\\] == 1\\)\\n\\s+\\{\\n\\s+damage = 0;\\n\\s+\\}\\n\\s+scr_damage_enemy\\(star, damage\\);\\n\\s+attack = instance_create\\(global\\.monsterx\\[star\\] \\+ random\\(6\\), global\\.monstery\\[star\\] \\+ random\\(6\\), obj_basicattack\\);\\n\\s+attack\\.sprite_index = spr_attack_mash1;\\n\\s+dm\\.delay = 8;",
+  "replace": "damage = knight_xslash_damage(arg1, star);\n\\1if (global.automiss[star] == 1)\n\\1{\n\\1    damage = 0;\n\\1}\n\\1knight_kspell_start(1, arg1, star, damage);",
+  "why": "X-Slash is the Spamton NEO / knight X-Slash: two slashes (Kris shows their slash pose) with the same damage formula as the X-Slash ACT.",
+  "regex": true
+ },
+ {
+  "id": "H11b-xslash-delay",
+  "variants": [
+   "base",
+   "kaizo",
+   "elec",
+   "violet",
+   "thorn",
+   "cyan"
+  ],
+  "entry": "gml_GlobalScript_scr_spell",
+  "find": "            global.spelldelay = 30;\n            break;\n        case 2:",
+  "replace": "            global.spelldelay = knight_ks_delay(30);\n            break;\n        case 2:",
+  "why": "Spell phase lasts long enough for both X-Slash slashes to land."
+ },
+ {
+  "id": "H12-redbuster-cast",
+  "variants": [
+   "base",
+   "kaizo",
+   "elec",
+   "violet",
+   "thorn",
+   "cyan"
+  ],
+  "entry": "gml_GlobalScript_scr_spell",
+  "find": "(attack = instance_create\\(obj_herosusie\\.x, obj_herosusie\\.y, obj_rudebuster_anim\\);\\n\\s+attack\\.damage = damage;\\n\\s+attack\\.star = star;\\n\\s+attack\\.caster = caster;\\n\\s+attack\\.target = global\\.monsterinstance\\[star\\];\\n\\s+attack\\.red = 1;)",
+  "replace": "if (global.char[caster] == 1 && knight_soul_slot(2) >= 0)\n{\n    var _rbs = knight_soul_slot(2);\n    damage = ceil(((global.battlemag[_rbs] * 6) + (global.battleat[_rbs] * 13)) - (global.monsterdf[star] * 6));\n    if (global.automiss[star] == 1)\n    {\n        damage = 0;\n    }\n    global.spelldelay = 90;\n    knight_kspell_start(2, caster, star, damage);\n}\nelse if (i_ex(obj_herosusie))\n{\n    \\1\n}",
+  "why": "Red Buster chosen by Kris is Kris shining their SOUL on Susie: soul-shine scene, then SUSIE casts it with her own Attack/Magic (the vanilla anim from Susie). Anyone else falls back to the vanilla cast.",
+  "regex": true
+ },
+ {
+  "id": "H12-dualheal-cast",
+  "variants": [
+   "base",
+   "kaizo",
+   "elec",
+   "violet",
+   "thorn",
+   "cyan"
+  ],
+  "entry": "gml_GlobalScript_scr_spell",
+  "find": "(        case 6:\\n)(            healnum = ceil\\(global\\.battlemag\\[arg1\\] \\* ([0-9.]+)\\);)",
+  "replace": "\\1            if (variable_global_exists(\"knight_run\") && global.knight_run == 1 && ((global.char[caster] == 1 && knight_soul_slot(3) >= 0) || (knight_duo_heal_mode() && (global.char[caster] == 3 || global.char[caster] == 4) && knight_soul_slot(3) >= 0 && knight_soul_slot(4) >= 0)))\n            {\n                knight_kspell_start(3, caster, star, \\3);\n                global.spelldelay = 50;\n                break;\n            }\n\\2",
+  "why": "Dual Heal chosen by Kris is Kris shining their SOUL on Ralsei: soul-shine scene, then the heal uses Ralsei's magic (same multiplier the base/mod version uses).",
+  "regex": true
+ },
+ {
+  "id": "H20-soul-lock",
+  "variants": [
+   "base",
+   "kaizo",
+   "elec",
+   "violet",
+   "thorn",
+   "cyan"
+  ],
+  "entry": "gml_GlobalScript_scr_spellconsumeb",
+  "find": "    global.tensionselect = 0;\n    if (spellanim == 1)",
+  "replace": "    global.tensionselect = 0;\n    knight_soul_lock();\n    if (spellanim == 1)",
+  "why": "Choosing Red Buster / Dual Heal with Kris uses up Susie's / Ralsei's command for the turn (same flags the ACT versions set)."
+ },
+ {
+  "id": "H21-soul-text-rb",
+  "variants": [
+   "base",
+   "kaizo",
+   "elec",
+   "violet",
+   "thorn",
+   "cyan"
+  ],
+  "entry": "gml_GlobalScript_scr_spelltext",
+  "find": "            global.msg[0] = stringsetsubloc(\"* ~1 used RED BUSTER!/%\", global.charname[global.char[caster]], \"scr_spelltext_slash_scr_spelltext_gml_47_0\");",
+  "replace": "            global.msg[0] = stringsetsubloc(\"* ~1 used RED BUSTER!/%\", global.charname[global.char[caster]], \"scr_spelltext_slash_scr_spelltext_gml_47_0\");\n            if (global.char[caster] == 1)\n            {\n                global.msg[0] = \"* Your SOUL shined its power on Susie!/%\";\n            }",
+  "why": "The vanilla Red Buster ACT line."
+ },
+ {
+  "id": "H21-soul-text-dh",
+  "variants": [
+   "base",
+   "kaizo",
+   "elec",
+   "violet",
+   "thorn",
+   "cyan"
+  ],
+  "entry": "gml_GlobalScript_scr_spelltext",
+  "find": "            global.msg[0] = stringsetsubloc(\"* ~1 cast DUAL HEAL!/%\", global.charname[global.char[caster]], \"scr_spelltext_slash_scr_spelltext_gml_51_0\");",
+  "replace": "            global.msg[0] = stringsetsubloc(\"* ~1 cast DUAL HEAL!/%\", global.charname[global.char[caster]], \"scr_spelltext_slash_scr_spelltext_gml_51_0\");\n            if (global.char[caster] == 1)\n            {\n                global.msg[0] = \"* Your SOUL shined its power on Ralsei!/%\";\n            }",
+  "why": "Same line as the Red Buster ACT, for Ralsei (wording is this mod's, modelled on the vanilla Susie line)."
+ },
+ {
+  "id": "H16b-dualheal-cost",
+  "variants": [
+   "base",
+   "kaizo",
+   "elec",
+   "violet",
+   "thorn",
+   "cyan"
+  ],
+  "entry": "gml_GlobalScript_scr_spellinfo",
+  "find": "(scr_spellinfo_gml_78_0\"\\);\\n\\s+spelltarget = 0;\\n\\s+cost = )0;",
+  "replace": "\\g<1>125;",
+  "why": "Dual Heal costs 50% TP (125), like the Dual Heal ACT.",
+  "regex": true
+ },
+ {
+  "id": "H13-actor-stubs",
+  "variants": [
+   "base",
+   "kaizo",
+   "elec",
+   "violet",
+   "thorn",
+   "cyan"
+  ],
+  "entry": "gml_GlobalScript_scr_maincharacters_actors",
+  "find": "\\n\\}\\s*\\Z",
+  "replace": "\\n    knight_actor_stubs();\\n}\\n",
+  "why": "Hub fights can lack Susie / Ralsei: the game only makes su_actor / ra_actor for followers that exist, and the after-fight scene writes to them (\"Variable set failed x - read only variable?\"). Missing ones get invisible stand-ins.",
+  "regex": true
+ },
+ {
+  "id": "H14-kris-spellmenu-route",
+  "variants": [
+   "base",
+   "kaizo",
+   "elec",
+   "violet",
+   "thorn",
+   "cyan"
+  ],
+  "entry": "gml_Object_obj_battlecontroller_Step_0",
+  "find": "if (global.bmenucoord[0][global.charturn] == 1 && global.char[global.charturn] != 1)",
+  "replace": "if (global.bmenucoord[0][global.charturn] == 1 && (global.char[global.charturn] != 1 || knight_kris_menu()))",
+  "why": "Kris normally goes straight to the ACT list, so their spells (X-Slash, Red Buster) could never be picked. In hub fights where they have them, their command opens the magic list, which holds an ACT entry plus the spells."
+ },
+ {
+  "id": "H14-kris-act-entry",
+  "variants": [
+   "base",
+   "kaizo",
+   "elec",
+   "violet",
+   "thorn",
+   "cyan"
+  ],
+  "entry": "gml_Object_obj_battlecontroller_Step_0",
+  "find": "if (global.battlespell[thischar][global.bmenucoord[2][global.charturn]] != -1)\n                {\n                    scr_spellinfo(",
+  "replace": "if (knight_kris_actpick(thischar))\n                {\n                    global.bmenuno = knight_actpick_menu(thischar);\n                    onebuffer = 1;\n                }\n                else if (global.battlespell[thischar][global.bmenucoord[2][global.charturn]] != -1)\n                {\n                    scr_spellinfo(",
+  "why": "Choosing the ACT entry in Kris's magic list opens the normal ACT list."
+ },
+ {
+  "id": "H14-kris-no-act-rows",
+  "variants": [
+   "base",
+   "kaizo",
+   "elec",
+   "violet",
+   "cyan"
+  ],
+  "entry": "gml_GlobalScript_scr_spellmenu_setup",
+  "find": "            if (global.char[__i] == 1)\n            {\n                if (global.canact[0][__fj] == 1)",
+  "replace": "            if (global.char[__i] == 1 && !knight_kris_menu())\n            {\n                if (global.canact[0][__fj] == 1)",
+  "why": "With his magic list in use Kris gets one ACT entry (spell 7) instead of every ACT spelled out."
+ },
+ {
+  "id": "H15-redbuster-needs-susie-step",
+  "variants": [
+   "base",
+   "kaizo",
+   "elec",
+   "violet",
+   "thorn",
+   "cyan"
+  ],
+  "entry": "gml_Object_obj_battlecontroller_Step_0",
+  "find": "        global.tensionselect = global.battlespellcost[thischar][global.bmenucoord[2][global.charturn]];\n        var _confirm = true;\n",
+  "replace": "        global.tensionselect = global.battlespellcost[thischar][global.bmenucoord[2][global.charturn]];\n        var _confirm = true;\n        if (knight_redbuster_blocked(thischar, global.bmenucoord[2][global.charturn]))\n        {\n            _confirm = false;\n        }\n",
+  "why": "Red Buster needs Susie in the party and standing; otherwise it cannot be picked."
+ },
+ {
+  "id": "H15-redbuster-needs-susie-draw",
+  "variants": [
+   "base",
+   "kaizo",
+   "elec",
+   "violet",
+   "thorn",
+   "cyan"
+  ],
+  "entry": "gml_Object_obj_battlecontroller_Draw_0",
+  "find": "            _cant = 0;\n",
+  "replace": "            _cant = 0;\n            if (knight_redbuster_blocked(thischar, (page * 6) + (i * 2) + __n))\n            {\n                _cant = 1;\n            }\n",
+  "why": "Grey Red Buster out while Susie is not up."
+ },
+ {
+  "id": "H35-no-cmenu-in-battle",
+  "variants": [
+   "base",
+   "kaizo",
+   "elec",
+   "violet",
+   "thorn",
+   "cyan"
+  ],
+  "entry": "gml_Object_obj_mainchara_Step_0",
+  "find": "    if (button3_p() && threebuffer < 0)\n",
+  "replace": "    if (button3_p() && threebuffer < 0 && !(variable_global_exists(\"knight_run\") && global.knight_run == 1 && instance_exists(obj_battlecontroller)))\n",
+  "why": "The overworld C menu (ITEM/EQUIP/POWER/CONFIG) could be opened in the middle of a hub fight (interact is 0 there) and corrupted the battle UI; it is blocked while a hub battle is running."
+ },
+ {
+  "id": "H34-fix-target-slot",
+  "variants": [
+   "base",
+   "kaizo",
+   "elec",
+   "violet",
+   "thorn",
+   "cyan"
+  ],
+  "entry": "gml_GlobalScript_scr_damage",
+  "find": "\n        tdamage = damage;\n",
+  "replace": "\n        target = knight_fix_target(target);\n        tdamage = damage;\n",
+  "why": "After the knight redirect code, make sure the hit lands on a living party slot (the redirect used hp[1..3] by character: after Ralsei was lost it kept picking his empty slot, and Noelle never took hits properly)."
+ },
+ {
+  "id": "H33-soul-spell-partner-icon",
+  "variants": [
+   "base",
+   "kaizo",
+   "elec",
+   "violet",
+   "thorn",
+   "cyan"
+  ],
+  "entry": "gml_Object_obj_battlecontroller_Draw_0",
+  "find": "draw_text(xx + 30 + (__n * 230), yy + 375 + (i * 30), string_hash_to_newline(global.battlespellname[thischar][(page * 6) + (i * 2) + __n]));",
+  "replace": "var _sic = knight_soul_icon(thischar, (page * 6) + (i * 2) + __n);\n            if (_sic != -1)\n            {\n                draw_sprite_ext(_sic, 0, xx + 30 + (__n * 230), yy + 375 + (i * 30), 1, 1, 0, draw_get_color(), 1);\n            }\n            draw_text(xx + 30 + (__n * 230) + ((_sic != -1) ? 32 : 0), yy + 375 + (i * 30), string_hash_to_newline(global.battlespellname[thischar][(page * 6) + (i * 2) + __n]));",
+  "why": "Soul spells show the partner head icon (Susie/Ralsei/Noelle) like the ACT list does."
+ },
+ {
+  "id": "H16-redbuster-cost",
+  "variants": [
+   "base",
+   "kaizo",
+   "elec",
+   "violet",
+   "thorn",
+   "cyan"
+  ],
+  "entry": "gml_GlobalScript_scr_spellinfo",
+  "find": "(scr_spellinfo_gml_67_0\"\\);\\n\\s+spelltarget = 2;\\n\\s+cost = )0;",
+  "replace": "\\g<1>150;",
+  "why": "Red Buster costs 60% TP (150), like the Red Buster ACT.",
+  "regex": true
+ },
+ {
+  "id": "H16-redbuster-desc",
+  "variants": [
+   "base",
+   "kaizo",
+   "elec",
+   "violet",
+   "thorn",
+   "cyan"
+  ],
+  "entry": "gml_GlobalScript_scr_spellinfo",
+  "find": "spelldesc = stringsetloc(\" \", \"scr_spellinfo_slash_scr_spellinfo_gml_67_0\");",
+  "replace": "spelldesc = stringsetloc(\"Red-elemental damage to#one foe. Needs Susie to be up.\", \"scr_spellinfo_slash_scr_spellinfo_gml_67_0\");",
+  "why": "Red Buster menu description."
+ },
+ {
+  "id": "H30-soulshock-info",
+  "variants": [
+   "base",
+   "kaizo",
+   "elec",
+   "violet",
+   "thorn",
+   "cyan"
+  ],
+  "entry": "gml_GlobalScript_scr_spellinfo",
+  "find": "        case 11:\n",
+  "replace": "        case 12:\n            spellname = \"Permafrost\";\n            spellnameb = \"Permafrost\";\n            spelldescb = \"Red ICE#Damage\";\n            spelldesc = \"Kris shines their SOUL on Noelle,#who casts a red Ice Shock. Needs Noelle.\";\n            spelltarget = 2;\n            cost = 100;\n            spellusable = 0;\n            break;\n        case 11:\n",
+  "why": "New spell Permafrost (id 12, formerly SoulShock; Kris only): 100 TP (40%), Noelle casts it."
+ },
+ {
+  "id": "H30-soulshock-cast",
+  "variants": [
+   "base",
+   "kaizo",
+   "elec",
+   "violet",
+   "thorn",
+   "cyan"
+  ],
+  "entry": "gml_GlobalScript_scr_spell",
+  "find": "        case 8:\n            var _mistcount = 0;\n",
+  "replace": "        case 12:\n            cancelattack = 0;\n            global.spelldelay = 30;\n            if (global.monster[star] == 0)\n            {\n                scr_retarget_spell();\n            }\n            if (cancelattack == 0 && global.char[caster] == 1 && knight_soul_slot(4) >= 0)\n            {\n                damage = knight_soulshock_damage(knight_soul_slot(4), caster, star);\n                if (global.automiss[star] == 1)\n                {\n                    damage = 0;\n                }\n                global.spelldelay = 100;\n                knight_kspell_start(4, caster, star, damage);\n            }\n            break;\n        case 8:\n            var _mistcount = 0;\n",
+  "why": "SoulShock cast: soul-shine scene on Noelle, then the game's Ice Shock object (red) hits the knight with the X-Slash + Ice Shock combo x1.3."
+ },
+ {
+  "id": "H30-soulshock-text",
+  "variants": [
+   "base",
+   "kaizo",
+   "elec",
+   "violet",
+   "thorn",
+   "cyan"
+  ],
+  "entry": "gml_GlobalScript_scr_spelltext",
+  "find": "        case 11:\n            global.msg[0] = stringsetsubloc(\"* ~1 cast ULTRAHEAL!/%\"",
+  "replace": "        case 12:\n            global.msg[0] = \"* Your SOUL shined its power on Noelle!/%\";\n            break;\n        case 11:\n            global.msg[0] = stringsetsubloc(\"* ~1 cast ULTRAHEAL!/%\"",
+  "why": "SoulShock battle line, in the style of the Red Buster ACT line."
+ },
+ {
+  "id": "H36-fireshock-info",
+  "variants": [
+   "base",
+   "kaizo",
+   "elec",
+   "violet",
+   "thorn",
+   "cyan"
+  ],
+  "entry": "gml_GlobalScript_scr_spellinfo",
+  "find": "        case 12:\n            spellname = \"Permafrost\";",
+  "replace": "        case 13:\n            spellname = \"FireShock\";\n            spellnameb = \"FireShock\";\n            spelldescb = \"Damage#w/ FIRE\";\n            spelldesc = \"Deals magical FIRE damage to#one enemy.\";\n            spelltarget = 2;\n            cost = 40;\n            spellusable = 0;\n            break;\n        case 12:\n            spellname = \"Permafrost\";",
+  "why": "New spell FireShock (id 13, from Chapter 5): same cost as Ice Shock."
+ },
+ {
+  "id": "H36-fireshock-cast",
+  "variants": [
+   "base",
+   "kaizo",
+   "elec",
+   "violet",
+   "thorn",
+   "cyan"
+  ],
+  "entry": "gml_GlobalScript_scr_spell",
+  "find": "        case 12:\n            cancelattack = 0;\n            global.spelldelay = 30;",
+  "replace": "        case 13:\n            cancelattack = 0;\n            global.spelldelay = 30;\n            if (global.monster[star] == 0)\n            {\n                scr_retarget_spell();\n            }\n            if (cancelattack == 0)\n            {\n                damage = knight_fireshock_damage(arg1, star);\n                if (global.automiss[star] == 1)\n                {\n                    damage = 0;\n                }\n                global.spelldelay = 80;\n                knight_kspell_start(5, caster, star, damage);\n            }\n            break;\n        case 12:\n            cancelattack = 0;\n            global.spelldelay = 30;",
+  "why": "FireShock cast: Ralsei fireball pose (Chapter 5 sprites), fast fireball, Chapter 5 flame burst on the knight."
+ },
+ {
+  "id": "H36-fireshock-text",
+  "variants": [
+   "base",
+   "kaizo",
+   "elec",
+   "violet",
+   "thorn",
+   "cyan"
+  ],
+  "entry": "gml_GlobalScript_scr_spelltext",
+  "find": "        case 12:\n            global.msg[0] = \"* Your SOUL shined its power on Noelle!/%\";",
+  "replace": "        case 13:\n            global.msg[0] = stringsetsub(\"* ~1 cast FIRESHOCK!/%\", global.charname[global.char[caster]]);\n            break;\n        case 12:\n            global.msg[0] = \"* Your SOUL shined its power on Noelle!/%\";",
+  "why": "FireShock battle line."
+ },
+ {
+  "id": "H38-heatwave-frostfire-info",
+  "variants": [
+   "base",
+   "kaizo",
+   "elec",
+   "violet",
+   "thorn",
+   "cyan"
+  ],
+  "entry": "gml_GlobalScript_scr_spellinfo",
+  "find": "        case 13:\n            spellname = \"FireShock\";",
+  "replace": "        case 15:\n            spellname = \"Frostfire\";\n            spellnameb = \"Frostfire\";\n            spelldescb = \"ICE + FIRE#Duo spell\";\n            spelldesc = \"Ralsei and Noelle cast FireShock#and Ice Shock together. Needs both.\";\n            spelltarget = 2;\n            cost = 55;\n            spellusable = 0;\n            break;\n        case 14:\n            spellname = \"Heatwave\";\n            spellnameb = \"Heatwave\";\n            spelldescb = \"Blue FIRE#Damage\";\n            spelldesc = \"Kris shines their SOUL on Ralsei,#who throws a blue FireShock. Needs Ralsei.\";\n            spelltarget = 2;\n            cost = 125;\n            spellusable = 0;\n            break;\n        case 13:\n            spellname = \"FireShock\";",
+  "why": "New spells Heatwave (14, 125 TP = 50%) and Frostfire (15, 55 TP = 22%)."
+ },
+ {
+  "id": "H38-heatwave-frostfire-cast",
+  "variants": [
+   "base",
+   "kaizo",
+   "elec",
+   "violet",
+   "thorn",
+   "cyan"
+  ],
+  "entry": "gml_GlobalScript_scr_spell",
+  "find": "        case 13:\n            cancelattack = 0;\n            global.spelldelay = 30;",
+  "replace": "        case 15:\n            cancelattack = 0;\n            global.spelldelay = 30;\n            if (global.monster[star] == 0)\n            {\n                scr_retarget_spell();\n            }\n            if (cancelattack == 0 && (global.char[caster] == 3 || global.char[caster] == 4))\n            {\n                if (knight_frostfire_start(caster, star))\n                {\n                    global.spelldelay = 110;\n                }\n            }\n            break;\n        case 14:\n            cancelattack = 0;\n            global.spelldelay = 30;\n            if (global.monster[star] == 0)\n            {\n                scr_retarget_spell();\n            }\n            if (cancelattack == 0 && global.char[caster] == 1 && knight_soul_slot(3) >= 0)\n            {\n                damage = knight_heatwave_damage(knight_soul_slot(3), caster, star);\n                if (global.automiss[star] == 1)\n                {\n                    damage = 0;\n                }\n                global.spelldelay = 110;\n                knight_kspell_start(6, caster, star, damage);\n            }\n            break;\n        case 13:\n            cancelattack = 0;\n            global.spelldelay = 30;",
+  "why": "Heatwave: soul scene on Ralsei then a blue FireShock; Frostfire: both cast, Ice Shock and FireShock land together."
+ },
+ {
+  "id": "H38-heatwave-frostfire-text",
+  "variants": [
+   "base",
+   "kaizo",
+   "elec",
+   "violet",
+   "thorn",
+   "cyan"
+  ],
+  "entry": "gml_GlobalScript_scr_spelltext",
+  "find": "        case 13:\n            global.msg[0] = stringsetsub(\"* ~1 cast FIRESHOCK!/%\", global.charname[global.char[caster]]);",
+  "replace": "        case 15:\n            global.msg[0] = global.charname[3] + \" and \" + global.charname[4] + \" cast FROSTFIRE!/%\";\n            break;\n        case 14:\n            global.msg[0] = \"* Your SOUL shined its power on Ralsei!/%\";\n            break;\n        case 13:\n            global.msg[0] = stringsetsub(\"* ~1 cast FIRESHOCK!/%\", global.charname[global.char[caster]]);",
+  "why": "Heatwave / Frostfire battle lines."
+ },
+ {
+  "id": "H37-fireshock-precast-pose",
+  "variants": [
+   "base",
+   "kaizo",
+   "elec",
+   "violet",
+   "thorn",
+   "cyan"
+  ],
+  "entry": "gml_Object_obj_heroparent_Step_0",
+  "find": "        thissprite = spellsprite;\n        index = image_index;\n        attacktimer += 0.5;",
+  "replace": "        thissprite = spellsprite;\n        index = image_index;\n        if (knight_fire_pose(myself))\n        {\n            sprite_set_offset(spr_ralsei_spell_fireball_right, 7, -5);\n            thissprite = spr_ralsei_spell_fireball_right;\n            index = min(2, floor(attacktimer / 2.7));\n        }\n        attacktimer += 0.5;",
+  "why": "While Ralsei winds up a FireShock he holds the Chapter 5 fireball (frames 0-2) instead of his normal cast pose."
+ },
+ {
+  "id": "H31-iceshock-scale",
+  "variants": [
+   "base",
+   "elec",
+   "violet",
+   "thorn",
+   "cyan"
+  ],
+  "entry": "gml_GlobalScript_scr_spell",
+  "find": "damage = ceil((minbattlemag * 30) + 90 + random(10));",
+  "replace": "damage = ceil((minbattlemag * 30) + 90 + random(10));\n                damage = knight_iceshock_damage(arg1, star, damage);",
+  "why": "Ice Shock was never scaled by the knight's damage reduction (Rude Buster is: damage * (reduction + 0.65)); scale it the same way. Kaizo keeps its own division."
+ },
+ {
+  "id": "H32-icespell-red-ring",
+  "variants": [
+   "base",
+   "kaizo",
+   "elec",
+   "violet",
+   "thorn",
+   "cyan"
+  ],
+  "entry": "gml_Object_obj_icespell_Draw_0",
+  "find": "draw_set_color\\(c_white\\);\\n(\\s+)draw_circle\\(x, y, 60 - \\(timer \\* 6\\), true\\);",
+  "replace": "draw_set_color((variable_instance_exists(id, \"red\") && red) ? c_red : c_white);\\n\\1draw_circle(x, y, 60 - (timer * 6), true);",
+  "why": "Red Ice Shock (SoulShock): the rings are drawn red.",
+  "regex": true
+ },
+ {
+  "id": "H32-icespell-red-hex",
+  "variants": [
+   "base",
+   "kaizo",
+   "elec",
+   "violet",
+   "thorn",
+   "cyan"
+  ],
+  "entry": "gml_Object_obj_icespell_hexagon_Create_0",
+  "find": "rotspeed = 4;\n",
+  "replace": "rotspeed = 4;\nif (instance_exists(obj_icespell) && variable_instance_exists(obj_icespell, \"red\") && obj_icespell.red)\n    image_blend = c_red;\n",
+  "why": "Red Ice Shock (SoulShock): the hexagons are tinted red."
+ },
+ {
+  "id": "H39-cone-cleanup-guard-ne_",
+  "variants": [
+   "base",
+   "kaizo",
+   "elec",
+   "violet",
+   "thorn",
+   "cyan"
+  ],
+  "entry": "gml_Object_obj_knight_pointing_cone_CleanUp_0",
+  "find": "if (!obj_knight_enemy.visible)\n{\n    obj_knight_enemy.visible = true;\n    obj_knight_enemy.aetimer = aetimer;\n}",
+  "replace": "if (i_ex(obj_knight_enemy))\n{\n    if (!obj_knight_enemy.visible)\n    {\n        obj_knight_enemy.visible = true;\n        obj_knight_enemy.aetimer = aetimer;\n    }\n}",
+  "why": "Leaving a fight destroys the knight before the pointing cone cleans up: reading obj_knight_enemy then crashed (\"Unable to find any instance for object index 345 name obj_knight_enemy\")."
+ },
+ {
+  "id": "H39-cone-cleanup-guard-py_",
+  "variants": [
+   "thorn"
+  ],
+  "entry": "gml_Object_obj_knight_pointing_cone_Copy_CleanUp_0",
+  "find": "if (!obj_knight_enemy.visible)\n{\n    obj_knight_enemy.visible = true;\n    obj_knight_enemy.aetimer = aetimer;\n}",
+  "replace": "if (i_ex(obj_knight_enemy))\n{\n    if (!obj_knight_enemy.visible)\n    {\n        obj_knight_enemy.visible = true;\n        obj_knight_enemy.aetimer = aetimer;\n    }\n}",
+  "why": "Leaving a fight destroys the knight before the pointing cone cleans up: reading obj_knight_enemy then crashed (\"Unable to find any instance for object index 345 name obj_knight_enemy\")."
+ },
+ {
+  "id": "H50-rslash-cleanup-guard",
+  "variants": [
+   "kaizo"
+  ],
+  "entry": "gml_Object_obj_knight_rotating_slash_CleanUp_0",
+  "find": "if (kaizo_sideb() && obj_knight_enemy.myattackchoice == 111)",
+  "replace": "if (kaizo_sideb() && i_ex(obj_knight_enemy) && obj_knight_enemy.myattackchoice == 111)",
+  "why": "The knight gone before the rotating slash cleans up (pausing, leaving): reading obj_knight_enemy crashed."
+ },
+ {
+  "id": "H50-prac-hp-cc-dmg2",
+  "variants": [
+   "kaizo"
+  ],
+  "entry": "gml_GlobalScript_scr_damage",
+  "find": "            if (scr_havechar(4)) { global.hp[4] = global.maxhp[4] * 2; }\n",
+  "replace": "            if (scr_havechar(4)) { global.hp[4] = global.maxhp[4] * 2; }\n            knight_prac_hp_cc(2);\n",
+  "why": "Practice mode: HP kept up for the custom characters too (Flowery died in practice)."
+ },
+ {
+  "id": "H50-prac-hp-cc-dmg1",
+  "variants": [
+   "kaizo"
+  ],
+  "entry": "gml_GlobalScript_scr_damage",
+  "find": "            if (scr_havechar(4)) { global.hp[4] = global.maxhp[4]; }\n",
+  "replace": "            if (scr_havechar(4)) { global.hp[4] = global.maxhp[4]; }\n            knight_prac_hp_cc(1);\n",
+  "why": "Practice mode: HP kept up for the custom characters too."
+ },
+ {
+  "id": "H50-prac-hp-cc-max2",
+  "variants": [
+   "kaizo"
+  ],
+  "entry": "gml_GlobalScript_scr_damage_maxhp",
+  "find": "            global.hp[4] = global.maxhp[4] * 2;\n",
+  "replace": "            global.hp[4] = global.maxhp[4] * 2;\n            knight_prac_hp_cc(2);\n",
+  "why": "Practice mode: HP kept up for the custom characters too."
+ },
+ {
+  "id": "H50-prac-hp-cc-max1",
+  "variants": [
+   "kaizo"
+  ],
+  "entry": "gml_GlobalScript_scr_damage_maxhp",
+  "find": "            global.hp[4] = global.maxhp[4];\n",
+  "replace": "            global.hp[4] = global.maxhp[4];\n            knight_prac_hp_cc(1);\n",
+  "why": "Practice mode: HP kept up for the custom characters too."
+ },
+ {
+  "id": "H50-kroar-hpstrip-cc",
+  "variants": [
+   "kaizo"
+  ],
+  "entry": "gml_Object_obj_knight_roaring2_Other_22",
+  "find": "            var _charcolor = obj_darkcontroller.hpcolor[_char - 1];",
+  "replace": "            var _charcolor = ((_char - 1) < array_length(obj_darkcontroller.hpcolor)) ? obj_darkcontroller.hpcolor[_char - 1] : knight_cc_hpcolor(_char);",
+  "why": "Kaizo Roaring HP strip: a custom character (Flowery, 5) read past hpcolor (4 entries): crash."
+ },
+ {
+  "id": "H50-kroar-hpstrip-cc-icon",
+  "variants": [
+   "kaizo"
+  ],
+  "entry": "gml_Object_obj_knight_roaring2_Other_22",
+  "find": "            draw_sprite(_charicon[_char], _charind, _x + 3, 4);",
+  "replace": "            if (_char < array_length(_charicon))\n                draw_sprite(_charicon[_char], _charind, _x + 3, 4);\n            else\n                knight_cc_roar_head(_char, _x + 3, 4);",
+  "why": "Kaizo Roaring HP strip: a custom character has no icon in its list: its own head instead."
+ },
+ {
+  "id": "H40-cone-own-sprite",
+  "variants": [
+   "kaizo",
+   "violet",
+   "thorn",
+   "cyan"
+  ],
+  "entry": "gml_Object_obj_knight_pointing_cone_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_roaringknight_point_ol;\\n",
+  "why": "The pointing-cone attack drew the object default sprite (the NORMAL knight art in the merged game). Each variant now starts the cone with its own knight sprite.",
+  "regex": true
+ },
+ {
+  "id": "H40-cone-copy-own-sprite",
+  "variants": [
+   "thorn"
+  ],
+  "entry": "gml_Object_obj_knight_pointing_cone_Copy_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_roaringknight_point_ol;\\n",
+  "why": "The pointing-cone attack drew the object default sprite (the NORMAL knight art in the merged game). Each variant now starts the cone with its own knight sprite.",
+  "regex": true
+ },
+ {
+  "id": "H41-pstar-own-sprite",
+  "variants": [
+   "kaizo",
+   "thorn",
+   "cyan"
+  ],
+  "entry": "gml_Object_obj_knight_pointing_star_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_knight_bullet_star;\\n",
+  "why": "Star bullets of the cone / roaring attacks use the object default sprite for their size and drawing: in the merged game that was the NORMAL knight star for every variant. Each variant now starts with its own star sprite.",
+  "regex": true
+ },
+ {
+  "id": "H41-pstar-copy-own-sprite",
+  "variants": [
+   "thorn"
+  ],
+  "entry": "gml_Object_obj_knight_pointing_star_Copy_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_knight_bullet_star;\\n",
+  "why": "Star bullets of the cone / roaring attacks use the object default sprite for their size and drawing: in the merged game that was the NORMAL knight star for every variant. Each variant now starts with its own star sprite.",
+  "regex": true
+ },
+ {
+  "id": "H41-rstar-own-sprite",
+  "variants": [
+   "kaizo",
+   "thorn",
+   "cyan"
+  ],
+  "entry": "gml_Object_obj_knight_roaring_star_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_knight_bullet_star;\\n",
+  "why": "Star bullets of the cone / roaring attacks use the object default sprite for their size and drawing: in the merged game that was the NORMAL knight star for every variant. Each variant now starts with its own star sprite.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-kaizo-obj_roaringknight_boxsplitter_attack",
+  "variants": [
+   "kaizo"
+  ],
+  "entry": "gml_Object_obj_roaringknight_boxsplitter_attack_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_roaringknight_attack_ol;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-kaizo-obj_knight_weird_circle_bullet",
+  "variants": [
+   "kaizo"
+  ],
+  "entry": "gml_Object_obj_knight_weird_circle_bullet_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_knight_weird_shape;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-kaizo-obj_shootout_beeg_tenna_shot",
+  "variants": [
+   "kaizo"
+  ],
+  "entry": "gml_Object_obj_shootout_beeg_tenna_shot_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_smallbullet;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-kaizo-obj_knight_tunnel_slasher",
+  "variants": [
+   "kaizo"
+  ],
+  "entry": "gml_Object_obj_knight_tunnel_slasher_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_roaringknight_attack_ol;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-kaizo-obj_knight_roaring_fx",
+  "variants": [
+   "kaizo"
+  ],
+  "entry": "gml_Object_obj_knight_roaring_fx_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_roaringknight_attack_ol;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-kaizo-obj_roaringknight_quickslash_afterimage",
+  "variants": [
+   "kaizo"
+  ],
+  "entry": "gml_Object_obj_roaringknight_quickslash_afterimage_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_roaringknight_front_slash;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-kaizo-obj_knight_diamondswordbullet_ext",
+  "variants": [
+   "kaizo"
+  ],
+  "entry": "gml_Object_obj_knight_diamondswordbullet_ext_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_knight_diamondswordbullet;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-kaizo-obj_knight_enemy",
+  "variants": [
+   "kaizo"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_roaringknight_idle;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-kaizo-obj_roaringknight_quickslash_attack",
+  "variants": [
+   "kaizo"
+  ],
+  "entry": "gml_Object_obj_roaringknight_quickslash_attack_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_roaringknight_attack_ol;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-kaizo-obj_ch3_PTB02_roaringknight",
+  "variants": [
+   "kaizo"
+  ],
+  "entry": "gml_Object_obj_ch3_PTB02_roaringknight_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_roaringknight_idle_overworld_sword;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-kaizo-obj_knight_pointing_starchild",
+  "variants": [
+   "kaizo"
+  ],
+  "entry": "gml_Object_obj_knight_pointing_starchild_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_knight_starchild;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-kaizo-obj_knight_roaring2",
+  "variants": [
+   "kaizo"
+  ],
+  "entry": "gml_Object_obj_knight_roaring2_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_roaringknight_attack_ol;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-kaizo-obj_diagonal_bullet",
+  "variants": [
+   "kaizo"
+  ],
+  "entry": "gml_Object_obj_diagonal_bullet_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_smallbullet;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-kaizo-obj_knight_swordfall",
+  "variants": [
+   "kaizo"
+  ],
+  "entry": "gml_Object_obj_knight_swordfall_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_roaringknight_attack_ol;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-kaizo-obj_knight_rotating_slash",
+  "variants": [
+   "kaizo"
+  ],
+  "entry": "gml_Object_obj_knight_rotating_slash_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_roaringknight_attack_ol;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-kaizo-obj_roaringknight_split_bullet",
+  "variants": [
+   "kaizo"
+  ],
+  "entry": "gml_Object_obj_roaringknight_split_bullet_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_roaringknight_tooth;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-kaizo-obj_knight_tunnel_slasher_2_revised",
+  "variants": [
+   "kaizo"
+  ],
+  "entry": "gml_Object_obj_knight_tunnel_slasher_2_revised_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_roaringknight_attack_ol;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-kaizo-obj_bullet_knight_tunnelslash",
+  "variants": [
+   "kaizo"
+  ],
+  "entry": "gml_Object_obj_bullet_knight_tunnelslash_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_roaringknight_slash_tunnel;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-kaizo-obj_knight_crescentslash_slashinganimation",
+  "variants": [
+   "kaizo"
+  ],
+  "entry": "gml_Object_obj_knight_crescentslash_slashinganimation_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_knight_crescentslash;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-kaizo-obj_knight_warp",
+  "variants": [
+   "kaizo"
+  ],
+  "entry": "gml_Object_obj_knight_warp_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_knight_warp;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-kaizo-obj_timed_bullet",
+  "variants": [
+   "kaizo"
+  ],
+  "entry": "gml_Object_obj_timed_bullet_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_smallbullet;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-kaizo-obj_shootout_bullet",
+  "variants": [
+   "kaizo"
+  ],
+  "entry": "gml_Object_obj_shootout_bullet_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_smallbullet;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-kaizo-obj_knight_weird_bottom_manager",
+  "variants": [
+   "kaizo"
+  ],
+  "entry": "gml_Object_obj_knight_weird_bottom_manager_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_knight_warp;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-kaizo-obj_sword_tunnel_sword",
+  "variants": [
+   "kaizo"
+  ],
+  "entry": "gml_Object_obj_sword_tunnel_sword_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_knight_diamondbullet_l;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-kaizo-obj_tensionbar",
+  "variants": [
+   "kaizo"
+  ],
+  "entry": "gml_Object_obj_tensionbar_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_tensionbar;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-kaizo-obj_ralseibullet",
+  "variants": [
+   "kaizo"
+  ],
+  "entry": "gml_Object_obj_ralseibullet_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_smallbullet;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-kaizo-obj_dbullet_maker",
+  "variants": [
+   "kaizo"
+  ],
+  "entry": "gml_Object_obj_dbullet_maker_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_diamondbullet_form;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-kaizo-obj_knight_slasher",
+  "variants": [
+   "kaizo"
+  ],
+  "entry": "gml_Object_obj_knight_slasher_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_roaringknight_attack_ol;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-kaizo-obj_knight_stream",
+  "variants": [
+   "kaizo"
+  ],
+  "entry": "gml_Object_obj_knight_stream_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_roaringknight_attack_ol;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-elec-obj_bullet_knightcrescent",
+  "variants": [
+   "elec"
+  ],
+  "entry": "gml_Object_obj_bullet_knightcrescent_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_bullet_knightcrescent;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-elec-obj_knight_rotating_slash",
+  "variants": [
+   "elec"
+  ],
+  "entry": "gml_Object_obj_knight_rotating_slash_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_roaringknight_attack_ol_temp;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-elec-obj_tensionbar",
+  "variants": [
+   "elec"
+  ],
+  "entry": "gml_Object_obj_tensionbar_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_tensionbar;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-violet-obj_roaringknight_boxsplitter_attack",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_roaringknight_boxsplitter_attack_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_roaringknight_attack_ol;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-violet-obj_shootout_beeg_tenna_shot",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_shootout_beeg_tenna_shot_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_smallbullet;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-violet-obj_knight_tunnel_slasher",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_knight_tunnel_slasher_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_roaringknight_attack_ol;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-violet-obj_knight_roaring_fx",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_knight_roaring_fx_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_roaringknight_attack_ol;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-violet-obj_roaringknight_quickslash_afterimage",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_roaringknight_quickslash_afterimage_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_roaringknight_front_slash;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-violet-obj_knight_enemy",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_roaringknight_idle;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-violet-obj_roaringknight_quickslash_attack",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_roaringknight_quickslash_attack_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_roaringknight_attack_ol;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-violet-obj_bullet_knightcrescent",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_bullet_knightcrescent_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_bullet_knightcrescent;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-violet-obj_ch3_PTB02_roaringknight",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_ch3_PTB02_roaringknight_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_roaringknight_idle_overworld_sword;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-violet-obj_knight_roaring2",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_knight_roaring2_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_roaringknight_attack_ol;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-violet-obj_diagonal_bullet",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_diagonal_bullet_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_smallbullet;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-violet-obj_knight_swordfall",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_knight_swordfall_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_roaringknight_attack_ol;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-violet-obj_knight_rotating_slash",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_knight_rotating_slash_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_roaringknight_attack_ol;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-violet-obj_knight_tunnel_slasher_2_revised",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_knight_tunnel_slasher_2_revised_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_roaringknight_attack_ol;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-violet-obj_bullet_knight_tunnelslash",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_bullet_knight_tunnelslash_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_roaringknight_slash_tunnel;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-violet-obj_knight_crescentslash_slashinganimation",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_knight_crescentslash_slashinganimation_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_knight_crescentslash;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-violet-obj_knight_warp",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_knight_warp_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_knight_warp;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-violet-obj_timed_bullet",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_timed_bullet_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_smallbullet;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-violet-obj_shootout_bullet",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_shootout_bullet_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_smallbullet;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-violet-obj_knight_weird_bottom_manager",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_knight_weird_bottom_manager_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_knight_warp;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-violet-obj_ralseibullet",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_ralseibullet_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_smallbullet;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-violet-obj_knight_slasher",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_knight_slasher_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_roaringknight_attack_ol;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-violet-obj_knight_stream",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_knight_stream_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_roaringknight_point_ol;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-violet-obj_knight_roaring3",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_knight_roaring3_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_roaringknight_attack_ol;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-violet-obj_not_stolen_from_kaizo",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_not_stolen_from_kaizo_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_roaringknight_attack_ol;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-thorn-obj_roaringknight_boxsplitter_attack",
+  "variants": [
+   "thorn"
+  ],
+  "entry": "gml_Object_obj_roaringknight_boxsplitter_attack_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_roaringknight_attack_ol;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-thorn-obj_knight_weird_circle_bullet",
+  "variants": [
+   "thorn"
+  ],
+  "entry": "gml_Object_obj_knight_weird_circle_bullet_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_knight_weird_shape;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-thorn-obj_fallingsword",
+  "variants": [
+   "thorn"
+  ],
+  "entry": "gml_Object_obj_fallingsword_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_roaringknight_sword_ol;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-thorn-obj_knight_tunnel_slasher",
+  "variants": [
+   "thorn"
+  ],
+  "entry": "gml_Object_obj_knight_tunnel_slasher_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_roaringknight_attack_ol;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-thorn-obj_knight_roaring_fx",
+  "variants": [
+   "thorn"
+  ],
+  "entry": "gml_Object_obj_knight_roaring_fx_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_roaringknight_attack_ol;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-thorn-obj_roaringknight_quickslash_afterimage",
+  "variants": [
+   "thorn"
+  ],
+  "entry": "gml_Object_obj_roaringknight_quickslash_afterimage_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_roaringknight_front_slash;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-thorn-obj_sword_vortex",
+  "variants": [
+   "thorn"
+  ],
+  "entry": "gml_Object_obj_sword_vortex_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_roaringknight_sword_ol;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-thorn-obj_sword_break_vfx4",
+  "variants": [
+   "thorn"
+  ],
+  "entry": "gml_Object_obj_sword_break_vfx4_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_roaringknight_sword_break_piece;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-thorn-obj_knight_enemy",
+  "variants": [
+   "thorn"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_roaringknight_idle;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-thorn-obj_roaringknight_quickslash_attack",
+  "variants": [
+   "thorn"
+  ],
+  "entry": "gml_Object_obj_roaringknight_quickslash_attack_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_roaringknight_attack_ol;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-thorn-obj_bullet_knightcrescent",
+  "variants": [
+   "thorn"
+  ],
+  "entry": "gml_Object_obj_bullet_knightcrescent_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_bullet_knightcrescent;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-thorn-obj_ch3_PTB02_roaringknight",
+  "variants": [
+   "thorn"
+  ],
+  "entry": "gml_Object_obj_ch3_PTB02_roaringknight_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_roaringknight_idle_overworld_sword;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-thorn-obj_knight_pointing_starchild",
+  "variants": [
+   "thorn"
+  ],
+  "entry": "gml_Object_obj_knight_pointing_starchild_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_knight_starchild;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-thorn-obj_knight_roaring2",
+  "variants": [
+   "thorn"
+  ],
+  "entry": "gml_Object_obj_knight_roaring2_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_roaringknight_attack_ol;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-thorn-obj_diagonal_bullet",
+  "variants": [
+   "thorn"
+  ],
+  "entry": "gml_Object_obj_diagonal_bullet_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_smallbullet_red;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-thorn-obj_knight_swordfall",
+  "variants": [
+   "thorn"
+  ],
+  "entry": "gml_Object_obj_knight_swordfall_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_roaringknight_attack_ol;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-thorn-obj_knight_rotating_slash",
+  "variants": [
+   "thorn"
+  ],
+  "entry": "gml_Object_obj_knight_rotating_slash_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_roaringknight_attack_ol;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-thorn-obj_heart_follower",
+  "variants": [
+   "thorn"
+  ],
+  "entry": "gml_Object_obj_heart_follower_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_hiddenheart;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-thorn-obj_roaringknight_split_bullet",
+  "variants": [
+   "thorn"
+  ],
+  "entry": "gml_Object_obj_roaringknight_split_bullet_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_roaringknight_tooth;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-thorn-obj_knight_tunnel_slasher_2_revised",
+  "variants": [
+   "thorn"
+  ],
+  "entry": "gml_Object_obj_knight_tunnel_slasher_2_revised_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_roaringknight_attack_ol;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-thorn-obj_knight_crescentslash_slashinganimation",
+  "variants": [
+   "thorn"
+  ],
+  "entry": "gml_Object_obj_knight_crescentslash_slashinganimation_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_knight_crescentslash;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-thorn-obj_tracking_sword1",
+  "variants": [
+   "thorn"
+  ],
+  "entry": "gml_Object_obj_tracking_sword1_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_roaringknight_sword_ol;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-thorn-obj_knight_warp",
+  "variants": [
+   "thorn"
+  ],
+  "entry": "gml_Object_obj_knight_warp_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_knight_warp;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-thorn-obj_berdlyb_spearblast_trail",
+  "variants": [
+   "thorn"
+  ],
+  "entry": "gml_Object_obj_berdlyb_spearblast_trail_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_spearblast_trail;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-thorn-obj_knight_weird_bottom_manager",
+  "variants": [
+   "thorn"
+  ],
+  "entry": "gml_Object_obj_knight_weird_bottom_manager_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_knight_warp;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-thorn-obj_berdlyb_spearblast_mini",
+  "variants": [
+   "thorn"
+  ],
+  "entry": "gml_Object_obj_berdlyb_spearblast_mini_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_spearblast_trail;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-thorn-obj_sword_tunnel_sword",
+  "variants": [
+   "thorn"
+  ],
+  "entry": "gml_Object_obj_sword_tunnel_sword_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_knight_diamondbullet_l;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-thorn-obj_spell_snowgrave",
+  "variants": [
+   "thorn"
+  ],
+  "entry": "gml_Object_obj_spell_snowgrave_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_icespell_snowflake;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-thorn-obj_spell_snowgrave_snowflake",
+  "variants": [
+   "thorn"
+  ],
+  "entry": "gml_Object_obj_spell_snowgrave_snowflake_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_icespell_snowflake;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-thorn-obj_icespell",
+  "variants": [
+   "thorn"
+  ],
+  "entry": "gml_Object_obj_icespell_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_icespell_snowflake;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-thorn-obj_icespell_hexagon",
+  "variants": [
+   "thorn"
+  ],
+  "entry": "gml_Object_obj_icespell_hexagon_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_icespell_snowflake;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-thorn-obj_heart_follower_overshoot",
+  "variants": [
+   "thorn"
+  ],
+  "entry": "gml_Object_obj_heart_follower_overshoot_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_hiddenheart;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-thorn-obj_dbullet_maker",
+  "variants": [
+   "thorn"
+  ],
+  "entry": "gml_Object_obj_dbullet_maker_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_diamondbullet_form;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-thorn-obj_knight_slasher",
+  "variants": [
+   "thorn"
+  ],
+  "entry": "gml_Object_obj_knight_slasher_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_roaringknight_attack_ol;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-thorn-obj_knight_stream",
+  "variants": [
+   "thorn"
+  ],
+  "entry": "gml_Object_obj_knight_stream_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_roaringknight_attack_ol;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-thorn-obj_tracking_sword1_Copy",
+  "variants": [
+   "thorn"
+  ],
+  "entry": "gml_Object_obj_tracking_sword1_Copy_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_roaringknight_sword_ol;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-thorn-obj_tracking_sword1_Copy_Copy",
+  "variants": [
+   "thorn"
+  ],
+  "entry": "gml_Object_obj_tracking_sword1_Copy_Copy_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_knight_diamondbullet_l;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-thorn-obj_roaringknight_boxsplitter_attack_Copy",
+  "variants": [
+   "thorn"
+  ],
+  "entry": "gml_Object_obj_roaringknight_boxsplitter_attack_Copy_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_roaringknight_attack_ol;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-thorn-obj_sword_tunnel_sword_Copy",
+  "variants": [
+   "thorn"
+  ],
+  "entry": "gml_Object_obj_sword_tunnel_sword_Copy_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_roaringknight_sword_ol;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-thorn-obj_knight_rotating_slash_Copy",
+  "variants": [
+   "thorn"
+  ],
+  "entry": "gml_Object_obj_knight_rotating_slash_Copy_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_roaringknight_attack_ol;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-thorn-obj_suitbomb",
+  "variants": [
+   "thorn"
+  ],
+  "entry": "gml_Object_obj_suitbomb_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_knight_starchild_parts;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-thorn-obj_knight_pointing_starchild_Copy",
+  "variants": [
+   "thorn"
+  ],
+  "entry": "gml_Object_obj_knight_pointing_starchild_Copy_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_knight_starchild;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-cyan-obj_roaringknight_boxsplitter_attack",
+  "variants": [
+   "cyan"
+  ],
+  "entry": "gml_Object_obj_roaringknight_boxsplitter_attack_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_roaringknight_attack_ol;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-cyan-obj_knight_weird_circle_bullet",
+  "variants": [
+   "cyan"
+  ],
+  "entry": "gml_Object_obj_knight_weird_circle_bullet_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_knight_weird_shape;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-cyan-obj_fallingsword",
+  "variants": [
+   "cyan"
+  ],
+  "entry": "gml_Object_obj_fallingsword_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_devilsknife;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-cyan-obj_shootout_beeg_tenna_shot",
+  "variants": [
+   "cyan"
+  ],
+  "entry": "gml_Object_obj_shootout_beeg_tenna_shot_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_smallbullet;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-cyan-obj_knight_tunnel_slasher",
+  "variants": [
+   "cyan"
+  ],
+  "entry": "gml_Object_obj_knight_tunnel_slasher_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_roaringknight_attack_ol;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-cyan-obj_knight_roaring_fx",
+  "variants": [
+   "cyan"
+  ],
+  "entry": "gml_Object_obj_knight_roaring_fx_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_roaringknight_attack_ol;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-cyan-obj_roaringknight_quickslash_afterimage",
+  "variants": [
+   "cyan"
+  ],
+  "entry": "gml_Object_obj_roaringknight_quickslash_afterimage_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_roaringknight_front_slash;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-cyan-obj_knight_diamondswordbullet_ext",
+  "variants": [
+   "cyan"
+  ],
+  "entry": "gml_Object_obj_knight_diamondswordbullet_ext_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_knight_diamondswordbullet;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-cyan-obj_knight_enemy",
+  "variants": [
+   "cyan"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_roaringknight_idle;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-cyan-obj_roaringknight_quickslash_attack",
+  "variants": [
+   "cyan"
+  ],
+  "entry": "gml_Object_obj_roaringknight_quickslash_attack_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_roaringknight_attack_ol;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-cyan-obj_bullet_knightcrescent",
+  "variants": [
+   "cyan"
+  ],
+  "entry": "gml_Object_obj_bullet_knightcrescent_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_bullet_knightcrescent;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-cyan-obj_ch3_PTB02_roaringknight",
+  "variants": [
+   "cyan"
+  ],
+  "entry": "gml_Object_obj_ch3_PTB02_roaringknight_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_roaringknight_idle_overworld_sword;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-cyan-obj_knight_pointing_starchild",
+  "variants": [
+   "cyan"
+  ],
+  "entry": "gml_Object_obj_knight_pointing_starchild_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_knight_starchild;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-cyan-obj_knight_roaring2",
+  "variants": [
+   "cyan"
+  ],
+  "entry": "gml_Object_obj_knight_roaring2_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_roaringknight_attack_ol;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-cyan-obj_diagonal_bullet",
+  "variants": [
+   "cyan"
+  ],
+  "entry": "gml_Object_obj_diagonal_bullet_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_smallbullet;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-cyan-obj_knight_swordfall",
+  "variants": [
+   "cyan"
+  ],
+  "entry": "gml_Object_obj_knight_swordfall_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_roaringknight_attack_ol;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-cyan-obj_knight_rotating_slash",
+  "variants": [
+   "cyan"
+  ],
+  "entry": "gml_Object_obj_knight_rotating_slash_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_roaringknight_attack_ol;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-cyan-obj_roaringknight_split_bullet",
+  "variants": [
+   "cyan"
+  ],
+  "entry": "gml_Object_obj_roaringknight_split_bullet_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_roaringknight_tooth;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-cyan-obj_knight_tunnel_slasher_2_revised",
+  "variants": [
+   "cyan"
+  ],
+  "entry": "gml_Object_obj_knight_tunnel_slasher_2_revised_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_roaringknight_attack_ol;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-cyan-obj_bullet_knight_tunnelslash",
+  "variants": [
+   "cyan"
+  ],
+  "entry": "gml_Object_obj_bullet_knight_tunnelslash_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_roaringknight_slash_tunnel;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-cyan-obj_knight_crescentslash_slashinganimation",
+  "variants": [
+   "cyan"
+  ],
+  "entry": "gml_Object_obj_knight_crescentslash_slashinganimation_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_knight_crescentslash;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-cyan-obj_knight_warp",
+  "variants": [
+   "cyan"
+  ],
+  "entry": "gml_Object_obj_knight_warp_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_knight_warp;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-cyan-obj_timed_bullet",
+  "variants": [
+   "cyan"
+  ],
+  "entry": "gml_Object_obj_timed_bullet_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_smallbullet;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-cyan-obj_shootout_bullet",
+  "variants": [
+   "cyan"
+  ],
+  "entry": "gml_Object_obj_shootout_bullet_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_smallbullet;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-cyan-obj_knight_weird_bottom_manager",
+  "variants": [
+   "cyan"
+  ],
+  "entry": "gml_Object_obj_knight_weird_bottom_manager_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_knight_warp;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-cyan-obj_sword_tunnel_sword",
+  "variants": [
+   "cyan"
+  ],
+  "entry": "gml_Object_obj_sword_tunnel_sword_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_knight_diamondbullet_l;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-cyan-obj_ralseibullet",
+  "variants": [
+   "cyan"
+  ],
+  "entry": "gml_Object_obj_ralseibullet_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_smallbullet;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-cyan-obj_knight_slasher",
+  "variants": [
+   "cyan"
+  ],
+  "entry": "gml_Object_obj_knight_slasher_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_roaringknight_attack_ol;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ },
+ {
+  "id": "H42-spr-cyan-obj_knight_stream",
+  "variants": [
+   "cyan"
+  ],
+  "entry": "gml_Object_obj_knight_stream_Create_0",
+  "find": "\\A",
+  "replace": "sprite_index = spr_roaringknight_attack_ol;\n",
+  "why": "Object default sprite is variant art in the mod; the merged object only keeps the base default, so set the variant sprite on creation.",
+  "regex": true
+ }
+]

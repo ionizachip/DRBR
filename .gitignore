@@ -1,0 +1,34 @@
+# --- never in the repository -------------------------------------------------------------------------------------
+# the release signing key (keep it private; GitHub Actions gets it as the DRBR_SIGNING_KEY secret)
+*.pem
+!**/public*.pem
+*.key
+signing/
+# DELTARUNE's own files (proprietary): the game data and anything built from it
+*.win
+*.win.vanilla
+*.xdelta
+*.xdelta.part*
+mod/gen/
+mod/**/*_gen/
+mod/gml_base/
+# the player's / tester's saves and settings (only the provided starting save in save-profile/ is part of DRBR)
+filech*
+!save-profile/starting-save/start_filech3
+dr.ini
+keyconfig_*.ini
+config_*.ini
+knight_hub.ini
+knight_hub.bak
+knightfights_online.ini
+knightfights_debug.log
+# --- build output -------------------------------------------------------------------------------------------------
+build/
+dist/
+bin/
+obj/
+*.user
+__pycache__/
+*.pyc
+src/Drbr.Core/BuildInfo.g.cs
+src/VERSION

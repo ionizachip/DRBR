@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "current": 1,
+  "migrations": [
+    {
+      "version": 1,
+      "release": "1.0.0",
+      "changes": "The first DRBR save profile. Nothing to move.",
+      "touches": []
+    }
+  ],
+  "rules": [
+    "A migration runs at PLAY, in DRBR Launcher (SaveProfile.Migrate), from the installed profile's migration_version up to this release's.",
+    "It may change only DRBR's own folder (%LOCALAPPDATA%\\DRBR) and the DRBR saves (%LOCALAPPDATA%\\DELTARUNE\\drbr_profile).",
+    "It never changes the player's own DELTARUNE saves or the mod's settings files (knight_hub.ini, knightfights_online.ini, keyconfig_mod.ini).",
+    "It moves files aside to %LOCALAPPDATA%\\DRBR\\backups instead of deleting them.",
+    "A profile from a newer DRBR (a higher schema_version) is refused with a message to update."
+  ]
+}

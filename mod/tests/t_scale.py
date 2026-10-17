@@ -1,0 +1,26 @@
+from harness import *
+FAILS=[];N=[0]
+def eq(a,b,msg):
+    N[0]+=1
+    if a!=b:FAILS.append(msg);print('FAIL',msg,'got',repr(a),'want',repr(b))
+sim=make_sim()
+sim.run('global.knight_run=1; global.krun={cfg:{}}; global.char=[1,2,3];')
+for d in (0,1,2,7,40,999): eq(sim.eval('knight_scale_dealt(%d)'%d),d,'trio dealt unchanged %d'%d); eq(sim.eval('knight_scale_taken(%d,0)'%d),d,'trio taken unchanged %d'%d)
+sim.run('global.char=[1,2,0];')
+eq(sim.eval('knight_scale_dealt(10)'),15,'duo dealt x1.5'); eq(sim.eval('knight_scale_taken(20,0)'),17,'duo taken x0.85')
+eq(sim.eval('knight_scale_dealt(0)'),0,'zero stays zero'); eq(sim.eval('knight_scale_taken(1,0)'),1,'min damage 1 stays 1')
+sim.run('global.char=[1,0,0];')
+eq(sim.eval('knight_scale_dealt(10)'),30,'solo dealt x3'); eq(sim.eval('knight_scale_taken(10,0)'),7,'solo taken x0.7')
+eq(sim.eval('knight_scale_dealt(-5)'),-5,'negative untouched')
+sim.run('global.char=[1,1,1];'); eq(sim.eval('knight_scale_dealt(10)'),10,'three of the same slot count as three')
+sim.run('global.char=[1,0,0]; global.knight_run=0;'); eq(sim.eval('knight_scale_dealt(10)'),10,'off outside hub runs')
+# clones share one HP bar: each clone slot takes its share of a hit (all-party hits subtract once per slot)
+sim.run('global.knight_run=1; global.krun={cfg:{}}; global.char=[1,1,1];'); eq(sim.eval('knight_clone_count(0)'),3,'3 clone slots')
+eq(sim.eval('knight_scale_taken(30,1)'),10,'3 Kris: a 30 hit is 10 per clone slot (30 total on the shared bar)')
+eq(sim.eval('knight_scale_taken(1,1)'),1,'1 stays 1')
+sim.run('global.char=[1,1,2];'); eq(sim.eval('knight_clone_count(0)'),2,'2 Kris slots'); eq(sim.eval('knight_clone_count(2)'),1,'Susie alone')
+eq(sim.eval('knight_scale_taken(30,0)'),15,'2 Kris: 15 each'); eq(sim.eval('knight_scale_taken(30,2)'),30,'distinct Susie takes full hit (duo-size scale not applied: 3 slots)')
+sim.run('global.char=[1,1,0];'); eq(sim.eval('knight_scale_taken(30,0)'),15,'2 Kris only: clone split wins, no extra size reduction')
+sim.run('global.char=[3,3,3];'); eq(sim.eval('knight_scale_taken(21,2)'),7,'3 Ralsei: 7 each')
+sim.run('global.char=[1,2,0]; global.knight_run=1; global.krun={cfg:{}};'); eq(sim.eval('knight_clone_count(5)'),1,'bad slot is safe'); eq(sim.eval('knight_clone_count(2)'),1,'empty slot safe')
+print('scale tests',N[0],'fails',len(FAILS)); sys.exit(1 if FAILS else 0)

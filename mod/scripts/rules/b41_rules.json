@@ -1,0 +1,450 @@
+[
+ {
+  "id": "B41-lu-turnend-base",
+  "variants": [
+   "base"
+  ],
+  "entry": "gml_GlobalScript_scr_mnendturn",
+  "find": "\\n    \\}\\n\\}\\s*\\Z",
+  "replace": "\n        knight_lu_turnend();\n    }\n}\n",
+  "why": "Tag Team / Attack Remix: at the end of every enemy turn the lineup picks the knight for the next round (switched in at the start of the player turn, never while bullets fly).",
+  "scenarios": [
+   "tag",
+   "remix",
+   "start_at",
+   "repeat"
+  ],
+  "regex": true,
+  "count": 1
+ },
+ {
+  "id": "B41-lu-turnend-kaizo",
+  "variants": [
+   "kaizo"
+  ],
+  "entry": "gml_GlobalScript_scr_mnendturn",
+  "find": "\\n    \\}\\n\\}\\s*\\Z",
+  "replace": "\n        knight_lu_turnend();\n    }\n}\n",
+  "why": "Tag Team / Attack Remix: at the end of every enemy turn the lineup picks the knight for the next round (switched in at the start of the player turn, never while bullets fly).",
+  "scenarios": [
+   "tag",
+   "remix",
+   "start_at",
+   "repeat"
+  ],
+  "regex": true,
+  "count": 1
+ },
+ {
+  "id": "B41-lu-turnend-elec",
+  "variants": [
+   "elec"
+  ],
+  "entry": "gml_GlobalScript_scr_mnendturn",
+  "find": "\\n    \\}\\n\\}\\s*\\Z",
+  "replace": "\n        knight_lu_turnend();\n    }\n}\n",
+  "why": "Tag Team / Attack Remix: at the end of every enemy turn the lineup picks the knight for the next round (switched in at the start of the player turn, never while bullets fly).",
+  "scenarios": [
+   "tag",
+   "remix",
+   "start_at",
+   "repeat"
+  ],
+  "regex": true,
+  "count": 1
+ },
+ {
+  "id": "B41-lu-turnend-violet",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_GlobalScript_scr_mnendturn",
+  "find": "\\n    \\}\\n\\}\\s*\\Z",
+  "replace": "\n        knight_lu_turnend();\n    }\n}\n",
+  "why": "Tag Team / Attack Remix: at the end of every enemy turn the lineup picks the knight for the next round (switched in at the start of the player turn, never while bullets fly).",
+  "scenarios": [
+   "tag",
+   "remix",
+   "start_at",
+   "repeat"
+  ],
+  "regex": true,
+  "count": 1
+ },
+ {
+  "id": "B41-lu-turnend-thorn",
+  "variants": [
+   "thorn"
+  ],
+  "entry": "gml_GlobalScript_scr_mnendturn",
+  "find": "\\n    \\}\\n\\}\\s*\\Z",
+  "replace": "\n        knight_lu_turnend();\n    }\n}\n",
+  "why": "Tag Team / Attack Remix: at the end of every enemy turn the lineup picks the knight for the next round (switched in at the start of the player turn, never while bullets fly).",
+  "scenarios": [
+   "tag",
+   "remix",
+   "start_at",
+   "repeat"
+  ],
+  "regex": true,
+  "count": 1
+ },
+ {
+  "id": "B41-lu-turnend-cyan",
+  "variants": [
+   "cyan"
+  ],
+  "entry": "gml_GlobalScript_scr_mnendturn",
+  "find": "\\n    \\}\\n\\}\\s*\\Z",
+  "replace": "\n        knight_lu_turnend();\n    }\n}\n",
+  "why": "Tag Team / Attack Remix: at the end of every enemy turn the lineup picks the knight for the next round (switched in at the start of the player turn, never while bullets fly).",
+  "scenarios": [
+   "tag",
+   "remix",
+   "start_at",
+   "repeat"
+  ],
+  "regex": true,
+  "count": 1
+ },
+ {
+  "id": "B41-lu-end-base",
+  "variants": [
+   "base"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Draw_0",
+  "find": "(if \\([^\\n]*haveusedroaring == true && end_cutscene_version == 0 && global\\.monsterhp\\[myself\\] <= \\(global\\.monstermaxhp\\[myself\\] \\* [0-9.]+\\) && endcon != 1[^\\n]*)\\)\\n",
+  "replace": "\\1 && knight_lu_end_ok())\\n",
+  "why": "Tag Team: a knight beaten after its Roaring is knocked out and its partner takes over while the partner still stands; the last knight ends the battle as usual. Attack Remix: only the finale knight ends it. Checked last (only when the fight's own ending conditions all hold).",
+  "scenarios": [
+   "tag",
+   "remix",
+   "start_at",
+   "repeat"
+  ],
+  "regex": true,
+  "count": 1
+ },
+ {
+  "id": "B41-lu-end-kaizo",
+  "variants": [
+   "kaizo"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Draw_0",
+  "find": "(if \\([^\\n]*haveusedroaring == true && end_cutscene_version == 0 && global\\.monsterhp\\[myself\\] <= \\(global\\.monstermaxhp\\[myself\\] \\* [0-9.]+\\) && endcon != 1[^\\n]*)\\)\\n",
+  "replace": "\\1 && knight_lu_end_ok())\\n",
+  "why": "Tag Team: a knight beaten after its Roaring is knocked out and its partner takes over while the partner still stands; the last knight ends the battle as usual. Attack Remix: only the finale knight ends it. Checked last (only when the fight's own ending conditions all hold).",
+  "scenarios": [
+   "tag",
+   "remix",
+   "start_at",
+   "repeat"
+  ],
+  "regex": true,
+  "count": 1
+ },
+ {
+  "id": "B41-lu-end-elec",
+  "variants": [
+   "elec"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Draw_0",
+  "find": "(if \\([^\\n]*haveusedroaring == true && end_cutscene_version == 0 && global\\.monsterhp\\[myself\\] <= \\(global\\.monstermaxhp\\[myself\\] \\* [0-9.]+\\) && endcon != 1[^\\n]*)\\)\\n",
+  "replace": "\\1 && knight_lu_end_ok())\\n",
+  "why": "Tag Team: a knight beaten after its Roaring is knocked out and its partner takes over while the partner still stands; the last knight ends the battle as usual. Attack Remix: only the finale knight ends it. Checked last (only when the fight's own ending conditions all hold).",
+  "scenarios": [
+   "tag",
+   "remix",
+   "start_at",
+   "repeat"
+  ],
+  "regex": true,
+  "count": 1
+ },
+ {
+  "id": "B41-lu-end-violet",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Draw_0",
+  "find": "(if \\([^\\n]*haveusedroaring == true && end_cutscene_version == 0 && global\\.monsterhp\\[myself\\] <= \\(global\\.monstermaxhp\\[myself\\] \\* [0-9.]+\\) && endcon != 1[^\\n]*)\\)\\n",
+  "replace": "\\1 && knight_lu_end_ok())\\n",
+  "why": "Tag Team: a knight beaten after its Roaring is knocked out and its partner takes over while the partner still stands; the last knight ends the battle as usual. Attack Remix: only the finale knight ends it. Checked last (only when the fight's own ending conditions all hold).",
+  "scenarios": [
+   "tag",
+   "remix",
+   "start_at",
+   "repeat"
+  ],
+  "regex": true,
+  "count": 1
+ },
+ {
+  "id": "B41-lu-end-thorn",
+  "variants": [
+   "thorn"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Draw_0",
+  "find": "(if \\([^\\n]*haveusedroaring == true && end_cutscene_version == 0 && global\\.monsterhp\\[myself\\] <= \\(global\\.monstermaxhp\\[myself\\] \\* [0-9.]+\\) && endcon != 1[^\\n]*)\\)\\n",
+  "replace": "\\1 && knight_lu_end_ok())\\n",
+  "why": "Tag Team: a knight beaten after its Roaring is knocked out and its partner takes over while the partner still stands; the last knight ends the battle as usual. Attack Remix: only the finale knight ends it. Checked last (only when the fight's own ending conditions all hold).",
+  "scenarios": [
+   "tag",
+   "remix",
+   "start_at",
+   "repeat"
+  ],
+  "regex": true,
+  "count": 1
+ },
+ {
+  "id": "B41-lu-end-cyan",
+  "variants": [
+   "cyan"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Draw_0",
+  "find": "(if \\([^\\n]*haveusedroaring == true && end_cutscene_version == 0 && global\\.monsterhp\\[myself\\] <= \\(global\\.monstermaxhp\\[myself\\] \\* [0-9.]+\\) && endcon != 1[^\\n]*)\\)\\n",
+  "replace": "\\1 && knight_lu_end_ok())\\n",
+  "why": "Tag Team: a knight beaten after its Roaring is knocked out and its partner takes over while the partner still stands; the last knight ends the battle as usual. Attack Remix: only the finale knight ends it. Checked last (only when the fight's own ending conditions all hold).",
+  "scenarios": [
+   "tag",
+   "remix",
+   "start_at",
+   "repeat"
+  ],
+  "regex": true,
+  "count": 1
+ },
+ {
+  "id": "B41-lu-hold-base",
+  "variants": [
+   "base"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Step_0",
+  "find": "\\A",
+  "replace": "if (knight_lu_hold())\n    exit;\n",
+  "why": "Tag Team / Attack Remix: the knight that is switched out at the end of this frame does not start a new turn or talk first.",
+  "scenarios": [
+   "tag",
+   "remix",
+   "start_at",
+   "repeat"
+  ],
+  "regex": true,
+  "count": 1
+ },
+ {
+  "id": "B41-lu-hold-kaizo",
+  "variants": [
+   "kaizo"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Step_0",
+  "find": "\\A",
+  "replace": "if (knight_lu_hold())\n    exit;\n",
+  "why": "Tag Team / Attack Remix: the knight that is switched out at the end of this frame does not start a new turn or talk first.",
+  "scenarios": [
+   "tag",
+   "remix",
+   "start_at",
+   "repeat"
+  ],
+  "regex": true,
+  "count": 1
+ },
+ {
+  "id": "B41-lu-hold-elec",
+  "variants": [
+   "elec"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Step_0",
+  "find": "\\A",
+  "replace": "if (knight_lu_hold())\n    exit;\n",
+  "why": "Tag Team / Attack Remix: the knight that is switched out at the end of this frame does not start a new turn or talk first.",
+  "scenarios": [
+   "tag",
+   "remix",
+   "start_at",
+   "repeat"
+  ],
+  "regex": true,
+  "count": 1
+ },
+ {
+  "id": "B41-lu-hold-violet",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Step_0",
+  "find": "\\A",
+  "replace": "if (knight_lu_hold())\n    exit;\n",
+  "why": "Tag Team / Attack Remix: the knight that is switched out at the end of this frame does not start a new turn or talk first.",
+  "scenarios": [
+   "tag",
+   "remix",
+   "start_at",
+   "repeat"
+  ],
+  "regex": true,
+  "count": 1
+ },
+ {
+  "id": "B41-lu-hold-thorn",
+  "variants": [
+   "thorn"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Step_0",
+  "find": "\\A",
+  "replace": "if (knight_lu_hold())\n    exit;\n",
+  "why": "Tag Team / Attack Remix: the knight that is switched out at the end of this frame does not start a new turn or talk first.",
+  "scenarios": [
+   "tag",
+   "remix",
+   "start_at",
+   "repeat"
+  ],
+  "regex": true,
+  "count": 1
+ },
+ {
+  "id": "B41-lu-hold-cyan",
+  "variants": [
+   "cyan"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Step_0",
+  "find": "\\A",
+  "replace": "if (knight_lu_hold())\n    exit;\n",
+  "why": "Tag Team / Attack Remix: the knight that is switched out at the end of this frame does not start a new turn or talk first.",
+  "scenarios": [
+   "tag",
+   "remix",
+   "start_at",
+   "repeat"
+  ],
+  "regex": true,
+  "count": 1
+ },
+ {
+  "id": "B41-force-base",
+  "variants": [
+   "base"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Other_10",
+  "find": "if (practicemode)\n{\n    phase = prac_list[prac_sel][0];",
+  "replace": "if (knight_force_sel() || practicemode)\n{\n    phase = prac_list[prac_sel][0];",
+  "why": "Attack Remix / START AT / REPEAT: the attack is picked through the same branch the in-fight attack picker uses (so it starts exactly as in practice); otherwise the fight's own list decides. Also names the attack for the fight stats.",
+  "scenarios": [
+   "tag",
+   "remix",
+   "start_at",
+   "repeat"
+  ]
+ },
+ {
+  "id": "B41-force-elec",
+  "variants": [
+   "elec"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Other_10",
+  "find": "if (practicemode)\n{\n    phase = prac_list[prac_sel][0];",
+  "replace": "if (knight_force_sel() || practicemode)\n{\n    phase = prac_list[prac_sel][0];",
+  "why": "Attack Remix / START AT / REPEAT: the attack is picked through the same branch the in-fight attack picker uses (so it starts exactly as in practice); otherwise the fight's own list decides. Also names the attack for the fight stats.",
+  "scenarios": [
+   "tag",
+   "remix",
+   "start_at",
+   "repeat"
+  ]
+ },
+ {
+  "id": "B41-force-violet",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Other_10",
+  "find": "if (practicemode)\n{\n    phase = prac_list[prac_sel][0];",
+  "replace": "if (knight_force_sel() || practicemode)\n{\n    phase = prac_list[prac_sel][0];",
+  "why": "Attack Remix / START AT / REPEAT: the attack is picked through the same branch the in-fight attack picker uses (so it starts exactly as in practice); otherwise the fight's own list decides. Also names the attack for the fight stats.",
+  "scenarios": [
+   "tag",
+   "remix",
+   "start_at",
+   "repeat"
+  ]
+ },
+ {
+  "id": "B41-force-thorn",
+  "variants": [
+   "thorn"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Other_10",
+  "find": "if (practicemode)\n{\n    phase = prac_list[prac_sel][0];",
+  "replace": "if (knight_force_sel() || practicemode)\n{\n    phase = prac_list[prac_sel][0];",
+  "why": "Attack Remix / START AT / REPEAT: the attack is picked through the same branch the in-fight attack picker uses (so it starts exactly as in practice); otherwise the fight's own list decides. Also names the attack for the fight stats.",
+  "scenarios": [
+   "tag",
+   "remix",
+   "start_at",
+   "repeat"
+  ]
+ },
+ {
+  "id": "B41-force-cyan",
+  "variants": [
+   "cyan"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Other_10",
+  "find": "if (practicemode)\n{\n    phase = prac_list[prac_sel][0];",
+  "replace": "if (knight_force_sel() || practicemode)\n{\n    phase = prac_list[prac_sel][0];",
+  "why": "Attack Remix / START AT / REPEAT: the attack is picked through the same branch the in-fight attack picker uses (so it starts exactly as in practice); otherwise the fight's own list decides. Also names the attack for the fight stats.",
+  "scenarios": [
+   "tag",
+   "remix",
+   "start_at",
+   "repeat"
+  ]
+ },
+ {
+  "id": "B41-force-kaizo",
+  "variants": [
+   "kaizo"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Other_10",
+  "find": "\\A",
+  "replace": "knight_force_kz();\n",
+  "why": "Attack Remix / START AT / REPEAT for Kaizo Knight: its attacks are named (kaizo_attack); also names the attack for the stats.",
+  "scenarios": [
+   "tag",
+   "remix",
+   "start_at",
+   "repeat"
+  ],
+  "regex": true,
+  "count": 1
+ },
+ {
+  "id": "B41-mus-cut-violet",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Step_0",
+  "find": "        if (kill_target != obj_herosusie)\n        {\n            snd_stop(global.batmusic[0]);\n",
+  "replace": "        if (kill_target != obj_herosusie)\n        {\n            knight_mus_cut(10);\n",
+  "why": "Violet Side B: the battle song fades out in a third of a second at the blow instead of stopping dead.",
+  "scenarios": [
+   "weird"
+  ]
+ },
+ {
+  "id": "B41-mus-sideb-violet",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Step_0",
+  "find": "        global.batmusic[0] = violetknight_sideb;\n        global.batmusic[1] = mus_loop(global.batmusic[0]);\n",
+  "replace": "        knight_mus_switch(violetknight_sideb, 60);\n",
+  "why": "Violet Side B: the Side B song fades in over two seconds instead of starting at full volume.",
+  "scenarios": [
+   "weird"
+  ]
+ }
+]

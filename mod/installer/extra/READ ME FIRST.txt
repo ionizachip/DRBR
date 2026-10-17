@@ -1,0 +1,128 @@
+KNIGHT HUB - build 51 - TESTER PACK
+===================================
+NEW HERE? Open EASY INSTALL GUIDE.txt first: four steps, including the save in "Save file" (Chapter 3 slot 3, at the
+Knight Hub) so you can start right away.
+
+A mod for DELTARUNE Chapter 3 (Steam, Windows). It puts all the Roaring Knight fights in one menu (a sign in the
+Roaring Knight area), plus DRBR - DELTARUNE BATTLE ROYALE: a battle royale for 2-8 players where everyone dodges the SAME
+boss, the SAME attacks, at the SAME moment, and the last SOUL standing wins - the Knights, and (online) Jevil, Gerson,
+Flowery, Spamton NEO and Pink with their own SOULs. This build is for testing: things may break, and that is what to
+report.
+
+
+WHAT YOU NEED
+-------------
+ - DELTARUNE from Steam on Windows, Chapter 3. The installer only accepts the exact Chapter 3 data.win this build was
+   made for. If yours is a different version or already modded, it stops without changing anything ("exit code 6",
+   or PLAY_KNIGHT_HUB.bat saying it could not put the original data.win back). Then run Steam's "Verify integrity of
+   game files" (below) and try again; if it still refuses, your DELTARUNE version is not the one this build was made
+   for (README_INSTALL.txt, section 4).
+ - A Chapter 3 save at the Roaring Knight area (the cold place). The hub is the sign there.
+ - For Steam rooms: Steam running and signed in. (Nothing else to install: kf_steam.dll, steam_api64.dll and
+   steam_appid.txt come with this pack and are copied next to the game by PLAY_KNIGHT_HUB.bat.)
+
+
+INSTALL
+-------
+ 1. Extract the whole zip into a folder. Do not run anything from inside the zip.
+ 2. Start Steam, then double-click PLAY_KNIGHT_HUB.bat.
+    It finds DELTARUNE, copies these files into DELTARUNE\chapter3_windows, keeps a backup of your original data.win
+    (data.win.vanilla), installs the mod (replacing an older Knight Hub build) and starts Chapter 3. If Windows asks
+    for administrator rights, allow it (the game folder is usually under Program Files).
+ 3. Load your save at the Roaring Knight area and talk to the sign.
+
+UNDO: double-click RESTORE_VANILLA.bat in DELTARUNE\chapter3_windows. It puts the original data.win back (the Knight Hub
+files, the three Steam files too, stay in the folder: the normal game does not use them). Steam > DELTARUNE >
+Properties > Installed Files > "Verify integrity of game files" also works.
+
+
+DRBR - DELTARUNE BATTLE ROYALE (KNIGHT tab > ONLINE)
+----------------------------------------------------
+ PRACTICE       a whole match on your own PC against bots. Try this first.
+ BOSSES         every boss with its SOUL and sends; Z starts a practice match against the one you pick. The room page's BOTS row adds / removes
+                bots and sets their difficulty (DUMMY, EASY, NORMAL, HARD, EXPERT, PERFECT, or sliders per bot).
+ STEAM HOST     make a Steam room (friends-only by default; MORE OPTIONS > STEAM ROOMS: private / friends / public).
+                It shows a 7-letter code. Give it to the others, or INVITE FRIENDS from the room page.
+ STEAM JOIN     type the 7-letter code.        STEAM BROWSE   the public Steam rooms.
+ RELAY ...      the same rooms on a small server instead of Steam (see the server section below).
+In the room: READY (the host: START), SPECTATE MATCH while a match runs, your SKIN and SOUL colour. Closing the menu keeps
+you in the room: the cold place is the lobby - no party following you, everyone in their own skin, and the way to the
+original Knight fight is closed while you are in a room. In a match (change the keys in MORE OPTIONS > KEYBINDS):
+ arrows      move your SOUL              X (held)  the game's own slow walk
+ S (held)    Hold Breath: your SOUL moves faster (as in the fights)
+ C (held)    charge the gauge (the TP bar), let go to draw one skill (60) or two (100)
+ Z (tap)     pick the next skill         Z (held)  use the picked skill
+ D           the picked skill into the HOLD slot / the held one back
+ F           quick settings                          V         the other SOULs off / on
+ Q / E       TARGETING mode left / right             A / 1-8   pick a target (CHECK)
+  T or \     chat (\ sends, ESC closes; not ENTER)   TAB       everyone's HP, shards and gauge
+ Backspace   give up / stop watching           F3        DEBUG OVERLAY (anywhere; see below)
+ Controller: LB / RB targeting mode, right stick a target, LT Hold Breath, RT the HOLD slot.
+TARGETING (the row under the box): CHAOS, PROCEED, BIG SHOT, DEFEND, CHECK, PACIFY or ROARING decides who YOUR red skills
+go to. They start around that player's SOUL, hurt anyone who touches them (not you), in your colour. A knockout gives you
+Shadow Crystal shards (1 + half of theirs) that make your sends stronger. The host can switch targeting off (UNTARGETED).
+The other players' SOULs are shown at 70% in their own colours: MORE OPTIONS > SOUL SETTINGS (five rows; SOUL COLOR opens
+the colour page). When your SOUL breaks it cracks and shatters as in Chapter 3, the GAME OVER shows over the battle with
+your place, then you watch (Left / Right: whose SOUL, Z: camera); the others' SOULs break where they were. The final two
+and the first attack after 3 minutes are the Knight's Roaring. Everything is explained in DRBR_ONLINE_GUIDE.txt (the bosses: DRBR_BOSSES.txt).
+Everyone in a room needs this same build (51).
+Steam shows "Spacewar" while you are in Steam rooms - that is expected (Steam's test app 480 is what lets a mod make
+rooms). If a friend accepts an invite while their game is closed, Steam starts Spacewar instead: close it, start
+DELTARUNE and join with the code.
+
+
+RUNNING THE RELAY SERVER (only if you use RELAY rooms instead of Steam; one person in the group)
+------------------------------------------------------------------------------------------------
+ 1. Install Node.js 18 or newer (https://nodejs.org, the LTS installer).
+ 2. Open the "Knight Fights Online server" folder and double-click START_RELAY.bat. Keep that window open.
+ 3. The others set MORE OPTIONS > SERVER to this PC's address:
+      same PC                          127.0.0.1
+      same network / Radmin / Hamachi  this PC's LAN or VPN address
+      over the internet                forward TCP port 7777 to this PC, or use a tunnel such as playit.gg
+                                       (details in README.md in the server folder)
+
+
+WHAT TO SEND BACK
+-----------------
+ - A crash: the whole error text (a screenshot of the error window is fine).
+ - Steam rooms do not work: what the ONLINE page says at the bottom right (READY / NOT INSTALLED / STEAM_API64.DLL
+   MISSING / STEAM IS NOT RUNNING) and what happens when you press STEAM HOST.
+ - The install fails: the text in the installer window, and knight_hub_install.log from DELTARUNE\chapter3_windows.
+ - A match: did everyone see the same knight and attack at the same time? Anything out of step, too hard, too easy?
+ - Which build is running: the bottom right of the sign's menu says "KNIGHT HUB V2 - BUILD 51 - <date>". If it says
+   anything else (or nothing), the game did not load this build's data.win: run PLAY_KNIGHT_HUB.bat again.
+ - The other SOULs or the bots are not where they should be: press F3 in the match (the DEBUG OVERLAY: every SOUL's
+   position, drawn or not and why, a coloured square at each), take a screenshot, and send knightfights_debug.log from
+   %LOCALAPPDATA%\DELTARUNE (written while the overlay is on).
+
+
+HONEST STATUS
+-------------
+Build 51: a cleaner match screen. Your skills are diamonds at the top left with pictures (green plus = MAX, a full heal
+everyone starts with once). The TARGETING modes have plain names (RANDOM, LOW HP, CRYSTALS, REVENGE, CHOOSE, TIRED,
+EVERYONE) on one strip at the bottom. The other players are small cards on the right. NEW: HOW TO PLAY on the sign's
+ONLINE page walks you through a practice match step by step. If you get knocked out without being hit, the results
+screen says why - please send a screenshot of it and knightfights_debug.log (in %LOCALAPPDATA%\DELTARUNE).
+
+Build 50: the attack skills players send each other are now the Roaring Knights' REAL attacks (the tracking sword, the
+pointing stars, the rotating slash, Kaizo's diamonds, crescents and falling swords, Elecknight's lightning, Thorn's
+fountain, the Violet Knight's eruption...), with five new items that only come when their knight is in the match. The
+charge and item system is unchanged. The TP bar is the skill meter (a slanted 60 line, gold above it, MAX at 100, the red
+part showing what a draw takes), your SHIELD shows in blue on your HP bar, Hold Breath is a toggle, shards use the
+Shadow Crystal graphic, and the Twin Knight flies round the box doing its attacks - now with the Knights' real attacks
+(stars that burst into starchildren, tracking swords, falling swords), the Knight's warp, poses, afterimages and sounds,
+and see-through. The HUD steps aside during a knight's Roaring, and the bots no longer always die in it. Flowery (Chapter 5)
+is a party member of his own (his own hero, stats, gear and golden HP bar - he no longer takes Noelle's place - with moves
+from his own Chapter 5 fight, F-Action and voice clips, with every knight), Flower Man / Raise Up Your Bat show their
+lyrics during the fight, your SKIN stays after you close the menu, and practice starts with no bots. All of it was
+tested in the emulator that runs the mod's real code - NOT in the real game yet.
+
+Build 49 fixes the reason nobody saw the other SOULs or the bots in the real game: the Knight fight takes place far into
+the cold place (the camera is at x 2063 and more), and build 48 cut every SOUL position it passed on at x 1000 (drawn off
+screen) and took the real battle box for "no box" (the bots never moved and were never drawn). Every position now travels
+relative to the battle's camera. Our earlier tests ran the battle with the camera at 0, where this never showed; the new
+test puts each game's camera where the real arena's is, and the same test run on build 48's code shows the old failure.
+Build 49 also brings smart bots with six difficulty presets and sliders, the BOTS page, the build stamp, the F3 DEBUG
+OVERLAY with its log, an opacity floor of 15% and CONFIG > RESET MOD SETTINGS.
+Build 49 has NOT been played in the real game, and Steam rooms have NOT been confirmed on real Steam. Expect rough edges
+and please report them (TESTING_REPORT.txt lists exactly what was tested and what was not).

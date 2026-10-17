@@ -1,0 +1,372 @@
+[
+ {
+  "id": "P1-create-base",
+  "variants": [
+   "base"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Create_0",
+  "find": "overrideAttack = 0;\n",
+  "replace": "overrideAttack = 0;\npracticemode = (variable_global_exists(\"kaizo_practice\") && global.kaizo_practice) ? 1 : 0;\nprac_sel = 0;\nif (!variable_instance_exists(id, \"difficulty\"))\n    difficulty = 0;\nprac_list = [[1,1,\"Stars 1\"],[1,2,\"Tracking Swords 1\"],[1,3,\"Splitters 1\"],[1,4,\"Sword Tunnel 1\"],[1,5,\"Spinning Slashes 1\"],[1,6,\"Diamond Storm (unused)\"],[1,7,\"Slashes + Swords (unused)\"],[1,8,\"Tracking Swords 2 (unused)\"],[1,9,\"Combination Attack (unused)\"],[2,1,\"Stars 2\"],[2,2,\"Splitters 2\"],[2,3,\"Sword Tunnel 2\"],[2,4,\"Vortex + Swords\"],[2,5,\"Spinning Slashes 2\"],[3,1,\"Stars 3\"],[3,2,\"Splitters 3\"],[3,3,\"Tracking Swords 3\"],[3,4,\"Sword Tunnel 3\"],[3,5,\"Spinning Slashes 3\"],[4,1,\"Spinning Slashes (Phase 4)\"],[4,3,\"Roaring\"]];\n",
+  "why": "Practice mode (hub option): named attack picker list of (phase, turn).",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "P2-force-base-Other10",
+  "variants": [
+   "base"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Other_10",
+  "find": "if (scr_debug() && overrideAttack > 0)\n{\n    phaseturn = overrideAttack;\n}\n",
+  "replace": "if (scr_debug() && overrideAttack > 0)\n{\n    phaseturn = overrideAttack;\n}\nif (practicemode)\n{\n    phase = prac_list[prac_sel][0];\n    phaseturn = prac_list[prac_sel][1];\n    rotatingslash3used = false;\n    haveusedroaring = false;\n    phase4turn = 0;\n    if (phase == 4)\n        phase4turn = phaseturn - 1;\n}\n",
+  "why": "Practice: force the picked phase/turn each enemy turn.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "P3-step-base",
+  "variants": [
+   "base"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Step_0",
+  "find": "if (global.monsterhp[myself] <= (global.monstermaxhp[myself] * 0.8))\n{\n    global.tempflag[96] = 1;\n}\n",
+  "replace": "if (practicemode)\n{\n    global.monsterhp[myself] = global.monstermaxhp[myself];\n    for (var _pi = 1; _pi < min(array_length(global.hp), array_length(global.maxhp)); _pi++)\n    {\n        if (scr_havechar(_pi))\n            global.hp[_pi] = global.maxhp[_pi] * 2;\n    }\n}\nif (global.monsterhp[myself] <= (global.monstermaxhp[myself] * 0.8))\n{\n    global.tempflag[96] = 1;\n}\n",
+  "why": "Practice: Knight never loses HP, party never dies.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "P4-battlecontroller-base",
+  "variants": [
+   "base"
+  ],
+  "entry": "gml_Object_obj_battlecontroller_Step_0",
+  "find": "        var can_input = true;\n",
+  "replace": "        var can_input = true;\n        with (obj_knight_enemy)\n        {\n            if (variable_instance_exists(id, \"practicemode\") && practicemode)\n                can_input = false;\n        }\n",
+  "why": "Practice: the normal command menu is replaced by the attack picker.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "P1-create-elec",
+  "variants": [
+   "elec"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Create_0",
+  "find": "overrideAttack = 0;\n",
+  "replace": "overrideAttack = 0;\npracticemode = (variable_global_exists(\"kaizo_practice\") && global.kaizo_practice) ? 1 : 0;\nprac_sel = 0;\nif (!variable_instance_exists(id, \"difficulty\"))\n    difficulty = 0;\nprac_list = [[1,1,\"Stars 1\"],[1,2,\"Tracking Swords 1\"],[1,3,\"Alternating Swords\"],[1,4,\"Spinning Slashes 1\"],[1,5,\"Sword Vortex\"],[1,6,\"Splitters 1\"],[1,7,\"Slashes + Swords (unused)\"],[1,8,\"Tracking Swords 2 (unused)\"],[1,9,\"Combination Attack (unused)\"],[2,1,\"Stars 2\"],[2,2,\"Tunnel + Swords 1\"],[2,3,\"Tracking Swords 3\"],[2,4,\"Box Cluster\"],[2,5,\"Spinning Slashes 2\"],[2,6,\"Splitters 2\"],[3,1,\"Stars 3\"],[3,2,\"Tracking Swords 4\"],[3,3,\"Tunnel + Swords 2\"],[3,4,\"Splitters 3\"],[3,5,\"Spinning Slashes 3\"],[4,1,\"Spinning Slashes (Phase 4)\"],[4,3,\"Roaring\"]];\n",
+  "why": "Practice mode (hub option): named attack picker list of (phase, turn).",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "P2-force-elec-Other10",
+  "variants": [
+   "elec"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Other_10",
+  "find": "if (scr_debug() && overrideAttack > 0)\n{\n    phaseturn = overrideAttack;\n}\n",
+  "replace": "if (scr_debug() && overrideAttack > 0)\n{\n    phaseturn = overrideAttack;\n}\nif (practicemode)\n{\n    phase = prac_list[prac_sel][0];\n    phaseturn = prac_list[prac_sel][1];\n    rotatingslash3used = false;\n    haveusedroaring = false;\n    phase4turn = 0;\n    if (phase == 4)\n        phase4turn = phaseturn - 1;\n}\n",
+  "why": "Practice: force the picked phase/turn each enemy turn.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "P3-step-elec",
+  "variants": [
+   "elec"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Step_0",
+  "find": "if (global.monsterhp[myself] <= (global.monstermaxhp[myself] * 0.8))\n{\n    global.tempflag[96] = 1;\n}\n",
+  "replace": "if (practicemode)\n{\n    global.monsterhp[myself] = global.monstermaxhp[myself];\n    for (var _pi = 1; _pi < min(array_length(global.hp), array_length(global.maxhp)); _pi++)\n    {\n        if (scr_havechar(_pi))\n            global.hp[_pi] = global.maxhp[_pi] * 2;\n    }\n}\nif (global.monsterhp[myself] <= (global.monstermaxhp[myself] * 0.8))\n{\n    global.tempflag[96] = 1;\n}\n",
+  "why": "Practice: Knight never loses HP, party never dies.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "P4-battlecontroller-elec",
+  "variants": [
+   "elec"
+  ],
+  "entry": "gml_Object_obj_battlecontroller_Step_0",
+  "find": "        var can_input = true;\n",
+  "replace": "        var can_input = true;\n        with (obj_knight_enemy)\n        {\n            if (variable_instance_exists(id, \"practicemode\") && practicemode)\n                can_input = false;\n        }\n",
+  "why": "Practice: the normal command menu is replaced by the attack picker.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "P1-create-thorn",
+  "variants": [
+   "thorn"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Create_0",
+  "find": "overrideAttack = 0;\n",
+  "replace": "overrideAttack = 0;\npracticemode = (variable_global_exists(\"kaizo_practice\") && global.kaizo_practice) ? 1 : 0;\nprac_sel = 0;\nif (!variable_instance_exists(id, \"difficulty\"))\n    difficulty = 0;\nprac_list = [[1,1,\"Stars 1\"],[1,2,\"Tracking Swords 1\"],[1,3,\"Thorn Flurry\"],[1,4,\"Sword Tunnel 1\"],[1,5,\"Spinning Slashes 1\"],[2,1,\"Crescent Slash\"],[2,2,\"Stars 2\"],[2,3,\"Splitters 1\"],[2,4,\"Box Cluster\"],[2,5,\"Spinning Slashes 2\"],[2,6,\"Sword Tunnel 2\"],[2,7,\"Spinning Slashes 3\"],[2,8,\"Tracking Swords 2\"],[3,1,\"Quickstorm\"],[3,2,\"Stars 3\"],[3,3,\"Splitters 2\"],[3,4,\"Children\"],[3,5,\"Spinning Slashes 4\"],[3,6,\"Tracking Swords 3\"],[3,7,\"Lightsplitter\"],[3,8,\"Spinning Slashes 5\"],[4,1,\"Spinning Slashes (Phase 4)\"],[4,3,\"Roaring\"]];\n",
+  "why": "Practice mode (hub option): named attack picker list of (phase, turn).",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "P2-force-thorn-Other10",
+  "variants": [
+   "thorn"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Other_10",
+  "find": "if (scr_debug() && overrideAttack > 0)\n{\n    phaseturn = overrideAttack;\n}\n",
+  "replace": "if (scr_debug() && overrideAttack > 0)\n{\n    phaseturn = overrideAttack;\n}\nif (practicemode)\n{\n    phase = prac_list[prac_sel][0];\n    phaseturn = prac_list[prac_sel][1];\n    rotatingslash3used = false;\n    haveusedroaring = false;\n    phase4turn = 0;\n    if (phase == 4)\n        phase4turn = phaseturn - 1;\n}\n",
+  "why": "Practice: force the picked phase/turn each enemy turn.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "P3-step-thorn",
+  "variants": [
+   "thorn"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Step_0",
+  "find": "if (global.monsterhp[myself] <= (global.monstermaxhp[myself] * 0.5))\n{\n    global.tempflag[96] = 1;\n}\n",
+  "replace": "if (practicemode)\n{\n    global.monsterhp[myself] = global.monstermaxhp[myself];\n    for (var _pi = 1; _pi < min(array_length(global.hp), array_length(global.maxhp)); _pi++)\n    {\n        if (scr_havechar(_pi))\n            global.hp[_pi] = global.maxhp[_pi] * 2;\n    }\n}\nif (global.monsterhp[myself] <= (global.monstermaxhp[myself] * 0.5))\n{\n    global.tempflag[96] = 1;\n}\n",
+  "why": "Practice: Knight never loses HP, party never dies.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "P4-battlecontroller-thorn",
+  "variants": [
+   "thorn"
+  ],
+  "entry": "gml_Object_obj_battlecontroller_Step_0",
+  "find": "        var can_input = true;\n",
+  "replace": "        var can_input = true;\n        with (obj_knight_enemy)\n        {\n            if (variable_instance_exists(id, \"practicemode\") && practicemode)\n                can_input = false;\n        }\n",
+  "why": "Practice: the normal command menu is replaced by the attack picker.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "P1-create-cyan",
+  "variants": [
+   "cyan"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Create_0",
+  "find": "overrideAttack = 0;\n",
+  "replace": "overrideAttack = 0;\npracticemode = (variable_global_exists(\"kaizo_practice\") && global.kaizo_practice) ? 1 : 0;\nprac_sel = 0;\nif (!variable_instance_exists(id, \"difficulty\"))\n    difficulty = 0;\nprac_list = [[1,1,\"Stars 1\"],[1,2,\"Stars 2\"],[1,3,\"Stars 3\"],[1,4,\"Crescent Slash\"],[1,5,\"Splitters 1\"],[1,6,\"Sword Tunnel 1\"],[1,7,\"Spinning Slashes 1\"],[1,8,\"Diamond Storm\"],[1,9,\"Spinning Slashes 2\"],[1,10,\"Tracking Swords 1\"],[1,11,\"Roaring\"],[2,1,\"Stars 4\"],[2,2,\"Tracking Swords 2\"],[2,3,\"Splitters 2\"],[2,4,\"Sword Tunnel 2\"],[2,5,\"Box Cluster\"],[2,6,\"X Slashes\"],[2,7,\"Tracking Swords 3\"],[2,8,\"Sword Hail\"],[2,9,\"Spinning Slashes 3\"],[3,1,\"Stars 5\"],[3,2,\"Sword Tunnel 3\"],[3,3,\"Tracking Swords 4\"],[3,4,\"Sword Tunnel 4\"],[3,5,\"Knightlines\"],[3,6,\"Splitters 3\"],[3,7,\"Spinning Slashes 4\"],[4,1,\"Spinning Slashes (Phase 4)\"],[4,3,\"Roaring\"]];\n",
+  "why": "Practice mode (hub option): named attack picker list of (phase, turn).",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "P2-force-cyan-Other10",
+  "variants": [
+   "cyan"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Other_10",
+  "find": "if (scr_debug() && overrideAttack > 0)\n{\n    phaseturn = overrideAttack;\n}\n",
+  "replace": "if (scr_debug() && overrideAttack > 0)\n{\n    phaseturn = overrideAttack;\n}\nif (practicemode)\n{\n    phase = prac_list[prac_sel][0];\n    phaseturn = prac_list[prac_sel][1];\n    rotatingslash3used = false;\n    haveusedroaring = false;\n    phase4turn = 0;\n    if (phase == 4)\n        phase4turn = phaseturn - 1;\n}\n",
+  "why": "Practice: force the picked phase/turn each enemy turn.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "P3-step-cyan",
+  "variants": [
+   "cyan"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Step_0",
+  "find": "if (global.monsterhp[myself] <= (global.monstermaxhp[myself] * 0.8))\n{\n    global.tempflag[96] = 1;\n}\n",
+  "replace": "if (practicemode)\n{\n    global.monsterhp[myself] = global.monstermaxhp[myself];\n    for (var _pi = 1; _pi < min(array_length(global.hp), array_length(global.maxhp)); _pi++)\n    {\n        if (scr_havechar(_pi))\n            global.hp[_pi] = global.maxhp[_pi] * 2;\n    }\n}\nif (global.monsterhp[myself] <= (global.monstermaxhp[myself] * 0.8))\n{\n    global.tempflag[96] = 1;\n}\n",
+  "why": "Practice: Knight never loses HP, party never dies.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "P4-battlecontroller-cyan",
+  "variants": [
+   "cyan"
+  ],
+  "entry": "gml_Object_obj_battlecontroller_Step_0",
+  "find": "        var can_input = true;\n",
+  "replace": "        var can_input = true;\n        with (obj_knight_enemy)\n        {\n            if (variable_instance_exists(id, \"practicemode\") && practicemode)\n                can_input = false;\n        }\n",
+  "why": "Practice: the normal command menu is replaced by the attack picker.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "P1-create-violet",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Create_0",
+  "find": "overrideAttack = 0;\n",
+  "replace": "overrideAttack = 0;\npracticemode = (variable_global_exists(\"kaizo_practice\") && global.kaizo_practice) ? 1 : 0;\nprac_sel = 0;\nif (!variable_instance_exists(id, \"difficulty\"))\n    difficulty = 0;\nprac_list = (((global.flag[456] != 0) && !(global.tempflag[30] >= 1)) ? [[1,1,\"Starlines 1\"],[1,2,\"Crescent Slash 1\"],[1,3,\"Splitters 1B\"],[1,4,\"Tunnel 1\"],[1,5,\"Tracking Swords 1\"],[1,6,\"Diamond Eruption\"],[1,7,\"Alternating Swords\"],[1,8,\"Dual Slashes 1\"],[2,1,\"Starlines 2\"],[2,2,\"Crescent Slash 2\"],[2,3,\"Sword Vortex 1b\"],[2,4,\"Tunnel 2B\"],[2,5,\"Roaring FX\"],[2,6,\"Tracking Swords 2\"],[2,7,\"Big Box Cluster 1\"],[2,8,\"Dual Slashes 2\"],[2,9,\"Spinning Slashes (unused)\"],[3,1,\"Starlines 3\"],[3,2,\"Crescent Slash 3\"],[3,3,\"Splitters 2B\"],[3,4,\"Sword Vortex 2b\"],[3,5,\"Tunnel 3\"],[3,6,\"Diamonds\"],[3,7,\"Tracking Swords 3\"],[3,8,\"Big Box Cluster 2\"],[3,9,\"Combination Attack\"],[3,10,\"Sword Hail\"],[3,11,\"Dual Slashes 3\"],[4,1,\"Spinning Slashes (Phase 4)\"],[4,3,\"Roaring\"]] : [[1,1,\"Stars 1\"],[1,2,\"Crescent Slash 1\"],[1,3,\"Splitters 1\"],[1,4,\"Sword Tunnel 1\"],[1,5,\"Tracking Swords 1\"],[1,6,\"Spinning Slashes 1\"],[1,9,\"Sword Vortex 1 (unused)\"],[2,1,\"Stars 2\"],[2,2,\"Crescent Slash 2\"],[2,3,\"Splitters 2\"],[2,4,\"Sword Tunnel 2\"],[2,5,\"Sword Vortex 2\"],[2,6,\"Fountains\"],[2,7,\"Tracking Swords 2\"],[2,8,\"Spinning Slashes 2\"],[3,1,\"Stars 3\"],[3,2,\"Crescent Slash 3\"],[3,3,\"Splitters 3\"],[3,4,\"Sword Tunnel 3\"],[3,5,\"Sword Vortex 3\"],[3,6,\"Diamond Eruption\"],[3,7,\"Tracking Swords 3\"],[3,8,\"Spinning Slashes 3\"],[4,1,\"Spinning Slashes (Phase 4)\"],[4,3,\"Roaring\"]]);\n",
+  "why": "Practice mode (hub option): named attack picker list of (phase, turn).",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "P2-force-violet-Other10",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Other_10",
+  "find": "if (phase != 4 && practice == false)\n{\n    turn++;\n    phaseturn++;\n}\n",
+  "replace": "if (phase != 4 && practice == false)\n{\n    turn++;\n    phaseturn++;\n}\nif (practicemode)\n{\n    phase = prac_list[prac_sel][0];\n    phaseturn = prac_list[prac_sel][1];\n    rotatingslash3used = false;\n    haveusedroaring = false;\n    phase4turn = 0;\n    if (phase == 4)\n        phase4turn = phaseturn;\n}\n",
+  "why": "Practice: force the picked phase/turn each enemy turn.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "P2-force-violet-Other19",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Other_19",
+  "find": "if (phase != 4 && practice == false)\n{\n    turn++;\n    phaseturn++;\n}\n",
+  "replace": "if (phase != 4 && practice == false)\n{\n    turn++;\n    phaseturn++;\n}\nif (practicemode)\n{\n    phase = prac_list[prac_sel][0];\n    phaseturn = prac_list[prac_sel][1];\n    rotatingslash3used = false;\n    haveusedroaring = false;\n    phase4turn = 0;\n    if (phase == 4)\n        phase4turn = phaseturn;\n}\n",
+  "why": "Practice: force the picked phase/turn each enemy turn.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "P2b-noguard-10",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Other_10",
+  "regex": true,
+  "find": "if \\(practice == false\\)",
+  "replace": "if (practice == false && !practicemode)",
+  "why": "Practice: the fight's own phase-change/cutscene steps must not run while practising.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "P2b-noguard-19",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Other_19",
+  "regex": true,
+  "find": "if \\(practice == false\\)",
+  "replace": "if (practice == false && !practicemode)",
+  "why": "Practice: the fight's own phase-change/cutscene steps must not run while practising.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "P3-step-violet",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Step_0",
+  "find": "if (global.monsterhp[myself] <= (global.monstermaxhp[myself] * knight_hp_threshold))\n{\n    global.tempflag[96] = 1;\n}\n",
+  "replace": "if (practicemode)\n{\n    global.monsterhp[myself] = global.monstermaxhp[myself];\n    for (var _pi = 1; _pi < min(array_length(global.hp), array_length(global.maxhp)); _pi++)\n    {\n        if (scr_havechar(_pi))\n            global.hp[_pi] = global.maxhp[_pi] * 2;\n    }\n}\nif (global.monsterhp[myself] <= (global.monstermaxhp[myself] * knight_hp_threshold))\n{\n    global.tempflag[96] = 1;\n}\n",
+  "why": "Practice: Knight never loses HP, party never dies.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "P4-battlecontroller-violet",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_battlecontroller_Step_0",
+  "find": "        var can_input = true;\n",
+  "replace": "        var can_input = true;\n        with (obj_knight_enemy)\n        {\n            if (variable_instance_exists(id, \"practicemode\") && practicemode)\n                can_input = false;\n        }\n",
+  "why": "Practice: the normal command menu is replaced by the attack picker.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ }
+]

@@ -1,0 +1,511 @@
+[
+ {
+  "id": "K1-remove-fixparty",
+  "variants": [
+   "kaizo"
+  ],
+  "entry": "gml_Object_obj_ch3_PTB02_Create_0",
+  "find": "scr_fixparty();\n",
+  "replace": "",
+  "why": "scr_fixparty dedups/reorders global.char ([1,1,1]->[1,0,0], [3,2,1]->[1,2,3]) before rem_char is captured, destroying the hub-chosen party. Removal is safe: Step con==2 does the canonical swap and CleanUp restores rem_char.",
+  "scenarios": [
+   "dup",
+   "nokris",
+   "noelle"
+  ]
+ },
+ {
+  "id": "K2-div0-init",
+  "variants": [
+   "kaizo"
+  ],
+  "entry": "gml_GlobalScript_kaizo_settings_init",
+  "find": "            var _sus = max(global.hp[_ch1] / global.maxhp[_ch1], 0.45);\n            var _ral = max(global.hp[_ch2] / global.maxhp[_ch2], 0.45);\n",
+  "replace": "            var _sus = (_ch1 > 0) ? max(global.hp[_ch1] / global.maxhp[_ch1], 0.45) : 0;\n            var _ral = (_ch2 > 0) ? max(global.hp[_ch2] / global.maxhp[_ch2], 0.45) : 0;\n",
+  "why": "Absent slot gives char 0 -> hp[0]/maxhp[0] = 0/0 (division by zero error in GML) computed before the char==0 guards.",
+  "scenarios": [
+   "solo",
+   "nokris"
+  ]
+ },
+ {
+  "id": "K2-div0-maxhp",
+  "variants": [
+   "kaizo"
+  ],
+  "entry": "gml_GlobalScript_scr_damage_maxhp",
+  "find": "                    var _sus = max(global.hp[_ch1] / global.maxhp[_ch1], 0.45);\n                    var _ral = max(global.hp[_ch2] / global.maxhp[_ch2], 0.45);\n",
+  "replace": "                    var _sus = (_ch1 > 0) ? max(global.hp[_ch1] / global.maxhp[_ch1], 0.45) : 0;\n                    var _ral = (_ch2 > 0) ? max(global.hp[_ch2] / global.maxhp[_ch2], 0.45) : 0;\n",
+  "why": "Absent slot gives char 0 -> hp[0]/maxhp[0] = 0/0 (division by zero error in GML) computed before the char==0 guards.",
+  "scenarios": [
+   "solo",
+   "nokris"
+  ]
+ },
+ {
+  "id": "K4a-susie-balloon-guard",
+  "variants": [
+   "kaizo"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Step_0",
+  "find": "if (practicemode || k_sideb || !i_ex(obj_herosusie))",
+  "replace": "if (practicemode || k_sideb || !scr_havechar(2))",
+  "why": "i_ex(obj_herosusie) is true for ghost heroes / false for non-canonical parties; test party membership instead.",
+  "scenarios": [
+   "solo",
+   "nokris",
+   "noelle"
+  ]
+ },
+ {
+  "id": "K4b-susie-balloon-hp",
+  "variants": [
+   "kaizo"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Step_0",
+  "find": "        if (global.hp[2] > 0 || k_freeze[2])\n",
+  "replace": "        if (scr_havechar(2) && (global.hp[2] > 0 || k_freeze[2]))\n",
+  "why": "hp[2] of an absent Susie may have been set to maxhp by the nohit/CleanUp/roaring2 resets, so balloons would fire for a Susie not in the party.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "K5-hpscene-charturn",
+  "variants": [
+   "kaizo"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Step_0",
+  "find": "            if (global.hp[1] > 0)\n            {\n                global.charturn = 0;\n            }\n            else if (global.hp[2] > 0)\n            {\n                global.charturn = 1;\n            }\n            else\n            {\n                global.charturn = 2;\n            }\n",
+  "replace": "            global.charturn = 0;\n            for (var _ci = 0; _ci < 3; _ci++)\n            {\n                if (global.char[_ci] != 0 && global.hp[global.char[_ci]] > 0)\n                {\n                    global.charturn = _ci;\n                    break;\n                }\n            }\n",
+  "why": "hp[1]/hp[2] are char-id indexed but charturn is a SLOT: [4,0,0] (or no-Kris/no-Susie) set charturn=2 = empty slot -> softlock/crash. Pick first non-empty living slot.",
+  "scenarios": [
+   "solo",
+   "nokris",
+   "noelle",
+   "dup"
+  ]
+ },
+ {
+  "id": "V6a-wipe-turntimer",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Step_0",
+  "find": "if (global.hp[1] < 1 && global.hp[2] < 1 && global.hp[3] < 1 && global.turntimer > 0)",
+  "replace": "if (!knight_party_alive_any() && global.turntimer > 0)",
+  "why": "Wipe test ignored Noelle (hp[4]) and counted absent ids (hp 0) as dead: Noelle-only party is declared wiped immediately / never wiped.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "V6b-wipe-endcon",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Step_0",
+  "find": "global.turntimer < 1 && global.hp[1] < 1 && global.hp[2] < 1 && global.hp[3] < 1 && endcon == 0",
+  "replace": "global.turntimer < 1 && !knight_party_alive_any() && endcon == 0",
+  "why": "Same wipe test (game over trigger).",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "V8a-susie-balloon-guard",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Step_0",
+  "find": "if (global.hp[2] > 0 && practice == false && !ral_dead)",
+  "replace": "if (scr_havechar(2) && global.hp[2] > 0 && practice == false && !ral_dead)",
+  "why": "Susie balloons must not fire when Susie is not in the party.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "V8b-friends-down",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Step_0",
+  "find": "balloonturn == (9|10) && global\\.hp\\[1\\] < 1 && global\\.hp\\[3\\] < 1",
+  "replace": "balloonturn == \\1 && knight_friends_down()",
+  "why": "hp[1]/hp[3] test ignores Noelle and treats absent friends as 'down'. knight_friends_down(): true iff no present member among ids 1,3,4 has hp>0.",
+  "scenarios": [
+   "noelle",
+   "solo",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 2
+ },
+ {
+  "id": "V8c-line-bt3",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Step_0",
+  "find": "\"Me? I got...&Kris and Ralsei&behind me./%\"",
+  "replace": "knight_susie_line(\"Me? I got...&Kris and Ralsei&behind me./%\")",
+  "why": "Susie dialogue names Kris/Ralsei; knight_susie_line(orig) returns orig for friends==[Kris,Ralsei], else a party-aware variant (see helpers).",
+  "scenarios": [
+   "noelle",
+   "solo",
+   "nokris"
+  ]
+ },
+ {
+  "id": "V8c-line-bt4",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Step_0",
+  "find": "\"As long as Kris,&Ralsei, are here.../%\"",
+  "replace": "knight_susie_line(\"As long as Kris,&Ralsei, are here.../%\")",
+  "why": "Susie dialogue names Kris/Ralsei; knight_susie_line(orig) returns orig for friends==[Kris,Ralsei], else a party-aware variant (see helpers).",
+  "scenarios": [
+   "noelle",
+   "solo",
+   "nokris"
+  ]
+ },
+ {
+  "id": "V8c-line-b9b",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Step_0",
+  "find": "\"Even... even if&you knock them down.../%\"",
+  "replace": "knight_susie_line(\"Even... even if&you knock them down.../%\")",
+  "why": "Susie dialogue names Kris/Ralsei; knight_susie_line(orig) returns orig for friends==[Kris,Ralsei], else a party-aware variant (see helpers).",
+  "scenarios": [
+   "noelle",
+   "solo",
+   "nokris"
+  ]
+ },
+ {
+  "id": "V8c-line-b10a",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Step_0",
+  "find": "\"As long as Kris has got&a hand to lift me up with.../%\"",
+  "replace": "knight_susie_line(\"As long as Kris has got&a hand to lift me up with.../%\")",
+  "why": "Susie dialogue names Kris/Ralsei; knight_susie_line(orig) returns orig for friends==[Kris,Ralsei], else a party-aware variant (see helpers).",
+  "scenarios": [
+   "noelle",
+   "solo",
+   "nokris"
+  ]
+ },
+ {
+  "id": "V8c-line-b10b",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Step_0",
+  "find": "\"As long as I'm here to&lift them back up.../%\"",
+  "replace": "knight_susie_line(\"As long as I'm here to&lift them back up.../%\")",
+  "why": "Susie dialogue names Kris/Ralsei; knight_susie_line(orig) returns orig for friends==[Kris,Ralsei], else a party-aware variant (see helpers).",
+  "scenarios": [
+   "noelle",
+   "solo",
+   "nokris"
+  ]
+ },
+ {
+  "id": "V9-other12-clamp",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Other_12",
+  "find": "        if (ti == 0 && global.hp[1] > 1 && global.hp[1] < 41)\n        {\n            damage = global.hp[1] - 1;\n        }\n        if (ti == 1 && global.hp[2] > 1 && global.hp[2] < 41)\n        {\n            damage = global.hp[2] - 1;\n        }\n        if (ti == 2 && global.hp[3] > 1 && global.hp[3] < 41)\n        {\n            damage = global.hp[3] - 1;\n        }\n",
+  "replace": "        if (global.char[ti] != 0 && global.hp[global.char[ti]] > 1 && global.hp[global.char[ti]] < 41)\n        {\n            damage = global.hp[global.char[ti]] - 1;\n        }\n",
+  "why": "Slot index ti used as character id: wrong clamp for non-canonical parties, Noelle never clamped.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "V11a-kris-mult1-_Step_0",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_heroparent_Step_0",
+  "find": "if (global.hp[2] < 0 && global.hp[3] < 0)",
+  "replace": "if (!(scr_havechar(2) && global.hp[2] >= 0) && !(scr_havechar(3) && global.hp[3] >= 0) && !(scr_havechar(4) && global.hp[4] >= 0))",
+  "why": "Kris last-stand multiplier ignored Noelle and counted absent chars; party-aware (x2 when no other member is up).",
+  "scenarios": [
+   "solo",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "V11b-kris-mult2-_Step_0",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_heroparent_Step_0",
+  "find": "else if (global.hp[2] < 0 || global.hp[3] < 0)",
+  "replace": "else if ((scr_havechar(2) && global.hp[2] < 0) || (scr_havechar(3) && global.hp[3] < 0) || (scr_havechar(4) && global.hp[4] < 0))",
+  "why": "x1 when some other member is down.",
+  "scenarios": [
+   "noelle"
+  ]
+ },
+ {
+  "id": "V11a-kris-mult1-ther_10",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_heroparent_Other_10",
+  "find": "if (global.hp[2] < 0 && global.hp[3] < 0)",
+  "replace": "if (!(scr_havechar(2) && global.hp[2] >= 0) && !(scr_havechar(3) && global.hp[3] >= 0) && !(scr_havechar(4) && global.hp[4] >= 0))",
+  "why": "Kris last-stand multiplier ignored Noelle and counted absent chars; party-aware (x2 when no other member is up).",
+  "scenarios": [
+   "solo",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "V11b-kris-mult2-ther_10",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_heroparent_Other_10",
+  "find": "else if (global.hp[2] < 0 || global.hp[3] < 0)",
+  "replace": "else if ((scr_havechar(2) && global.hp[2] < 0) || (scr_havechar(3) && global.hp[3] < 0) || (scr_havechar(4) && global.hp[4] < 0))",
+  "why": "x1 when some other member is down.",
+  "scenarios": [
+   "noelle"
+  ]
+ },
+ {
+  "id": "V10-kris-spare-damage",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_GlobalScript_scr_damage",
+  "find": "                if (target == 0)\n                {\n                    if (global.hp[2] > 0 && global.hp[3] > 0)\n                    {\n                        target = choose(1, 2);\n                    }\n                    else if (global.hp[2] > 0)\n                    {\n                        target = 1;\n                    }\n                    else if (global.hp[3] > 0)\n                    {\n                        target = 2;\n                    }\n                }",
+  "replace": "                if (target == 0 && global.char[0] == 1)\n                {\n                    var _kc1 = (global.char[1] != 0 && global.char[1] != 1 && global.hp[global.char[1]] > 0);\n                    var _kc2 = (global.char[2] != 0 && global.char[2] != 1 && global.hp[global.char[2]] > 0);\n                    if (_kc1 && _kc2)\n                        target = choose(1, 2);\n                    else if (_kc1)\n                        target = 1;\n                    else if (_kc2)\n                        target = 2;\n                }",
+  "why": "Kris-sparing used hp[2]/hp[3] by id and returned slots 1/2 by id: wrong for Noelle (id 4), duplicates and absent chars. Now only spares a slot-0 Kris and redirects to other living non-Kris slots (absent slots have char 0).",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "V10-kris-spare-maxhp",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_GlobalScript_scr_damage_maxhp",
+  "find": "                if (target == 0)\n                {\n                    if (global.hp[2] > 0 && global.hp[3] > 0)\n                    {\n                        target = choose(1, 2);\n                    }\n                    else if (global.hp[2] > 0)\n                    {\n                        target = 1;\n                    }\n                    else if (global.hp[3] > 0)\n                    {\n                        target = 2;\n                    }\n                }",
+  "replace": "                if (target == 0 && global.char[0] == 1)\n                {\n                    var _kc1 = (global.char[1] != 0 && global.char[1] != 1 && global.hp[global.char[1]] > 0);\n                    var _kc2 = (global.char[2] != 0 && global.char[2] != 1 && global.hp[global.char[2]] > 0);\n                    if (_kc1 && _kc2)\n                        target = choose(1, 2);\n                    else if (_kc1)\n                        target = 1;\n                    else if (_kc2)\n                        target = 2;\n                }",
+  "why": "Kris-sparing used hp[2]/hp[3] by id and returned slots 1/2 by id: wrong for Noelle (id 4), duplicates and absent chars. Now only spares a slot-0 Kris and redirects to other living non-Kris slots (absent slots have char 0).",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "V16-kaizoknight-thissprite",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_kaizoknight_Draw_0",
+  "find": "if (i_ex(obj_herokris) && isreflecting)",
+  "replace": "if (i_ex(obj_herokris) && variable_instance_exists(obj_herokris, \"thissprite\") && isreflecting)",
+  "why": "thissprite exists only on real heroes; inert ghost heroes make i_ex true and the read crashes.",
+  "scenarios": [
+   "solo",
+   "nokris"
+  ]
+ },
+ {
+  "id": "V13-sideb-needs-trio",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Create_0",
+  "find": "v_sideb = global.flag[456];",
+  "replace": "v_sideb = global.flag[456] && scr_havechar(1) && scr_havechar(2) && scr_havechar(3);",
+  "why": "Weird Route kills Ralsei then Susie via scripted sequences (obj ids 1411/1410, scr_vsideb_kill_char hard-codes char[1]/[2]) and is only winnable by Kris's X-Slash ACT. Requires the full trio; otherwise fall back to the normal fight. (violet_sideb() reads this.)",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "V1a-ptb02-create-init",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_ch3_PTB02_Create_0",
+  "find": "con = -1;\ncustomcon = 0;\n",
+  "replace": "rem_char = [global.char[0], global.char[1], global.char[2]];\nchar_change = 0;\ncon = -1;\ncustomcon = 0;\n",
+  "why": "Violet has no canonical-party swap: init vars.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "V1b-ptb02-create-swap",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_ch3_PTB02_Create_0",
+  "find": "    if (global.tempflag[90] > 0)\n    {\n",
+  "replace": "    if (global.tempflag[90] > 0)\n    {\n        if (global.char[0] != 1 || global.char[1] != 2 || global.char[2] != 3)\n        {\n            scr_refreshchar();\n            scr_reset_caterpillars(1, 2, 3);\n            char_change = 1;\n        }\n",
+  "why": "The retry/hub path calls scr_maincharacters_actors() which needs Susie/Ralsei caterpillars; use the canonical cast like Kaizo (rem_char saved above).",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "V2-ptb02-step-con2",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_ch3_PTB02_Step_0",
+  "find": "    con = 2.6;\n    cutscene_master = scr_cutscene_make();\n    scr_maincharacters_actors();\n",
+  "replace": "    con = 2.6;\n    if (!char_change)\n    {\n        rem_char = [global.char[0], global.char[1], global.char[2]];\n        if (rem_char[0] != 1 || rem_char[1] != 2 || rem_char[2] != 3)\n        {\n            scr_refreshchar();\n            scr_reset_caterpillars(1, 2, 3);\n            char_change = 1;\n        }\n    }\n    cutscene_master = scr_cutscene_make();\n    scr_maincharacters_actors();\n",
+  "why": "scr_maincharacters_actors leaves su_actor/ra_actor undefined when the party lacks them -> crash in the cutscene. Swap to [1,2,3] for the cutscene.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "V3-ptb02-restore-after-battle",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_ch3_PTB02_Step_0",
+  "find": "    scr_battle(115, 1, knight_marker, 0, 0);\n",
+  "replace": "    scr_battle(115, 1, knight_marker, 0, 0);\n    if (char_change)\n    {\n        global.char[0] = rem_char[0];\n        global.char[1] = rem_char[1];\n        global.char[2] = rem_char[2];\n        with (instance_create(0, 0, obj_marker))\n        {\n            sprite_index = spr_whitepx_10;\n            image_blend = c_black;\n            depth = -999999999;\n            image_xscale = room_width / 9;\n            image_yscale = room_height / 9;\n            scr_script_delayed(instance_destroy, 25);\n        }\n    }\n",
+  "why": "Real party must be in global.char when obj_battlecontroller builds the heroes (mirrors Kaizo).",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "V4a-con8-restore",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_ch3_PTB02_Step_0",
+  "find": "    global.hp[3] = 1;\n    if (i_ex(obj_battleback))\n",
+  "replace": "    global.hp[3] = 1;\n    global.hp[4] = 1;\n    if (char_change)\n    {\n        global.char[0] = 1;\n        global.char[1] = 2;\n        global.char[2] = 3;\n    }\n    if (i_ex(obj_battleback))\n",
+  "why": "Restore canonical party for the post-fight cutscene and set Noelle's hp like Kaizo.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "V4b-con8-hero-xy",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_ch3_PTB02_Step_0",
+  "find": "obj_hero(kris|susie|ralsei)\\.(x|y)",
+  "replace": "(i_ex(obj_hero\\1) ? obj_hero\\1.\\2 : knight_canon_xy(\"\\1\", \"\\2\"))",
+  "why": "obj_herokris/susie/ralsei do not exist when the party lacks them; fall back to the canonical positions (needs helper knight_canon_xy). NOTE: with ghost heroes i_ex is true and x/y are 0 -> ghosts must set x,y to canonical positions or this rule must test knight_party_has.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 8
+ },
+ {
+  "id": "V15a-retry-getchar",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_DEVICE_FAILURE_Step_0",
+  "find": "\\n *if \\(!scr_havechar\\((2|3)\\)\\)\\n *\\{\\n *scr_getchar\\(\\1\\);\\n *\\}",
+  "replace": "",
+  "why": "Retry path force-adds Susie/Ralsei into the hub-chosen party ([4,0,0] -> [4,2,3]). PTB02 now swaps to the canonical cast itself.",
+  "scenarios": [
+   "solo",
+   "nokris",
+   "noelle"
+  ],
+  "regex": true,
+  "count": 6
+ },
+ {
+  "id": "V15b-retry-hp",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_DEVICE_FAILURE_Step_0",
+  "find": "i < 4; i\\+\\+\\)(\\n *\\{\\n *global\\.hp\\[i\\] = global\\.maxhp\\[i\\])",
+  "replace": "i <= 4; i++)\\1",
+  "why": "hp restore loop misses Noelle (id 4).",
+  "scenarios": [
+   "noelle",
+   "solo"
+  ],
+  "regex": true,
+  "count": 1
+ },
+ {
+  "id": "V17-endturn-slot0-act",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_GlobalScript_scr_endturn",
+  "find": "        global.currentactingchar = 0;\n        if (global.acting[0] == 0)\n",
+  "replace": "        global.currentactingchar = 0;\n        if (global.char[0] > 1 && global.actingsingle[0] == 1)\n        {\n            global.acting[0] = 1;\n            __minstance = global.monsterinstance[global.actingtarget[global.currentactingchar]];\n            with (__minstance)\n            {\n                if (global.char[0] == 2)\n                {\n                    actconsus = 1;\n                }\n                if (global.char[0] == 3)\n                {\n                    actconral = 1;\n                }\n                if (global.char[0] == 4)\n                {\n                    actconnoe = 1;\n                }\n            }\n        }\n        if (global.acting[0] == 0)\n",
+  "why": "scr_nextact starts at slot 1, so a non-Kris slot-0 leader's ACT is silently skipped (battle stalls/ACT lost); ported from Kaizo.",
+  "scenarios": [
+   "solo",
+   "nokris"
+  ]
+ }
+]

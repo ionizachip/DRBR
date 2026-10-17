@@ -1,0 +1,10 @@
+using System;using System.IO;using System.Text;
+EnsureDataLoaded();
+var sb=new StringBuilder();
+for(int i=0;i<Data.GameObjects.Count;i++)sb.AppendLine("obj\t"+i+"\t"+Data.GameObjects[i].Name.Content);
+for(int i=0;i<Data.Sprites.Count;i++)sb.AppendLine("spr\t"+i+"\t"+Data.Sprites[i].Name.Content);
+for(int i=0;i<Data.Sounds.Count;i++)sb.AppendLine("snd\t"+i+"\t"+Data.Sounds[i].Name.Content);
+for(int i=0;i<Data.Rooms.Count;i++)sb.AppendLine("room\t"+i+"\t"+Data.Rooms[i].Name.Content);
+for(int i=0;i<Data.Fonts.Count;i++)sb.AppendLine("font\t"+i+"\t"+Data.Fonts[i].Name.Content);
+for(int i=0;i<Data.Scripts.Count;i++)sb.AppendLine("scr\t"+i+"\t"+Data.Scripts[i].Name.Content);
+File.WriteAllText(Environment.GetEnvironmentVariable("OUT_TSV"),sb.ToString());

@@ -1,0 +1,37 @@
+{
+  "product": "DRBR",
+  "title": "DRBR - DELTARUNE BATTLE ROYALE",
+  "version": "1.0.0",
+  "mod_build": "51.10",
+  "protocol": 51,
+  "launcher_version": "1.0.0",
+  "min_launcher_version": "1.0.0",
+  "github": {
+    "owner": "OWNER",
+    "repo": "DRBR"
+  },
+  "update_manifest_url": "https://github.com/{owner}/{repo}/releases/latest/download/update-manifest.json",
+  "release_download_base": "https://github.com/{owner}/{repo}/releases/download/v{version}/",
+  "public_key": {
+    "alg": "RSA-3072 PKCS#1 v1.5 SHA-256",
+    "modulus_b64": "uYJvqIkMub9JhZUENxoRZNXpuzLk+eCGcmRNLgxBN5CYzlho66ngbTHw2TVgki4WA7VaFuDkF/dldDt4JwGVU3FCzclRs18tLILaGOvrCsV7fc6j4bPZeObsMI3PQ+a5eK7ka0GLxvr/AXHSKs0FAkweIaOl4Oqme7az53s/pgkZtCO4+ASx/kzxX3VAamyxq49eON9XNsQdUHxoSZC9d9Ijd6f7ftNHgY9hABbSh07mGVo35ZwF967Si4intJNrQVtxiK/eY3/RUcvJv/YzMLrxPIdd0BfZagI0ZYsCGyWDJhZsXu4WVcf3xLYcaP6qQGrrq59IXgGy+NmqFyhjrvigje5eoHrc/7BDF883vBTDryvR3qDBWof0E0LY86zeOKnx0rXK6xDPxwpn/LSTCWbPIIfrLBBVbcWBRBF990QlHoPfgUf1ujKqQPFRey9mF9nwHb81t+moT6hKCSQCfdu0tD0AcPIG5jsHyGw+udVx0+kSUSpL7hf+v0GuqGa7",
+    "exponent_b64": "AQAB"
+  },
+  "supported_game_builds": [
+    {
+      "name": "DELTARUNE (Steam) - Chapter 3 v0.0.105",
+      "size": 126284402,
+      "sha256": "c1a0925343694ec9b9adcbf2f916a720b02fd1b999286cfe8fe6a52f3320f714"
+    }
+  ],
+  "save_profile": {
+    "schema_version": 1,
+    "profile": "drbr_default",
+    "save_template_version": 1,
+    "migration_version": 1,
+    "starting_location": "room_dw_snow_zone",
+    "starting_room_id": 30108,
+    "starting_plot": 320,
+    "default_start_mode": "template"
+  }
+}

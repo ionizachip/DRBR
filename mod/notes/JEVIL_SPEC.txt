@@ -1,0 +1,69 @@
+KNIGHT FIGHTS ONLINE - JEVIL AND THE SECRET BOSS SLOTS
+(the "Full Jevil Implementation" prompt, rewritten to fit how Knight Fights works today - build 51)
+=========================================================================================================
+
+WHAT KNIGHT FIGHTS ALREADY IS (so the work builds on it, not beside it)
+ - Every player's game runs its own copy of the same battle. Nothing is streamed per bullet. A match is a TIMELINE of
+   attack CYCLES that every game works out for itself from the host's seed and the room's settings (kbr_tl_*): cycle k =
+   which encounter, which attack, its seed, the tick it starts, how long it runs, the stage, Twin/Hyper, final two, sudden
+   death. The host only checks that games stay in step (cycle signatures, the shared clock) and passes players' states.
+ - Attack randomness comes from a stream seeded per attack (kbr_random / kbr_choose / kbr_irandom - the attack code calls
+   these instead of random()), so unaimed parts land in the same place in every game; aimed parts aim at your own SOUL.
+ - The "encounter director" is the timeline plus the LINEUP: the encounters of a match are made once and switched in and
+   out between attacks (knight_lu_*, kbr_step/kbr_arm/kbr_cut). An attack is armed (box up, SOUL centred), held at the
+   shared tick (kbr_rgate), runs, and is cut on the same frame in every game.
+ - The ROSTER (kbr_roster) is one table of online encounters: an online id is its row; rows are only ever added at the
+   end; MATCH SETTINGS (which encounters, weights, the rushes) and the HUD names/colours follow from the table. It was made
+   for "the bosses of the other chapters".
+ - Damage never comes from the bullet: every hit goes through scr_damage -> the room's damage table by kind of bullet
+   (kbr_hit_kind / kbr_hit_dmg) and the room's DAMAGE setting. One HP total per player; going to 0 = OUT, watching.
+ - Player attacks ("skills", red) are the bosses' REAL attack objects wrapped (kbr_sa / online_sent50): built around the
+   target's SOUL in the target's game, invisible copies in the others' games for the bots and the watchers, only the
+   recipient hurt. Targeting is the Tetris 99-style row (CHAOS, PROCEED, BIG SHOT, DEFEND, CHECK, PACIFY, ROARING).
+ - Bots dodge whatever is in the box (generic bullet tracking) - a new boss needs no bot code.
+ - Room settings are pages (online_set.gml), presets are named setting sets (kfo_set presets).
+
+THE REQUEST, IN THOSE TERMS
+1. ENCOUNTERS. The roster gets a kind: KNIGHT (the existing rows) or SECRET BOSS. Jevil is the first secret boss. A small
+   encounter table (kbr_enc_*) holds what a non-knight needs: key, name, short name, colour, category, music file, its
+   attack list in the knights' format [phase, id, name, flags], each attack's length, its finale (its "Roaring"), the
+   lineup id (1000 + n: never a hub registry index, so the offline hub is untouched), and the assets it needs (a boss whose
+   assets are missing is never valid - never shown, never picked). Adding the next boss = a table entry, its objects, a
+   roster row. Unfinished bosses are not listed.
+2. JEVIL'S OWN FIGHT, FROM CHAPTER 1. The player's Chapter 1 data.win is the source: obj_joker's attacks are 16
+   obj_dbulletcontroller types (70, 65, 49, 75, 62, 50, 73, 68, 61, 48, 72, 76, 71, 46, 74, 77) that make obj_spadering,
+   obj_suitbomb (spade/diamond/heart/club bombs), obj_heartbomb_blast, obj_carouselbullet, obj_centerscythe,
+   obj_laserscythe, obj_bigscythe, obj_joker_teleport, obj_clubsbullet_dark, obj_dbullet_vert. They are imported as their
+   own objects (obj_jv_*: Chapter 3 has some of these names for other things), with their sprites and Jevil's voice
+   sounds, and their code changed only where Chapter 3 differs: the SOUL's middle is +10 (Chapter 1: +8), randomness
+   through the attack stream, obj_joker -> Jevil's battle object, damage through the room's table (the laser scythe's
+   "take 30% of everyone's HP" becomes a normal hit).
+   Jevil's look: obj_joker_body's drawing (idle, dance, tired, the shadow-dance, sinking into the box for the attacks that
+   need it, coming back, turning into the devilsknife), its sounds (CHAOS, CHAOS!, I CAN DO ANYTHING!, BYE-BYE!, the oh's).
+   The background: obj_jokerbg_triangle_real as Chapter 1 draws it - the carousel picture in 32 strips (a turning drum),
+   scrolling, the canopy's navy triangles turning, fading in when Jevil steps in and out when he leaves, at depth 600000
+   (behind the battle). No shader is involved. The Knight's own background is hidden while Jevil is out.
+   Music: joker.ogg (THE WORLD REVOLVING) from DELTARUNE's own mus folder, while Jevil is out; the match's song after.
+3. JEVIL IN THE TIMELINE. Phases keep Chapter 1's order: phase 1 = attacks 0-3, phase 2 = 4-7, phase 3 = 8-11 and
+   12-14; stage 0 draws from phase 1, stage 1 from phases 1-2, stage 2+ from all (12-14 with HARD ATTACKS on), as for a
+   knight. His finale (attack 15, BYE-BYE: the box goes, devilsknives rain, the giant scythe and the white-out) takes the
+   Roaring's place (3 minutes in, the final two). His dance level follows the stage. Each attack's length comes from its
+   own turn timer (240, 270, 300, 330 frames; the finale until it ends). Everyone fights the same Jevil, the same attack,
+   at the same tick; a swap between a knight and Jevil cleans the other one's bullets, background and music.
+4. JEVIL SKILLS (what players send). New red skills built from Jevil's own pieces, through kbr_sa like the knights'
+   skills (around the target's SOUL, only the target hurt, the others see nothing that hurts them):
+     SPADE RING (spade ring, low cost), DIAMOND RAIN (falling diamonds, mid), CLUB SPIRAL (the dark clubs closing in,
+     mid), HEART CAROUSEL (the carousel horses, high), DEVILSKNIFE (the spinning scythe, high), CHAOS BOMBS (a few suit
+     bombs, high). Their cost, damage and pool follow the existing skill table (kbr_skill_*): low / mid / full pools.
+   They go into the draw pool only when the room's SKILL FAMILIES allows them.
+5. PRESETS. One new row in MATCH SETTINGS: ENCOUNTERS = KNIGHTS / JEVIL / SECRET BOSSES / ALL BOSSES / CUSTOM (custom =
+   the existing per-encounter rows). One row: SKILL FAMILIES = KNIGHT / JEVIL / ALL. Secret Bosses = every completed
+   secret boss (Jevil now). Settings go to everyone with the room as they do today.
+6. FAIRNESS. Room difficulty (DAMAGE, HARD ATTACKS, the stage ramp, Hyper) applies to Jevil as to the knights. Sends
+   already have their own pressure limits (cooldown, slots, outnumbered bonus).
+7. EVERYTHING ELSE STAYS: watching (followed player's view), other SOULs, chat, the HUD, bots, OUT and shatter, results.
+   Offline DELTARUNE and the offline hub do not change (Jevil is online only; the Cyan Knight stays out of online play).
+8. TESTS (emulated: the real code, a mocked engine; nothing here is the real game): every Jevil attack runs to its end
+   and leaves nothing behind; the timeline picks Jevil only when the room allows it and in the right phase order; three
+   games over the simulated network see the same Jevil cycles; a swap knight -> Jevil -> knight leaves no stale objects,
+   background or music; each Jevil skill reaches only its target; the presets; the existing tests still pass.

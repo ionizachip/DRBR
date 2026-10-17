@@ -1,0 +1,433 @@
+DRBR - DELTARUNE BATTLE ROYALE (Knight Hub build 51, update 9) - WHAT IS NEW
+==========================================================================
+The online battle royale of the Knight Hub is now called DRBR - DELTARUNE BATTLE ROYALE (the ONLINE page, the window
+title while you are in a room, the HOW TO PLAY lesson). It still lives in the hub: KNIGHT page > ONLINE. Offline DELTARUNE
+and the offline hub are unchanged.
+
+FIVE BOSSES BESIDES THE KNIGHTS (online only) - each one the game's own fight, from your own DELTARUNE files:
+  JEVIL        Chapter 1's secret boss - RED SOUL - his 16 attacks, BYE-BYE as his finale
+  GERSON       Chapter 4's secret boss, the Hammer of Justice - GREEN SOUL: the arrows turn your shield; BLOCK the spears
+  FLOWERY      Chapter 5's boss - ORANGE SOUL: hold Z to charge, let go to DASH through the blue and into his JARONA
+  SPAMTON NEO  Chapter 2's secret boss - YELLOW SOUL: Z shoots, hold Z for a BIG SHOT
+  PINK         Chapter 5's secret boss - PURPLE SOUL: the arrows move you from lane to lane
+  Your SOUL changes for that boss's attacks only, in your own game, and is red again after (a SOUL COLOR you picked never
+  replaces it). The first two times a special SOUL turns on in a match, a short line under the box says what it does.
+  Their turn orders,
+  pieces, music, backgrounds and lines are the originals; what had to change for a shared online fight (no FIGHT/ACT menu,
+  one shared timeline, damage from the room's settings) is listed per boss in DRBR_BOSSES.txt.
+WHO FIGHTS: the room's SETTINGS > BOSSES. WHO FIGHTS is the boss preset (KNIGHTS, JEVIL, SPAMTON, GERSON, PINK,
+  FLOWERY, SECRET BOSSES, ALL BOSSES, CUSTOM); under it each boss has its own ON / OFF row, then FIRST BOSS, BOSS ORDER
+  (CLASSIC, RUSH...), BOSS STAYS and SHOW NEXT. Each row's description says the boss's chapter, its SOUL and its sends.
+SENDS (SETTINGS > SKILLS): whose attacks your red skills are - CURRENT BOSS (the family of the boss on stage: knights'
+  attacks while a knight fights, Jevil's while Jevil is out...), ALL ENABLED (every family in the match), or one fixed
+  family. Every boss has its own sends, made of its own attack pieces, built around your target's SOUL in their game only
+  and kept dodgeable on top of the boss's own attack: Jevil 6, Gerson 6, Flowery 7 (only in a match Flowery is in - they
+  are pieces of his board), Spamton NEO 6, Pink 6. INCOMING (left of the box) lists what is coming at you: who sent it,
+  what it is in its family's colour, and when it lands; TARGETED BY N says how many players aim at you.
+PRESETS (SETTINGS > PRESETS, the whole room's rules): new JEVIL, ALL BOSSES, GERSON, FLOWERY, SPAMTON and PINK set who
+  fights and the sends together. WHO FIGHTS changes only who fights; SENDS only whose attacks you send; a PRESET sets both
+  (and the rest of the rules). A preset or boss missing from your copy of the game is not offered.
+THE BOSSES PAGE (ONLINE > BOSSES, or the room's BOSSES row): every boss with its look, chapter, SOUL and what it does, its
+  sends, its number of attacks and its music, in two groups (KNIGHTS, BOSSES). Z outside a room: a PRACTICE match against
+  that boss alone (your saved room settings stay as they were). Z in a room (the host): puts it in the room or takes it
+  out. < > the group, X back.
+NEW SKINS (online only, cosmetic: the same HP and SOUL for everyone): Chapter 5's flowers - Aqua, Seth, Orange, Green,
+  Yellow, Blue (and Flowery, the hub's own hero) - Pink, and Chapter 2's normal, small Spamton (not NEO). Each walks in
+  the cold place with its own sprites in every facing and stands still with its own idle where it has one; everyone in
+  the room sees your choice. THE SKINS PAGE (ONLINE > SKIN, Z): four groups (PARTY, FLOWERS, BOSSES, OTHER) with a preview
+  of how the skin walks, its battle pose and its face. < > on the SKIN row still changes it right there. SKINS.txt.
+CLEANER SCREENS: every menu checked at 640 x 480 with long names and every value: nothing over the frame, the party panel
+  or another text (the room's page, KEYBINDS, FIND ROOMS, the settings, the results box were fixed). In a match the top
+  middle is one stack (the boss and its attack, Flowery's GROUP MERCY, MATCH INFO, then a banner), NETWORK STATS sit beside
+  the network light (a warning takes the whole header), the watching lens and help box stay clear of the party panel.
+  OUT #0 is now just OUT (a place not known yet). The mouse wheel moves through every list of the menus.
+FIXED: a crash when a Jevil piece touched your SOUL ("obj_collidebullet.destroyonhit not set"): every bullet now gets
+  Chapter 3's fields when it is made, and a last-moment fallback fills anything still missing.
+
+BUILD 51 - WHAT CHANGED (on top of build 50)
+- TARGETING has plain names. Old -> new: CHAOS -> RANDOM, PROCEED -> LOW HP, BIG SHOT -> CRYSTALS, DEFEND -> REVENGE,
+  CHECK -> CHOOSE, PACIFY -> TIRED, ROARING -> EVERYONE. Same seven modes, same rules, same room switches (tgm0-tgm6).
+  The row is one slim strip: TARGET (with your target's SOUL colour) - the seven modes - your SHADOW CRYSTALS (x strength)
+  and !N (how many target you). Changing mode shows its one line for 2 seconds. CHOOSE: A / the right stick / 1-8 pick a
+  player; their card gets a yellow edge and ATTACKING: NAME shows under the cards. Keys: the TAB box.
+- SKILLS: staggered diamonds top left (HOLD on the right), pictures from the game's own art, MAX (Full Heal) a green plus,
+  the picked skill's name under them. Everyone and every bot starts with exactly one MAX; MAX fills to full HP whatever
+  HEAL POWER says. The TP bar is a little lower.
+- PLAYERS: a grid of small cards - number, SOUL colour, name, crystals (+N when they go up), connection bars, HP bar
+  (blue = shield, striped = TIRED). Edge: yellow = you target them, red = they target you, cyan = REFLECTION.
+- FEED: 3 lines, each send once ("* Susie sent Knightmare to Kris."); the same line twice in a second is "x2".
+- BIG MOMENTS: a knight stepping in, a new stage, the FINAL TWO and SUDDEN DEATH get an animated band with a new line.
+- HOW TO PLAY (the ONLINE page): a step-by-step lesson against a DUMMY. The Knight WAITS (the match clock stops between
+  attacks) while it shows the screen, the TP bar and the 60% line, charging, using and HOLDing skills, MAX and the seven
+  targeting modes; it attacks only for the dodge (arrows, X, Hold Breath), graze and send-a-Sword lessons; then crystals,
+  the final two and a tour of the menus (HOST A ROOM / JOIN WITH CODE / FIND ROOMS, SETTINGS, BOTS, KEYBINDS, SOUL COLOR,
+  TAB, chat, give up). Steps you do move on by themselves. ESC leaves. Remembered once finished.
+- The big announcements never cover the battle box (under it, or over it when there is no room).
+- The ONLINE page: HOW TO PLAY, PRACTICE, HOST A ROOM, JOIN WITH CODE, FIND ROOMS, NAME, SKIN, MORE... (relay, SETTINGS).
+- Going out without a hit: the results say why, and knightfights_debug.log records the battle's state at that moment.
+
+KNIGHT FIGHTS ONLINE - build 50 guide
+=====================================
+A battle royale for 2 to 8 players inside the Knight Hub (DELTARUNE Chapter 3): every player dodges the SAME Knight, the
+SAME attacks, at the SAME moment, in their own copy of the battle. The last SOUL standing wins. Up to 4 more room members
+can WATCH a match (WATCH PLACES).
+(KNIGHT page > ONLINE, or the sign in the cold place while you are in a room.)
+
+What is new in build 50 (details in the sections below)
+--------------------------------------------------------
+- THE ATTACK SKILLS ARE THE KNIGHTS' REAL ATTACKS. A skill sent at you is now made of the Roaring Knights' own attack
+  objects, with their own sprites, animations, telegraphs and sounds (quieter, so eight senders are not deafening),
+  tinted in the sender's colour. Damage, the kill feed and knockout credit work as before. The charge and item system
+  is unchanged: the same gauge, costs, pools, draws, slots, keys and damage per hit. Which real attack each item is:
+      Sword            a tracking sword (obj_tracking_sword1): it follows your SOUL from one of 8 sides, flashes, slashes
+      Flurry           five tracking swords, one every 8 frames, from alternating sides
+      Diamond Storm    Kaizo's diagonal diamond rows (obj_diagonal_bullet__v1), two rows from both sides
+      Streamline       the Splitters' teeth (obj_roaringknight_split_bullet) streaming across from one side
+      Ring             six pointing stars (obj_knight_pointing_star) close in on a ring and burst into starchildren
+      Star Burst       three pointing stars near your SOUL burst one after another
+      Weird Circle     Kaizo's Rising Abyss (obj_knight_weird_circle): circles at the floor fire up the weird shape
+      Slow, Confuse    unchanged (effects)
+      Knightmare       the Spinning Slashes: a black flash, then three rounds of the rotating slash's turning markers on
+                       your SOUL, each ending in its slashes (obj_roaringknight_slash, obj_knight_circle)
+  NEW ITEMS (drawn like the others, only when their knight is in the match's KNIGHTS pool; each has its own switch
+  in SKILLS):
+      Crescent Slash   (Kaizo, mid pool)  Kaizo's crescents (obj_bullet_knightcrescent) split and speed across
+      Sword Rain       (Kaizo, mid pool)  Kaizo's falling swords (obj_fallingsword__v1) flip in above and dive
+      Thunder Lines    (Elecknight, mid)  Elecknight's lightning (obj_knight_lightningshock), cyan line first
+      Fountain Split   (Thorn, mid pool)  Thorn's fountain (obj_roaringknight_fountain_bullet) out of a splitting seam
+      Diamond Eruption (Violet, full)     the Violet Knight's weird circle erupting in a full fan of diamonds
+  How it is done (the Knight's own fight does not change): a send only exists in the target's game; its objects are
+  marked as "sent by a player" and kept apart from the Knight's (the Knight's code never sees, moves, counts or
+  destroys them, and they never see the Knight's), they draw from their own random numbers (never the shared attack
+  stream), keep their own knight's look whatever knight is fighting, never touch the turn timer or shake the box,
+  start from the box's real place and size, and are cleaned up completely (bullets, helpers, sounds, surfaces).
+  The bots dodge hidden copies of each item's pattern made around them by the host.
+- THE TWIN KNIGHT USES THE KNIGHTS' REAL ATTACKS too (no more plain balls): STAR RAIN - pointing stars fall round your
+  SOUL, growing, stop, then burst into starchildren that fly out; STAR BURST - the twin points, a star drifts at you and
+  bursts the same way; SIDE SWORDS - tracking swords that follow your SOUL's height, flash and slash across; FALLING
+  SWORDS - Kaizo's falling swords flip in above you and dive. Each with the Knight's own sounds. The twin itself warps
+  to each attack's spot with the Knight's warp (and its teleport sound), plays that attack's pose (pointing, the flurry
+  wind-up and swing, the sword raise) with the Knight's afterimages, warps back beside the Knight between attacks, and is
+  always see-through (at most half). Its attacks end with the Knight's turn.
+- SONG LYRICS: with FLOWER MAN (Flowerman_Arrangement.ogg) or the new RAISE UP YOUR BAT (ch3_karaoke_full.ogg, Chapter 3's
+  own karaoke track, in MUSIC before RANDOM) as the fight's song, the lyrics run with it - online in the strip at the bottom
+  under the TARGETING row, offline at the top under the hub's lines - in the games' own lyric style: Chapter 5's Flower Man
+  lyrics (yellow, lit green syllable by syllable, glowing on the choruses), Chapter 3's karaoke lines for Raise Up Your Bat
+  (white, lit blue). They follow the song's real position and start over when it loops.
+- FLOWERY (Chapter 5) IS A PARTY MEMBER OF HIS OWN: pick him in PARTY (after Noelle) or as your online SKIN. He is not
+  Noelle in disguise any more: his own character (number 5) with his own hero in battle, his own HP / AT / DF / MAG (max HP
+  300; AT and DF 90%, MAG 115% of the party's average), his own gear (WinningSmile, PetalMantle, SundayBest - only he wears
+  them; the stats are the hub's own, Chapter 5 shows only the names), his golden HP bar (Chapter 5's colour), his head and
+  name. He and Noelle can be in one party (two Flowerys too, like any member).
+  His battle poses face the knight (Chapter 5 drew him facing left, as the enemy: they are mirrored copies). His MAGIC:
+    F-ACTION (0%, his own ACTION, first in the list): the party's TP +16% with one of his lines.
+    SANFRANDISCO (0%): his flash kick - he runs in and flips into a crescent kick (a little TP back).
+    MY JARONA (50%): a blue warning line first, then his runner from Chapter 5's fight four times - dash in rainbow
+      afterimages, crouch, crescent kick with its crescent and shockwave ("Jarona!" each time) - then "Heh. It's my Jarona."
+    EZ2DANCE (20%): his pirouette; on the next enemy turn the SOUL moves about 10% faster (does not stack).
+    PRISM RUSH (100%): OMEGA FLOWERY - his pose and power-up in every flower's colour, three rushes through the foe in
+      explosions, the clash (Kris jumps in and slashes when Kris is in the party), the wind-up and the final punch.
+    AFINIHUG (35%): one ally takes 20% less damage on the next enemy turn.
+    HONEY KISS (40%): his kiss blown to the foe: MERCY +20% where the fight has MERCY; a knight has none, so it is charmed
+      instead - its next attack hurts everyone 15% less.
+  His Chapter 5 voice clips play only with his moves and F-Action lines (never on their own, never cut short). With Flowery
+  leading the party you walk around the hub as him. Works with every knight. Online he is a SKIN like the others (only a
+  look): the online match has no party battle, so his techniques are for the hub's fights.
+- YOUR SKIN STAYS: the SKIN you pick is how you walk around the Dark World after you close the menu too (it used to turn
+  you back into Kris).
+- PRACTICE starts with no bots (add them on the room page's BOTS); you can start it on your own.
+- NO OPENING SCENE ONLINE: an online match goes straight into the fight every time (the cold place's Knight scene before
+  the battle is skipped).
+- THE TWIN KNIGHT MIXES ITS ATTACKS UP: it changes pattern every 2.5 - 3.5 seconds during the Knight's turn (never the one
+  it just did or the one before), and its stars are telegraphed first - a flashing line down the column and a ring where a
+  falling star stops, a closing ring and a direction line where a drifting star appears - for most of a second.
+- BOTS USE SKILLS MUCH MORE: they draw as soon as the bar reaches the draw cost, fire attack skills far more often (even
+  DUMMY now and then), use shields and reflection more readily, and never sit on a full hand for more than 4 seconds.
+- A KNIGHT'S ROARING (its finale) gets the screen to itself: the skill slots, the log, the player list, the knight card,
+  the TARGETING row, the banners, the chat and the hub's lines step aside while it is on screen and come back after it
+  (your SOUL, the others' SOULs, a hit's flash, GAME OVER and QUICK SETTINGS stay).
+- THE BOTS GET THROUGH THE ROARING like a player can: they keep to the screen as your SOUL does there (the Roaring's box
+  swells past the screen and then shrinks to nothing), the stars only hit them on the stars' own precise test (the
+  small hitbox your SOUL has for stars, not the SOUL's whole box), they hold their breath there as you can (+2 speed),
+  they watch the whole line of Kaizo's Roaring DELTA's full-screen slashes (not just the short marker it starts as), and
+  the Roaring pulls them toward the Knight as it pulls you. (DUMMY bots, which hardly dodge, can still fall to it.)
+- THE TP BAR IS THE SKILL METER (one meter, the game's own TP bar art): it shows your gauge 0-100%. A white line across
+  it at the draw cost (60), slanted like the bar's ends: dim below, lit and flashing when the bar (or the charge you
+  hold) reaches it. Orange under the line, gold above, the whole bar flashing white at 100 with MAX. While you hold
+  CHARGE, Deltarune's red section shows what the bar will lose when you let go; YOU DREW A SKILL! pops beside the bar
+  when skills are drawn (still on letting go of CHARGE, as before). The small charge bar under the slots is gone.
+- SHIELD IN BLUE ON YOUR HP BAR (the party panel): a blue part after your HP (each SHIELD hit shown as one ordinary Knight
+  hit, 16 HP x DAMAGE), the bar full with the blue on top when HP + shield is over your max, a blue +N left of your HP
+  numbers, shrinking as hits land and breaking with a flash and a sound. The player list shows the others' shields in
+  blue the same way.
+- HOLD BREATH IS A TOGGLE: press S once to hold your breath (SOUL faster), again to let go.
+- SHARDS use Deltarune's own Shadow Crystal graphic.
+- THE TWIN KNIGHT (the Knightmare's second knight) no longer just lurks: it flies round the box to each of its attacks
+  and plays the attack's own animation (pointing for stars, the flurry for swords, flying for dashes).
+- CHAT (as since build 49's last update): T or \ opens it (ENTER too during a match); ENTER or \ sends; ESC closes.
+
+What was new in build 49
+--------------------------------------------------------
+- THE OTHER SOULS AND THE BOTS ARE ON YOUR SCREEN NOW. In the real game the fight takes place far into the cold place
+  (the arena camera is at x 2063 and more); build 48 cut every SOUL position it passed on at x 1000, so the other
+  players' SOULs were drawn off screen, and its bots took the real box (x 2000+) for "no box": they were never placed,
+  never moved and never drawn. Every SOUL position now travels relative to the battle's camera and each game draws it at
+  that place plus its own camera. (Our earlier tests ran the battle with the camera at 0, where neither problem shows.)
+- SMART BOTS: they play by the players' rules (same SOUL, hitbox, speed, damage, gauge, skills and TARGETING) and dodge
+  from the real bullets in the box: every frame they see each bullet's box and how it moves, look ahead, and pick the
+  safest of 17 moves (stay, 8 directions, 8 at half speed for tight gaps), keeping off the edges and out of corners.
+  They heal when low and nothing is close, put up a SHIELD in trouble, REFLECT when several target them, wait to draw
+  two skills, and send attack skills with a TARGETING mode for the moment (PROCEED when someone is nearly out, DEFEND
+  when two or more target them, BIG SHOT, PACIFY, now and then ROARING). In the list they have a BOT tag and their party
+  skin.
+- BOT DIFFICULTY: DUMMY, EASY, NORMAL, HARD, EXPERT, PERFECT, per bot or for the whole room (BOT SKILL). PERFECT has no
+  delay, the full look-ahead, no mistakes and exact moves. Seven sliders per bot: REACTION TIME, PREDICTION, MISTAKES,
+  PRECISION, HEALING, CHARGING, AGGRESSION (moving one makes that bot CUSTOM). The numbers behind the presets are in one
+  table (kfo_bot_presets in the mod's code).
+- THE ROOM PAGE'S "BOTS" ROW (host only; PRACTICE and online rooms): ADD A BOT, REMOVE A BOT, BOT SKILL (ROOM) for every
+  bot not set one by one, and Z on a bot: its own page (PRESET, the sliders, ROOM'S SKILL).
+- STEAM INVITES IN THE GAME: the room page's INVITE FRIENDS opens your Steam friends list (playing Knight Fights first,
+  then online, away, offline). Z on a friend sends a Steam invite to this room (it also lets them into a PRIVATE room).
+  A friend with the game open gets a STEAM INVITE box (JOIN / NOT NOW) in the sign's menu, or a line at the top of the
+  screen; Steam's own notification works too. STEAM OVERLAY (Steam's invite list) is the row under the friends.
+  Steam starts when you open the sign's menu, so invites reach you without opening ONLINE first.
+- Bots charge their gauge to the top (two skills) and use the heals they hold as soon as a heal would not be wasted.
+- BUILD STAMP: "KNIGHT HUB V2 - BUILD 49 - <date and time>" at the bottom right of every page of the sign's menu, so you
+  can see which data.win the game loaded.
+- DEBUG OVERLAY: F3 (anywhere: the cold place, the menu, a match) shows the build stamp, the room and camera, your SOUL,
+  every other SOUL and bot (x, y in the room and relative to the camera, depth, drawn or not and why, alpha) and draws a
+  plain coloured square where each other SOUL is, whatever the SOUL settings say. While it is on, the same lines go to
+  knightfights_debug.log in the game's save folder (%LOCALAPPDATA%\DELTARUNE - GameMaker only lets a game write there).
+- CHAT: T or \ (backslash) opens it and \ sends (later in build 49: ENTER opens it during a match and sends too).
+  The CHAT key is in KEYBINDS.
+- OTHER SOUL OPACITY goes from 15% to 100% (a saved value below 15 is raised to 15). CONFIG > RESET MOD SETTINGS puts
+  every online setting (SOULs, your SOUL colour, view, keys, online song, room settings) back to the defaults; it asks
+  first and keeps your name, skin, server, fight setup, records and presets.
+
+What was new in build 48
+--------------------------------------------------------
+- SHOW OTHER SOULS really shows them: the other players' SOULs are drawn as real SOULs in their own colours (70% opacity
+  by default, yours always solid), with no rings or halos around any SOUL.
+- SOUL SETTINGS is five rows: SHOW OTHER SOULS, SOUL COLOR (its own page: RED ORANGE YELLOW GREEN CYAN BLUE PURPLE PINK
+  WHITE, RED / GREEN / BLUE, a hex code, OUTLINE and OUTLINE COLOR, a preview), SOUL NAMES, OTHER SOUL OPACITY (slider),
+  HIGHLIGHT MY SOUL (yours on top of the others).
+- CHAT: T or \ (backslash) opens it, \ sends, ESC closes, TAB makes it bigger, the mouse wheel scrolls. Works in
+  the room, the cold place, the match and while watching; the match never pauses for it. /mute NAME, /unmute NAME.
+- TARGETING (Tetris 99 style): CHAOS, PROCEED, BIG SHOT, DEFEND, CHECK, PACIFY, ROARING decide where YOUR attack skills
+  go; Shadow Crystal SHARDS for knockouts make your sends stronger; the OUTNUMBERED BONUS fills your gauge faster.
+- THE ROARING: as soon as the final two starts, and on the first attack after 3 minutes, the knight of that moment (any
+  knight) uses its own Roaring.
+- A SOUL that breaks breaks as in Chapter 3's GAME OVER (it cracks, then shatters) - the other players' too, where they
+  were. Yours is followed by the GAME OVER itself over the still-running battle, with your place, then you watch.
+- Keys: HOLD SLOT moved to D and QUICK SETTINGS to F (Q / E / A are the targeting keys). Controller: LB / RB change the
+  targeting mode, the right stick picks a target, HOLD BREATH is LT and the HOLD slot RT.
+- Songs: twelve new ones, Guardian (the game's own Chapter 4 titan_battle.ogg), RANDOM, and MORE OPTIONS > MUSIC: Z opens
+  a song list with every title and artist (C listens there).
+- Bots in PRACTICE now really use their attack skills (builds 45-47 turned every one of them down).
+- Offline: the Normal Knight's WEIRD ROUTE no longer takes a party member (it never does in Chapter 3).
+
+How it works (the short version)
+--------------------------------
+- One shared match timeline: the host's game picks a seed; every game works out from it, by itself, which knight comes,
+  which attack it uses, when it starts, and the randomness inside the attack. Nothing about the attacks has to travel
+  over the network, so every screen shows the same knight and attack at the same time even with lag.
+- Your screen is yours: your SOUL, your hits, your HP, your gauge and skills are decided in your game. Attacks that AIM at
+  a SOUL aim at YOUR SOUL on your screen; everything that is not aimed lands in the same places for everyone. A screen
+  shake never moves a bullet online (build 47).
+- The host passes the players' states around (the other SOULs, HP, outs, colours) and only steps in when something does
+  not add up (a game out of step is put back in step; impossible numbers are corrected); the host decides outs, places
+  and the winner.
+- The Cyan Knight (the joke fight) is never online. Offline it is exactly as it was. (Cyan as a SOUL COLOUR is fine.)
+
+The ONLINE page
+---------------
+  PRACTICE       the whole battle royale on your own PC against bots (0-7: the room page's BOTS row, or SETTINGS > GENERAL
+                 > BOTS; each bot's difficulty on the BOTS page). No network.
+  STEAM HOST / STEAM JOIN / STEAM BROWSE   Steam rooms (7-letter codes; PRIVATE, FRIENDS or PUBLIC).
+  RELAY CREATE / RELAY JOIN / RELAY LAN    rooms on the small relay server instead of Steam (5-letter codes).
+  NAME / SKIN    the name the others see (12 letters) and who you are (Kris, Susie, Ralsei or Noelle - a look only; the
+                 page shows the skin walking; C on SKIN puts Kris back).
+  MORE OPTIONS   SERVER, STEAM ROOMS, SOUL SETTINGS, MATCH VIEW, KEYBINDS, MUSIC (below).
+
+MORE OPTIONS (all kept in knightfights_online.ini, your game's save folder)
+-------------------------------------------------------------------------
+SOUL SETTINGS - how the SOULs show in YOUR box (nothing here changes the match):
+  SHOW OTHER SOULS (on), SOUL COLOR (Z: the colour page; < > the presets), SOUL NAMES (off: no names under SOULs),
+  OTHER SOUL OPACITY (a slider, 0-100% in 5% steps, hold < > to slide; 70%), HIGHLIGHT MY SOUL (yours is drawn over the
+  others; others over it are drawn fainter). Your own SOUL is always fully solid.
+SOUL COLOR (the colour page) - your own SOUL, as you and everyone else see it: the presets, RED / GREEN / BLUE (0-255),
+  HEX CODE (RRGGBB or RGB, e.g. A040FF; anything else is refused), OUTLINE (on / off) and OUTLINE COLOR (AUTO, WHITE,
+  BLACK, YELLOW, CYAN, MAGENTA), with a live preview. Everyone sees your colour (only a look).
+MATCH VIEW - SHAPE MARKERS (a shape per player: told apart without colours), REDUCED SHAKE (the game's no-shake option for
+  the match), REDUCED FLASHING, SIMPLE EFFECTS, KEY HINTS, OUT NOTICES (MINIMAL / FULL), MATCH INFO, NETWORK STATS,
+  WATCHING HUD (FULL / SMALL / OFF), WATCH CAMERA, WATCH KEYS BOX, ZOOM (2X / 3X), ROOM NAMES (names over heads in the
+  cold place), DEFAULTS.
+KEYBINDS - your keys for the match (below). MUSIC - the online fight song: AS IN THE HUB (the hub's FIGHT SONG) or any song
+  (only on your computer; others hear their own choice).
+
+The room
+--------
+Left: the players with their skin, SOUL colour, name, status (HOST, READY, REMATCH, ALIVE, OUT #n, WATCHING) and ping;
+more than 8 places (watchers) in shorter rows. Right: START (host) or READY / REMATCH (your vote after a match), SPECTATE
+MATCH and JOIN MATCH while a match runs (greyed with the reason when you cannot), SKIN, SOUL (< > colour, Z the page),
+KEYBINDS, MORE OPTIONS, SETTINGS, INVITE FRIENDS (Steam), COPY CODE, CONNECTION HELP, REMOVE A PLAYER (host), LEAVE ROOM.
+C starts the match for the host from anywhere on the page. Under the rows: the preset, the knights, the mutators and what
+the room is doing ("MATCH ON 1:20. 3 OF 5 STANDING, 1 WATCHING.", "REMATCH: 2 OF 3 VOTED").
+THE COLD PLACE IS THE LOBBY: closing the menu keeps you in the room (only a PRACTICE room ends). In a room:
+  - nobody's party follows them (Susie / Ralsei are put to sleep, not removed: they come back when you leave the room);
+  - you look like your SKIN, and so does everyone else (walking, standing, the four ways); names over heads (ROOM NAMES);
+  - the way east to the original Knight encounter is closed by a wall ("The way forward is blocked during online play.")
+    and the encounter itself refuses to start while you are in a room - the online matches are the room's fights;
+  - the box top left shows the room code, how many are ready, what to do; the sign opens the room page.
+When the host leaves (or their game drops off) the next player takes the room over - in a match too (watchers keep
+watching, and are told who hosts now).
+
+The match
+---------
+Countdown, then FIGHT!: the shared timeline runs. The knight changes between attacks as the room's SWITCHING says; STAGE
+RAMP moves the match through the stages (0 PURE, 1 GUESTS, 2 SHUFFLE, 3 KNIGHTMARE: the Twin Knight joins, 4 OVERDRIVE:
+Hyper speed). The online knights: NORMAL, KAIZO, ELECKNIGHT, VIOLET, THORN and KNIGHTMARE.
+SUDDEN DEATH, FINAL TWO, TIE RULE, TIME LIMIT: as in build 46 (the room's settings).
+The other SOULs are drawn at 70% by default (V switches them off / on; F > SOUL OPACITY slides them). A banner tells
+you about outs and the lead (OUT NOTICES), MATCH INFO shows the cycle, players, time, preset and sudden death, NETWORK
+STATS the ping and lost pings; "NO NEWS FROM THE HOST" / "NEW HOST" warnings show when they apply.
+Outs: your HP runs out -> OUT (#place); your SOUL cracks and shatters as in Chapter 3's GAME OVER, then the GAME OVER
+shows over the battle (which goes on for the others) with your place, fades, and you watch a living player. Another
+player's SOUL cracks and shatters where it was, in their colour - no GAME OVER for anyone else.
+THE ROARING: the first attack of the final two (two SOULs left - with FINAL TWO off too, without its showdown) and the
+first attack that starts once the match has run 3 minutes are the Roaring of whichever knight has that attack (Roaring
+DELTA for Kaizo). It is long (about 27-40 seconds); HOLD BREATH is two speeds faster during it.
+
+TARGETING (the room's SETTINGS > TARGETING; on by default)
+---------------------------------------------------------
+The command row under the box shows the seven modes; yours is yellow with the SOUL. It only decides where YOUR attack
+skills (Sword, Flurry, the mid-pool ones, Knightmare) go - drawing and using skills is unchanged.
+  RANDOM (build 50: CHAOS)      a random player still standing, a new one after every send (the default)
+  LOW HP (PROCEED)       the player with the least HP
+  CRYSTALS (BIG SHOT)    the player with the most shards
+  REVENGE (DEFEND)       everyone targeting you, the send split between them (nobody on you: RANDOM)
+  CHOOSE (CHECK)         the player you pick: 1-8 = the number in the player list, A = the next one (both switch to CHECK)
+  TIRED (PACIFY)         the TIRED players (healed in the last 4 seconds, or an empty gauge), split between them (none: RANDOM)
+  EVERYONE (ROARING)     every other player at once, at half strength each
+A target that falls or leaves is replaced at once by the mode's rule (the host decides every target and every knockout).
+A send starts around its target's SOUL (in every game: the target's own SOUL in their game, where the host last saw it
+everywhere else), aimed swords go for that SOUL, and its bullets hurt ANYONE who touches them except the sender. They are
+tinted in the sender's colour (the colour square of the player list).
+SHARDS: a knockout gives the player whose skill landed the final hit 1 Shadow Crystal shard plus half the fallen player's
+shards (rounded down); a Knight's hit is credited to the last player who hurt them. Shards make your sends stronger:
+  0-1 shards x1.00   2-3 x1.15   4-7 x1.30   8-15 x1.50   16+ x1.75 (damage; SLOW / CONFUSE last longer, up to x1.5)
+DEFEND / PACIFY on several players: each gets 1/n of the send (never under 40%). OUTNUMBERED BONUS: your gauge fills 25%
+faster for each player targeting you (up to double).
+On screen: thin threads in each sender's colour from the box's edge to their target (brighter as their gauge fills); the
+"!" over your SOUL (with its sound) when a new player locks onto you; ON YOU: n; your shards and their POWER; in the player
+list each player's number, shards, a yellow frame on your targets, a red ! on players targeting you, TIRED, and the name of
+the player with the least HP pulsing. A battle-text line ("* Susie's gaze sharpens on you.") when a player targeting you
+has 80+ charge.
+The host's TARGETING page: TARGETING (off = every attack skill at every rival, as before build 48 - also the UNTARGETED
+preset), each mode on or off, SHARDS, OUTNUMBERED BONUS. Bots pick their own mode for each send (build 49).
+
+CHAT
+----
+T or \ opens it anywhere in a room, ENTER too during a match; ENTER or \ sends (the CHAT key can be changed in
+KEYBINDS), ESC closes, TAB makes it bigger, the mouse wheel
+scrolls. While you type, your keys are the chat's (your SOUL stays where it is and can still be hit; the match never
+pauses). 80 characters a message, 5 messages in 5 seconds, the same text not twice in 4 seconds. Joins, leaves, the match's
+start and end and the outs are announced. /mute NAME hides a player's messages for you, /unmute NAME shows them again.
+The host keeps the last 30 messages for anyone who joins. QUICK SETTINGS > CHAT (or MATCH VIEW > CHAT) hides it on your
+screen. A controller cannot type yet (use a keyboard for chat).
+
+Watching (OUT, or SPECTATE MATCH from the room)
+-----------------------------------------------
+Watchers see the very battle the players see, from the same timeline; nothing a watcher does reaches the match.
+  < > / LB RB    follow the next / previous living player       TAB (held)  every player
+  Z              camera: FOLLOW (one player), FULL ARENA (every SOUL alike), AUTO (the final two, a skill, the lowest
+                 HP, the leader), ZOOM (a lens: arrows move it, X 2x / 3x)
+  C              watching card FULL / SMALL / OFF    V  only the followed SOUL for now    N  names for now
+  I              MATCH STATS (time, damage taken, healed, grazes, skills, place)    H  the keys box
+  F              QUICK SETTINGS            BACKSPACE (GIVE UP key)  back to the room
+When the player you follow goes OUT the camera moves to the next living player by itself. When the match ends watchers get
+the results; READY in the room is the rematch vote.
+
+Controls in the match (the keys are yours: MORE OPTIONS > KEYBINDS, or KEYBINDS in the room)
+-------------------------------------------------------------------------------------------
+  arrows        move your SOUL (MIRROR CONTROLS turns them around)
+  X (held)      the game's own slow walk
+  S             HOLD BREATH (build 50: a toggle - press to hold your breath, press again to let go): your SOUL moves
+                faster while it is on, as in the fights (one speed faster; two during the Roaring Knight's attacks)
+  C (held)      charge: the charge climbs up to your gauge (the TP bar's red part shows it); let go past the draw cost
+                (60) for a skill, at 100 for two
+  Z             tap: pick the next skill; hold (12 frames): use the picked one
+  D             the picked skill into the HOLD slot, and back
+  TAB (held)    every player in full
+  F             QUICK SETTINGS: other SOULs on / off, SOUL OPACITY (slider), names, highlight, (watching: camera, HUD),
+                CHAT, SFX VOLUME, MUSIC VOLUME. Your SOUL stays still while it is open.
+  Q / E         TARGETING mode left / right        A  CHOOSE the next player       1-8  CHOOSE that player
+  T or \        chat (ENTER or \ sends; ENTER also opens it in a match)
+  V             OTHER SOULS: show / hide the others' SOULs at once (kept for your next match)
+  BACKSPACE     give up (OUT, back to the room - it asks first) / stop watching
+A controller: confirm = Z, menu button = C, LT = Hold Breath, RT = HOLD slot, LB / RB = targeting mode, right stick =
+the next / previous target, BACK = player list, START = QUICK SETTINGS.
+KEYBINDS: Z on an action, then the key you want (ESC cancels); a key another action had: the two swap. The arrows, X /
+SHIFT, ENTER, ESC, F4 and 1-8 stay as they are. RESET KEYS puts S, Z, C, D, TAB, BACKSPACE, F, V, Q, E and A back.
+A build 47 settings file that had HOLD SLOT on A and QUICK SETTINGS on Q is moved to D and F once.
+The battle's own command menu and the party's panel never come up during an online match.
+
+Skills, Settings, Steam, the relay
+----------------------------------
+As in build 46 (see the build 46 notes below), except that with TARGETING on a RED skill goes to your targets; GREEN
+skills help you; the host's settings (PRESETS, GENERAL, KNIGHTS, KNIGHT RUSH, ATTACKS, SKILLS, SUDDEN DEATH, MUTATORS;
+GENERAL > SPECTATORS lets room members watch, WATCH PLACES 0-4 extra places for them). Steam rooms run as Steam's test app
+480 ("Spacewar"): kf_steam.dll, steam_api64.dll and steam_appid.txt stay in chapter3_windows; Steam must be running and
+signed in. The relay: knightfights_server.zip (Node.js 18+, TCP 7777); everyone types its address in MORE OPTIONS > SERVER.
+
+Known issues and limits (build 51 update 9 - DRBR)
+--------------------------------------------------
+- THE FIVE BOSSES (Jevil, Gerson, Flowery, Spamton NEO, Pink), their SOUL modes, their sends, the BOSSES and SKINS pages and
+  the new skins were tested in the emulator that runs the mod's real code (TESTING_REPORT.txt, BUILD 51 UPDATE 9), NOT in
+  the real game yet. Things only the real game can show: how each boss looks next to Chapter 3's HUD, Flowery's tower
+  shaders (taken from Chapter 5), the bosses' music switching, the yellow / orange SOUL feel at the real frame rate. Please
+  try each boss in PRACTICE first (ONLINE > BOSSES > Z) and send the whole error text of anything that stops.
+- The bosses' music is read from DELTARUNE's shared mus folder (joker.ogg, ch4_extra_boss.ogg, Flowerman_Arrangement.ogg,
+  spamton_neo_mix_ex_wip.ogg, pink.ogg): an install without Chapters 1-5 has no music for that boss.
+- Bots cannot shoot, dash or change lanes like a player: Spamton NEO's mail walls, Flowery's board and Pink's tunnel and
+  maze are played by the odds for them (a roll per hazard, by their skill).
+- Everyone in a room needs this update (another build is told so and cannot join).
+
+Known issues and limits (build 50)
+----------------------------------
+- Build 50's real attacks, TP bar, shield and Twin Knight were tested in the emulator that runs the mod's real code
+  (TESTING_REPORT.txt, BUILD 50), not yet in the real game. Collision there is a stand-in, so the exact hitboxes of the
+  sent attacks (the Knights' own masks) are the game's own and only checked in play.
+- A send that lands while the box is gone between two attacks waits for the box; what reads the box (diagonal diamonds,
+  weird circles, the slash circle) ends with it.
+- The Twin Knight's real attacks, the Roaring HUD and the bots' Roaring rules were tested in the emulator (TESTING_REPORT.txt,
+  BUILD 50 UPDATE), not in the real game.
+- During the Roaring a sent star's hit is an ordinary hit (the Roaring routes the Knight's own star hits through the
+  Knight).
+- The slash triangles and the lightning are drawn in their own colours with the sender's colour mixed in only where the
+  game's code takes a colour (sprites, sword colour, Violet's colour).
+- Build 49 was tested in the emulator that runs the mod's real code, now with each game's camera where the real arena's
+  is (TESTING_REPORT.txt, BUILD 49), and the real relay server; it has not been played in the real game yet, and Steam
+  rooms are still not confirmed on real Steam. If the other SOULs still do not show, press F3 in the match and send a
+  screenshot plus knightfights_debug.log (%LOCALAPPDATA%\DELTARUNE). Please try
+  PRACTICE first, then a room with a friend, and send the whole error text of anything that stops.
+- Everyone in a room needs build 50 (another build is told so and cannot join).
+- The SOULs, the chat panel, the targeting row, the threads and the GAME OVER were checked in the emulator's own pictures,
+  not on a real screen.
+- Chat needs a keyboard (no on-screen keyboard for a controller yet).
+- In YOUR game a send at ANOTHER player starts where the host last saw their SOUL (up to about a tenth of a second old);
+  in the target's own game it is exactly their SOUL.
+- Steam avatars are not shown (each player's skin and SOUL colour are).
+- Accepting a Steam invite while the game is closed starts Spacewar (app 480): start DELTARUNE first, or use the code.
+- Each game decides its own hits, so a game someone changed could cheat on its own HP (the host catches only impossible
+  numbers).
+- A player whose game dropped out of a running match cannot play on in it (with REJOIN or SPECTATORS on they can watch it).
+- In the cold place other players are drawn above the scenery (no depth sorting with trees); bots do not walk around it.
+- The bots only exist in the host's game: the host's PC does their thinking (at most 6 ms of a frame for all of them;
+  a bot that runs out of time keeps its move for that frame). Their dodging was measured in the emulator with a stand-in
+  for GameMaker's collision masks (the real sprites' boxes); on the real screen they may do a little better (the real
+  masks are smaller than those boxes). Some attacks cannot be fully dodged by anyone (a slash that appears on the SOUL):
+  even PERFECT takes those hits.
+
+Build 46 notes kept for reference: Hold Breath used to halve damage and double grazes (build 46) - it is now the fights'
+faster SOUL. The rest of build 46's guide (skills list, settings list, Steam troubleshooting) still applies.

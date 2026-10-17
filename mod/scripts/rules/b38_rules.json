@@ -1,0 +1,1510 @@
+[
+ {
+  "id": "C01-hb-setup-base",
+  "variants": [
+   "base"
+  ],
+  "entry": "gml_GlobalScript_scr_monstersetup",
+  "find": "        global.actcostnoe[myself][0] = 0;\n    }\n    if (global.monstertype[myself] == 105)",
+  "replace": "        global.actcostnoe[myself][0] = 0;\n        knight_hb_setup(\"base\");\n    }\n    if (global.monstertype[myself] == 105)",
+  "why": "Without Kris, Susie / Ralsei / Noelle each get HoldBreath on their own S / R / N-Action list (only Kris had it).",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "C01-hb-setup-elec",
+  "variants": [
+   "elec"
+  ],
+  "entry": "gml_GlobalScript_scr_monstersetup",
+  "find": "        global.actcostnoe[myself][0] = 0;\n    }\n    if (global.monstertype[myself] == 105)",
+  "replace": "        global.actcostnoe[myself][0] = 0;\n        knight_hb_setup(\"elec\");\n    }\n    if (global.monstertype[myself] == 105)",
+  "why": "Without Kris, Susie / Ralsei / Noelle each get HoldBreath on their own S / R / N-Action list (only Kris had it).",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "C01-hb-setup-violet",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_GlobalScript_scr_monstersetup",
+  "find": "        global.actcostnoe[myself][0] = 0;\n    }\n    if (global.monstertype[myself] == 105)",
+  "replace": "        global.actcostnoe[myself][0] = 0;\n        knight_hb_setup(\"violet\");\n    }\n    if (global.monstertype[myself] == 105)",
+  "why": "Without Kris, Susie / Ralsei / Noelle each get HoldBreath on their own S / R / N-Action list (only Kris had it).",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "C01-hb-setup-thorn",
+  "variants": [
+   "thorn"
+  ],
+  "entry": "gml_GlobalScript_scr_monstersetup",
+  "find": "        global.actcostnoe[myself][0] = 0;\n    }\n    if (global.monstertype[myself] == 105)",
+  "replace": "        global.actcostnoe[myself][0] = 0;\n        knight_hb_setup(\"thorn\");\n    }\n    if (global.monstertype[myself] == 105)",
+  "why": "Without Kris, Susie / Ralsei / Noelle each get HoldBreath on their own S / R / N-Action list (only Kris had it).",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "C01-hb-setup-cyan",
+  "variants": [
+   "cyan"
+  ],
+  "entry": "gml_GlobalScript_scr_monstersetup",
+  "find": "        global.actcostnoe[myself][0] = 0;\n    }\n    if (global.monstertype[myself] == 105)",
+  "replace": "        global.actcostnoe[myself][0] = 0;\n        knight_hb_setup(\"cyan\");\n    }\n    if (global.monstertype[myself] == 105)",
+  "why": "Without Kris, Susie / Ralsei / Noelle each get HoldBreath on their own S / R / N-Action list (only Kris had it).",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "C02-member-acts-base",
+  "variants": [
+   "base"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Step_0",
+  "find": "if (global.myfight == 3)\n{\n    xx = __view_get(e__VW.XView, 0);\n    yy = __view_get(e__VW.YView, 0);\n",
+  "replace": "if (global.myfight == 3)\n{\n    xx = __view_get(e__VW.XView, 0);\n    yy = __view_get(e__VW.YView, 0);\n    knight_member_acts();\n",
+  "why": "HoldBreath and the learned moves (RUDER BUSTER, ICESTORM, FIRESTORM) run before the fight's own ACT code and use the action up.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "C02-member-acts-elec",
+  "variants": [
+   "elec"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Step_0",
+  "find": "if (global.myfight == 3)\n{\n    xx = __view_get(e__VW.XView, 0);\n    yy = __view_get(e__VW.YView, 0);\n",
+  "replace": "if (global.myfight == 3)\n{\n    xx = __view_get(e__VW.XView, 0);\n    yy = __view_get(e__VW.YView, 0);\n    knight_member_acts();\n",
+  "why": "HoldBreath and the learned moves (RUDER BUSTER, ICESTORM, FIRESTORM) run before the fight's own ACT code and use the action up.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "C02-member-acts-thorn",
+  "variants": [
+   "thorn"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Step_0",
+  "find": "if (global.myfight == 3)\n{\n    xx = __view_get(e__VW.XView, 0);\n    yy = __view_get(e__VW.YView, 0);\n",
+  "replace": "if (global.myfight == 3)\n{\n    xx = __view_get(e__VW.XView, 0);\n    yy = __view_get(e__VW.YView, 0);\n    knight_member_acts();\n",
+  "why": "HoldBreath and the learned moves (RUDER BUSTER, ICESTORM, FIRESTORM) run before the fight's own ACT code and use the action up.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "C02-member-acts-cyan",
+  "variants": [
+   "cyan"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Step_0",
+  "find": "if (global.myfight == 3)\n{\n    xx = __view_get(e__VW.XView, 0);\n    yy = __view_get(e__VW.YView, 0);\n",
+  "replace": "if (global.myfight == 3)\n{\n    xx = __view_get(e__VW.XView, 0);\n    yy = __view_get(e__VW.YView, 0);\n    knight_member_acts();\n",
+  "why": "HoldBreath and the learned moves (RUDER BUSTER, ICESTORM, FIRESTORM) run before the fight's own ACT code and use the action up.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "C02-member-acts-violet",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Step_0",
+  "find": "    knight_vb_acts();\n",
+  "replace": "    knight_vb_acts();\n    knight_member_acts();\n",
+  "why": "HoldBreath and the learned moves run right after the finisher (which may be the same learned move) and use the action up.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "C03-vb-kris-hurt",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Step_0",
+  "find": "    else\n    {\n        if (kill_target == obj_heronoelle)\n        {\n            with (obj_heronoelle)",
+  "replace": "    else if (kill_target == obj_herokris)\n    {\n        knight_vb_hurt_kris();\n    }\n    else\n    {\n        if (kill_target == obj_heronoelle)\n        {\n            with (obj_heronoelle)",
+  "why": "Kris can be taken when Kris is not on top: Kris's own hurt stance (the mod only knew Susie / Noelle / Ralsei here).",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "C04-vb-kris-who",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Step_0",
+  "find": "        var personwhosgonnadie = \"ralsei\";\n",
+  "replace": "        var personwhosgonnadie = \"ralsei\";\n        if (kill_target == obj_herokris)\n        {\n            personwhosgonnadie = \"kris\";\n        }\n",
+  "why": "Kris can be taken when Kris is not on top.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "C05-vb-kris-kill",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_GlobalScript_scr_complete_save_file",
+  "find": "    if (personwhosabouttosuperdie == \"noelle\")\n    {\n        _cid = 4;\n        _obj = obj_heronoelle;\n    }\n",
+  "replace": "    if (personwhosabouttosuperdie == \"noelle\")\n    {\n        _cid = 4;\n        _obj = obj_heronoelle;\n    }\n    if (personwhosabouttosuperdie == \"kris\")\n    {\n        _cid = 1;\n        _obj = obj_herokris;\n    }\n",
+  "why": "Kris can be taken when Kris is not on top (the kill script defaulted to Ralsei).",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "C06-vb-deflect",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Step_0",
+  "find": "if (knightkillcon == 2 && kill_target == -4)\n{\n    kill_skipped = 1;\n    if (knight_vb_kris())\n    {\n        if (phase == 3)\n        {\n            kill_target = obj_herosusie;\n            knightkillcon = 30;\n        }\n        else\n        {\n            kill_target = obj_heroralsei;\n            snd_stop(global.batmusic[0]);\n            knightkillcon = 10;\n        }\n    }\n    else\n    {\n        if (phase < 3)\n            snd_stop(global.batmusic[0]);\n        knightkillcon = 10;\n    }\n}\n",
+  "replace": "if (knightkillcon == 2 && kill_target == -4)\n{\n    knight_vb_deflect_start();\n}\n",
+  "why": "Only the member on top is left: the Knight charges them and they knock the blade back (then what the mod did when nobody was left).",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "C07-vb-no-redbuster",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Step_0",
+  "find": "        if (scr_havechar(2))\n        {\n            global.canact[myself][2] = 1;\n            global.actactor[myself][2] = 2;\n            global.actname[myself][2] = stringset(\"RedBuster\");\n            global.actdesc[myself][2] = stringset(\"Red#Damage\");\n            global.actcost[myself][2] = 150;\n            whatsact3 = \"redbuster\";\n        }\n",
+  "replace": "",
+  "why": "Susie learns RUDER BUSTER herself when Ralsei falls (build 38): no Kris RedBuster ACT after a loss any more.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "C08-vb-raldead",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Step_0",
+  "find": "        ralseidownmessage = true;\n        ral_dead = true;\n        with (obj_herosusie)",
+  "replace": "        if (kill_target == obj_heroralsei || kill_skipped)\n        {\n            ralseidownmessage = true;\n            ral_dead = true;\n        }\n        with (obj_herosusie)",
+  "why": "With the party order the Angel can fall while Ralsei is still up: only mark Ralsei dead when it was him.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "C09-ruder-base",
+  "variants": [
+   "base"
+  ],
+  "entry": "gml_GlobalScript_scr_spell",
+  "find": "                attack = instance_create(obj_herosusie.x, obj_herosusie.y, obj_rudebuster_anim);\n                attack.damage = damage;\n                attack.star = star;\n                attack.caster = caster;\n                attack.target = global.monsterinstance[star];\n",
+  "replace": "                if (knight_dbl_take(caster, 4))\n                {\n                    global.spelldelay = 95;\n                    knight_kspell_start(8, caster, star, damage);\n                }\n                else\n                {\n                    attack = instance_create(obj_herosusie.x, obj_herosusie.y, obj_rudebuster_anim);\n                    attack.damage = damage;\n                    attack.star = star;\n                    attack.caster = caster;\n                    attack.target = global.monsterinstance[star];\n                }\n",
+  "why": "RUDER BUSTER: two Rude Busters, the second 15 frames after the first (X-Slash's timing).",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "C10-icestorm-base",
+  "variants": [
+   "base"
+  ],
+  "entry": "gml_GlobalScript_scr_spell",
+  "find": "                attack = instance_create(global.monsterx[star], global.monstery[star], obj_icespell);\n                attack.damage = damage;\n                attack.star = star;\n                attack.caster = caster;\n                attack.target = global.monsterinstance[star];\n",
+  "replace": "                if (knight_dbl_take(caster, 9))\n                {\n                    global.spelldelay = 70;\n                    knight_kspell_start(9, caster, star, damage);\n                }\n                else\n                {\n                    attack = instance_create(global.monsterx[star], global.monstery[star], obj_icespell);\n                    attack.damage = damage;\n                    attack.star = star;\n                    attack.caster = caster;\n                    attack.target = global.monsterinstance[star];\n                }\n",
+  "why": "ICESTORM: two Ice Shocks at X-Slash's timing.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "C11-firestorm-base",
+  "variants": [
+   "base"
+  ],
+  "entry": "gml_GlobalScript_scr_spell",
+  "find": "                global.spelldelay = 80;\n                knight_kspell_start(5, caster, star, damage);\n",
+  "replace": "                global.spelldelay = 80;\n                knight_kspell_start(5, caster, star, damage);\n                if (knight_dbl_take(caster, 13))\n                {\n                    global.knight_ks.dbl = 1;\n                    global.spelldelay = 100;\n                }\n",
+  "why": "FIRESTORM: Ralsei throws a second fireball 15 frames after the first.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "C12-dbl-text-Alarm_0-base",
+  "variants": [
+   "base"
+  ],
+  "entry": "gml_Object_obj_spellphase_Alarm_0",
+  "find": "scr_spelltext\\(global\\.charspecial\\[(\\w+)\\], (\\w+)\\);",
+  "replace": "scr_spelltext(global.charspecial[\\1], \\2);\\n knight_dbl_text(\\2);",
+  "why": "The spell phase's line names the learned move (RUDER BUSTER, ICESTORM, FIRESTORM).",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 2
+ },
+ {
+  "id": "C12-dbl-text-Step_0-base",
+  "variants": [
+   "base"
+  ],
+  "entry": "gml_Object_obj_spellphase_Step_0",
+  "find": "scr_spelltext\\(global\\.charspecial\\[(\\w+)\\], (\\w+)\\);",
+  "replace": "scr_spelltext(global.charspecial[\\1], \\2);\\n knight_dbl_text(\\2);",
+  "why": "The spell phase's line names the learned move (RUDER BUSTER, ICESTORM, FIRESTORM).",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 2
+ },
+ {
+  "id": "C09-ruder-kaizo",
+  "variants": [
+   "kaizo"
+  ],
+  "entry": "gml_GlobalScript_scr_spell",
+  "find": "                attack = instance_create(obj_herosusie.x, obj_herosusie.y, obj_rudebuster_anim);\n                attack.damage = damage;\n                attack.star = star;\n                attack.caster = caster;\n                attack.target = global.monsterinstance[star];\n",
+  "replace": "                if (knight_dbl_take(caster, 4))\n                {\n                    global.spelldelay = 95;\n                    knight_kspell_start(8, caster, star, damage);\n                }\n                else\n                {\n                    attack = instance_create(obj_herosusie.x, obj_herosusie.y, obj_rudebuster_anim);\n                    attack.damage = damage;\n                    attack.star = star;\n                    attack.caster = caster;\n                    attack.target = global.monsterinstance[star];\n                }\n",
+  "why": "RUDER BUSTER: two Rude Busters, the second 15 frames after the first (X-Slash's timing).",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "C10-icestorm-kaizo",
+  "variants": [
+   "kaizo"
+  ],
+  "entry": "gml_GlobalScript_scr_spell",
+  "find": "                attack = instance_create(global.monsterx[star], global.monstery[star], obj_icespell);\n                attack.damage = damage;\n                attack.star = star;\n                attack.caster = caster;\n                attack.target = global.monsterinstance[star];\n",
+  "replace": "                if (knight_dbl_take(caster, 9))\n                {\n                    global.spelldelay = 70;\n                    knight_kspell_start(9, caster, star, damage);\n                }\n                else\n                {\n                    attack = instance_create(global.monsterx[star], global.monstery[star], obj_icespell);\n                    attack.damage = damage;\n                    attack.star = star;\n                    attack.caster = caster;\n                    attack.target = global.monsterinstance[star];\n                }\n",
+  "why": "ICESTORM: two Ice Shocks at X-Slash's timing.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "C11-firestorm-kaizo",
+  "variants": [
+   "kaizo"
+  ],
+  "entry": "gml_GlobalScript_scr_spell",
+  "find": "                global.spelldelay = 80;\n                knight_kspell_start(5, caster, star, damage);\n",
+  "replace": "                global.spelldelay = 80;\n                knight_kspell_start(5, caster, star, damage);\n                if (knight_dbl_take(caster, 13))\n                {\n                    global.knight_ks.dbl = 1;\n                    global.spelldelay = 100;\n                }\n",
+  "why": "FIRESTORM: Ralsei throws a second fireball 15 frames after the first.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "C12-dbl-text-Alarm_0-kaizo",
+  "variants": [
+   "kaizo"
+  ],
+  "entry": "gml_Object_obj_spellphase_Alarm_0",
+  "find": "scr_spelltext\\(global\\.charspecial\\[(\\w+)\\], (\\w+)\\);",
+  "replace": "scr_spelltext(global.charspecial[\\1], \\2);\\n knight_dbl_text(\\2);",
+  "why": "The spell phase's line names the learned move (RUDER BUSTER, ICESTORM, FIRESTORM).",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 2
+ },
+ {
+  "id": "C12-dbl-text-Step_0-kaizo",
+  "variants": [
+   "kaizo"
+  ],
+  "entry": "gml_Object_obj_spellphase_Step_0",
+  "find": "scr_spelltext\\(global\\.charspecial\\[(\\w+)\\], (\\w+)\\);",
+  "replace": "scr_spelltext(global.charspecial[\\1], \\2);\\n knight_dbl_text(\\2);",
+  "why": "The spell phase's line names the learned move (RUDER BUSTER, ICESTORM, FIRESTORM).",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 2
+ },
+ {
+  "id": "C09-ruder-elec",
+  "variants": [
+   "elec"
+  ],
+  "entry": "gml_GlobalScript_scr_spell",
+  "find": "                attack = instance_create(obj_herosusie.x, obj_herosusie.y, obj_rudebuster_anim);\n                attack.damage = damage;\n                attack.star = star;\n                attack.caster = caster;\n                attack.target = global.monsterinstance[star];\n",
+  "replace": "                if (knight_dbl_take(caster, 4))\n                {\n                    global.spelldelay = 95;\n                    knight_kspell_start(8, caster, star, damage);\n                }\n                else\n                {\n                    attack = instance_create(obj_herosusie.x, obj_herosusie.y, obj_rudebuster_anim);\n                    attack.damage = damage;\n                    attack.star = star;\n                    attack.caster = caster;\n                    attack.target = global.monsterinstance[star];\n                }\n",
+  "why": "RUDER BUSTER: two Rude Busters, the second 15 frames after the first (X-Slash's timing).",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "C10-icestorm-elec",
+  "variants": [
+   "elec"
+  ],
+  "entry": "gml_GlobalScript_scr_spell",
+  "find": "                attack = instance_create(global.monsterx[star], global.monstery[star], obj_icespell);\n                attack.damage = damage;\n                attack.star = star;\n                attack.caster = caster;\n                attack.target = global.monsterinstance[star];\n",
+  "replace": "                if (knight_dbl_take(caster, 9))\n                {\n                    global.spelldelay = 70;\n                    knight_kspell_start(9, caster, star, damage);\n                }\n                else\n                {\n                    attack = instance_create(global.monsterx[star], global.monstery[star], obj_icespell);\n                    attack.damage = damage;\n                    attack.star = star;\n                    attack.caster = caster;\n                    attack.target = global.monsterinstance[star];\n                }\n",
+  "why": "ICESTORM: two Ice Shocks at X-Slash's timing.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "C11-firestorm-elec",
+  "variants": [
+   "elec"
+  ],
+  "entry": "gml_GlobalScript_scr_spell",
+  "find": "                global.spelldelay = 80;\n                knight_kspell_start(5, caster, star, damage);\n",
+  "replace": "                global.spelldelay = 80;\n                knight_kspell_start(5, caster, star, damage);\n                if (knight_dbl_take(caster, 13))\n                {\n                    global.knight_ks.dbl = 1;\n                    global.spelldelay = 100;\n                }\n",
+  "why": "FIRESTORM: Ralsei throws a second fireball 15 frames after the first.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "C12-dbl-text-Alarm_0-elec",
+  "variants": [
+   "elec"
+  ],
+  "entry": "gml_Object_obj_spellphase_Alarm_0",
+  "find": "scr_spelltext\\(global\\.charspecial\\[(\\w+)\\], (\\w+)\\);",
+  "replace": "scr_spelltext(global.charspecial[\\1], \\2);\\n knight_dbl_text(\\2);",
+  "why": "The spell phase's line names the learned move (RUDER BUSTER, ICESTORM, FIRESTORM).",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 2
+ },
+ {
+  "id": "C12-dbl-text-Step_0-elec",
+  "variants": [
+   "elec"
+  ],
+  "entry": "gml_Object_obj_spellphase_Step_0",
+  "find": "scr_spelltext\\(global\\.charspecial\\[(\\w+)\\], (\\w+)\\);",
+  "replace": "scr_spelltext(global.charspecial[\\1], \\2);\\n knight_dbl_text(\\2);",
+  "why": "The spell phase's line names the learned move (RUDER BUSTER, ICESTORM, FIRESTORM).",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 2
+ },
+ {
+  "id": "C09-ruder-violet",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_GlobalScript_scr_spell",
+  "find": "                attack = instance_create(obj_herosusie.x, obj_herosusie.y, obj_rudebuster_anim);\n                attack.damage = damage;\n                attack.star = star;\n                attack.caster = caster;\n                attack.target = global.monsterinstance[star];\n",
+  "replace": "                if (knight_dbl_take(caster, 4))\n                {\n                    global.spelldelay = 95;\n                    knight_kspell_start(8, caster, star, damage);\n                }\n                else\n                {\n                    attack = instance_create(obj_herosusie.x, obj_herosusie.y, obj_rudebuster_anim);\n                    attack.damage = damage;\n                    attack.star = star;\n                    attack.caster = caster;\n                    attack.target = global.monsterinstance[star];\n                }\n",
+  "why": "RUDER BUSTER: two Rude Busters, the second 15 frames after the first (X-Slash's timing).",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "C10-icestorm-violet",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_GlobalScript_scr_spell",
+  "find": "                attack = instance_create(global.monsterx[star], global.monstery[star], obj_icespell);\n                attack.damage = damage;\n                attack.star = star;\n                attack.caster = caster;\n                attack.target = global.monsterinstance[star];\n",
+  "replace": "                if (knight_dbl_take(caster, 9))\n                {\n                    global.spelldelay = 70;\n                    knight_kspell_start(9, caster, star, damage);\n                }\n                else\n                {\n                    attack = instance_create(global.monsterx[star], global.monstery[star], obj_icespell);\n                    attack.damage = damage;\n                    attack.star = star;\n                    attack.caster = caster;\n                    attack.target = global.monsterinstance[star];\n                }\n",
+  "why": "ICESTORM: two Ice Shocks at X-Slash's timing.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "C11-firestorm-violet",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_GlobalScript_scr_spell",
+  "find": "                global.spelldelay = 80;\n                knight_kspell_start(5, caster, star, damage);\n",
+  "replace": "                global.spelldelay = 80;\n                knight_kspell_start(5, caster, star, damage);\n                if (knight_dbl_take(caster, 13))\n                {\n                    global.knight_ks.dbl = 1;\n                    global.spelldelay = 100;\n                }\n",
+  "why": "FIRESTORM: Ralsei throws a second fireball 15 frames after the first.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "C12-dbl-text-Alarm_0-violet",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_spellphase_Alarm_0",
+  "find": "scr_spelltext\\(global\\.charspecial\\[(\\w+)\\], (\\w+)\\);",
+  "replace": "scr_spelltext(global.charspecial[\\1], \\2);\\n knight_dbl_text(\\2);",
+  "why": "The spell phase's line names the learned move (RUDER BUSTER, ICESTORM, FIRESTORM).",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 2
+ },
+ {
+  "id": "C12-dbl-text-Step_0-violet",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_spellphase_Step_0",
+  "find": "scr_spelltext\\(global\\.charspecial\\[(\\w+)\\], (\\w+)\\);",
+  "replace": "scr_spelltext(global.charspecial[\\1], \\2);\\n knight_dbl_text(\\2);",
+  "why": "The spell phase's line names the learned move (RUDER BUSTER, ICESTORM, FIRESTORM).",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 2
+ },
+ {
+  "id": "C09-ruder-thorn",
+  "variants": [
+   "thorn"
+  ],
+  "entry": "gml_GlobalScript_scr_spell",
+  "find": "                attack = instance_create(obj_herosusie.x, obj_herosusie.y, obj_rudebuster_anim);\n                attack.damage = damage;\n                attack.star = star;\n                attack.caster = caster;\n                attack.target = global.monsterinstance[star];\n",
+  "replace": "                if (knight_dbl_take(caster, 4))\n                {\n                    global.spelldelay = 95;\n                    knight_kspell_start(8, caster, star, damage);\n                }\n                else\n                {\n                    attack = instance_create(obj_herosusie.x, obj_herosusie.y, obj_rudebuster_anim);\n                    attack.damage = damage;\n                    attack.star = star;\n                    attack.caster = caster;\n                    attack.target = global.monsterinstance[star];\n                }\n",
+  "why": "RUDER BUSTER: two Rude Busters, the second 15 frames after the first (X-Slash's timing).",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "C10-icestorm-thorn",
+  "variants": [
+   "thorn"
+  ],
+  "entry": "gml_GlobalScript_scr_spell",
+  "find": "                attack = instance_create(global.monsterx[star], global.monstery[star], obj_icespell);\n                attack.damage = damage;\n                attack.star = star;\n                attack.caster = caster;\n                attack.target = global.monsterinstance[star];\n",
+  "replace": "                if (knight_dbl_take(caster, 9))\n                {\n                    global.spelldelay = 70;\n                    knight_kspell_start(9, caster, star, damage);\n                }\n                else\n                {\n                    attack = instance_create(global.monsterx[star], global.monstery[star], obj_icespell);\n                    attack.damage = damage;\n                    attack.star = star;\n                    attack.caster = caster;\n                    attack.target = global.monsterinstance[star];\n                }\n",
+  "why": "ICESTORM: two Ice Shocks at X-Slash's timing.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "C11-firestorm-thorn",
+  "variants": [
+   "thorn"
+  ],
+  "entry": "gml_GlobalScript_scr_spell",
+  "find": "                global.spelldelay = 80;\n                knight_kspell_start(5, caster, star, damage);\n",
+  "replace": "                global.spelldelay = 80;\n                knight_kspell_start(5, caster, star, damage);\n                if (knight_dbl_take(caster, 13))\n                {\n                    global.knight_ks.dbl = 1;\n                    global.spelldelay = 100;\n                }\n",
+  "why": "FIRESTORM: Ralsei throws a second fireball 15 frames after the first.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "C12-dbl-text-Alarm_0-thorn",
+  "variants": [
+   "thorn"
+  ],
+  "entry": "gml_Object_obj_spellphase_Alarm_0",
+  "find": "scr_spelltext\\(global\\.charspecial\\[(\\w+)\\], (\\w+)\\);",
+  "replace": "scr_spelltext(global.charspecial[\\1], \\2);\\n knight_dbl_text(\\2);",
+  "why": "The spell phase's line names the learned move (RUDER BUSTER, ICESTORM, FIRESTORM).",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 2
+ },
+ {
+  "id": "C12-dbl-text-Step_0-thorn",
+  "variants": [
+   "thorn"
+  ],
+  "entry": "gml_Object_obj_spellphase_Step_0",
+  "find": "scr_spelltext\\(global\\.charspecial\\[(\\w+)\\], (\\w+)\\);",
+  "replace": "scr_spelltext(global.charspecial[\\1], \\2);\\n knight_dbl_text(\\2);",
+  "why": "The spell phase's line names the learned move (RUDER BUSTER, ICESTORM, FIRESTORM).",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 2
+ },
+ {
+  "id": "C09-ruder-cyan",
+  "variants": [
+   "cyan"
+  ],
+  "entry": "gml_GlobalScript_scr_spell",
+  "find": "                attack = instance_create(obj_herosusie.x, obj_herosusie.y, obj_rudebuster_anim);\n                attack.damage = damage;\n                attack.star = star;\n                attack.caster = caster;\n                attack.target = global.monsterinstance[star];\n",
+  "replace": "                if (knight_dbl_take(caster, 4))\n                {\n                    global.spelldelay = 95;\n                    knight_kspell_start(8, caster, star, damage);\n                }\n                else\n                {\n                    attack = instance_create(obj_herosusie.x, obj_herosusie.y, obj_rudebuster_anim);\n                    attack.damage = damage;\n                    attack.star = star;\n                    attack.caster = caster;\n                    attack.target = global.monsterinstance[star];\n                }\n",
+  "why": "RUDER BUSTER: two Rude Busters, the second 15 frames after the first (X-Slash's timing).",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "C10-icestorm-cyan",
+  "variants": [
+   "cyan"
+  ],
+  "entry": "gml_GlobalScript_scr_spell",
+  "find": "                attack = instance_create(global.monsterx[star], global.monstery[star], obj_icespell);\n                attack.damage = damage;\n                attack.star = star;\n                attack.caster = caster;\n                attack.target = global.monsterinstance[star];\n",
+  "replace": "                if (knight_dbl_take(caster, 9))\n                {\n                    global.spelldelay = 70;\n                    knight_kspell_start(9, caster, star, damage);\n                }\n                else\n                {\n                    attack = instance_create(global.monsterx[star], global.monstery[star], obj_icespell);\n                    attack.damage = damage;\n                    attack.star = star;\n                    attack.caster = caster;\n                    attack.target = global.monsterinstance[star];\n                }\n",
+  "why": "ICESTORM: two Ice Shocks at X-Slash's timing.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "C11-firestorm-cyan",
+  "variants": [
+   "cyan"
+  ],
+  "entry": "gml_GlobalScript_scr_spell",
+  "find": "                global.spelldelay = 80;\n                knight_kspell_start(5, caster, star, damage);\n",
+  "replace": "                global.spelldelay = 80;\n                knight_kspell_start(5, caster, star, damage);\n                if (knight_dbl_take(caster, 13))\n                {\n                    global.knight_ks.dbl = 1;\n                    global.spelldelay = 100;\n                }\n",
+  "why": "FIRESTORM: Ralsei throws a second fireball 15 frames after the first.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "C12-dbl-text-Alarm_0-cyan",
+  "variants": [
+   "cyan"
+  ],
+  "entry": "gml_Object_obj_spellphase_Alarm_0",
+  "find": "scr_spelltext\\(global\\.charspecial\\[(\\w+)\\], (\\w+)\\);",
+  "replace": "scr_spelltext(global.charspecial[\\1], \\2);\\n knight_dbl_text(\\2);",
+  "why": "The spell phase's line names the learned move (RUDER BUSTER, ICESTORM, FIRESTORM).",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 2
+ },
+ {
+  "id": "C12-dbl-text-Step_0-cyan",
+  "variants": [
+   "cyan"
+  ],
+  "entry": "gml_Object_obj_spellphase_Step_0",
+  "find": "scr_spelltext\\(global\\.charspecial\\[(\\w+)\\], (\\w+)\\);",
+  "replace": "scr_spelltext(global.charspecial[\\1], \\2);\\n knight_dbl_text(\\2);",
+  "why": "The spell phase's line names the learned move (RUDER BUSTER, ICESTORM, FIRESTORM).",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 2
+ },
+ {
+  "id": "C18-elec-kris-create",
+  "variants": [
+   "elec"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Create_0",
+  "find": "scr_havechar\\(1\\)",
+  "replace": "knight_kris_here()",
+  "why": "When the Weird Route has taken Kris (not on top), the last phase hands UNLEASH to the others like a party without Kris.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 2
+ },
+ {
+  "id": "C19-elec-kris-step",
+  "variants": [
+   "elec"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Step_0",
+  "find": "scr_havechar\\(1\\)",
+  "replace": "knight_kris_here()",
+  "why": "A Kris the Weird Route took cannot be raised by RaiseKris / ReviveKris; the S/R-Actions work as without Kris.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 6
+ },
+ {
+  "id": "C13-infhp-scr_damage-base",
+  "variants": [
+   "base"
+  ],
+  "entry": "gml_GlobalScript_scr_damage",
+  "find": "global\\.hp\\[chartarget\\] -= ([^;\\n]+);",
+  "replace": "global.hp[chartarget] -= knight_infhp_cut(\\1);",
+  "why": "INFINITE HP: a hit still lands (number, flash, No-Hit) but takes no HP, so nobody goes down.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 3
+ },
+ {
+  "id": "C13-infhp-scr_damage_fixed-base",
+  "variants": [
+   "base"
+  ],
+  "entry": "gml_GlobalScript_scr_damage_fixed",
+  "find": "global\\.hp\\[chartarget\\] -= ([^;\\n]+);",
+  "replace": "global.hp[chartarget] -= knight_infhp_cut(\\1);",
+  "why": "INFINITE HP: a hit still lands (number, flash, No-Hit) but takes no HP, so nobody goes down.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 3
+ },
+ {
+  "id": "C13-infhp-scr_damage_maxhp-base",
+  "variants": [
+   "base"
+  ],
+  "entry": "gml_GlobalScript_scr_damage_maxhp",
+  "find": "global\\.hp\\[chartarget\\] -= ([^;\\n]+);",
+  "replace": "global.hp[chartarget] -= knight_infhp_cut(\\1);",
+  "why": "INFINITE HP: a hit still lands (number, flash, No-Hit) but takes no HP, so nobody goes down.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 3
+ },
+ {
+  "id": "C13-infhp-scr_damage_proportional-base",
+  "variants": [
+   "base"
+  ],
+  "entry": "gml_GlobalScript_scr_damage_proportional",
+  "find": "global\\.hp\\[chartarget\\] -= ([^;\\n]+);",
+  "replace": "global.hp[chartarget] -= knight_infhp_cut(\\1);",
+  "why": "INFINITE HP: a hit still lands (number, flash, No-Hit) but takes no HP, so nobody goes down.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 3
+ },
+ {
+  "id": "C13-infhp-scr_damage_sneo_final_attack-base",
+  "variants": [
+   "base"
+  ],
+  "entry": "gml_GlobalScript_scr_damage_sneo_final_attack",
+  "find": "global\\.hp\\[chartarget\\] -= ([^;\\n]+);",
+  "replace": "global.hp[chartarget] -= knight_infhp_cut(\\1);",
+  "why": "INFINITE HP: a hit still lands (number, flash, No-Hit) but takes no HP, so nobody goes down.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 3
+ },
+ {
+  "id": "C14-infhp-drain-base",
+  "variants": [
+   "base"
+  ],
+  "entry": "gml_Object_obj_battlecontroller_Step_0",
+  "find": "global\\.hp\\[(\\d)\\]--;",
+  "replace": "global.hp[\\1] -= knight_infhp_cut(1);",
+  "why": "INFINITE HP: the ThornRing's drain takes nothing.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 1
+ },
+ {
+  "id": "C13-infhp-scr_damage-kaizo",
+  "variants": [
+   "kaizo"
+  ],
+  "entry": "gml_GlobalScript_scr_damage",
+  "find": "global\\.hp\\[chartarget\\] -= ([^;\\n]+);",
+  "replace": "global.hp[chartarget] -= knight_infhp_cut(\\1);",
+  "why": "INFINITE HP: a hit still lands (number, flash, No-Hit) but takes no HP, so nobody goes down.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 3
+ },
+ {
+  "id": "C13-infhp-scr_damage_fixed-kaizo",
+  "variants": [
+   "kaizo"
+  ],
+  "entry": "gml_GlobalScript_scr_damage_fixed",
+  "find": "global\\.hp\\[chartarget\\] -= ([^;\\n]+);",
+  "replace": "global.hp[chartarget] -= knight_infhp_cut(\\1);",
+  "why": "INFINITE HP: a hit still lands (number, flash, No-Hit) but takes no HP, so nobody goes down.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 3
+ },
+ {
+  "id": "C13-infhp-scr_damage_maxhp-kaizo",
+  "variants": [
+   "kaizo"
+  ],
+  "entry": "gml_GlobalScript_scr_damage_maxhp",
+  "find": "global\\.hp\\[chartarget\\] -= ([^;\\n]+);",
+  "replace": "global.hp[chartarget] -= knight_infhp_cut(\\1);",
+  "why": "INFINITE HP: a hit still lands (number, flash, No-Hit) but takes no HP, so nobody goes down.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 3
+ },
+ {
+  "id": "C13-infhp-scr_damage_proportional-kaizo",
+  "variants": [
+   "kaizo"
+  ],
+  "entry": "gml_GlobalScript_scr_damage_proportional",
+  "find": "global\\.hp\\[chartarget\\] -= ([^;\\n]+);",
+  "replace": "global.hp[chartarget] -= knight_infhp_cut(\\1);",
+  "why": "INFINITE HP: a hit still lands (number, flash, No-Hit) but takes no HP, so nobody goes down.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 3
+ },
+ {
+  "id": "C13-infhp-scr_damage_sneo_final_attack-kaizo",
+  "variants": [
+   "kaizo"
+  ],
+  "entry": "gml_GlobalScript_scr_damage_sneo_final_attack",
+  "find": "global\\.hp\\[chartarget\\] -= ([^;\\n]+);",
+  "replace": "global.hp[chartarget] -= knight_infhp_cut(\\1);",
+  "why": "INFINITE HP: a hit still lands (number, flash, No-Hit) but takes no HP, so nobody goes down.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 3
+ },
+ {
+  "id": "C14-infhp-drain-kaizo",
+  "variants": [
+   "kaizo"
+  ],
+  "entry": "gml_Object_obj_battlecontroller_Step_0",
+  "find": "global\\.hp\\[(\\d)\\]--;",
+  "replace": "global.hp[\\1] -= knight_infhp_cut(1);",
+  "why": "INFINITE HP: the ThornRing's drain takes nothing.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 1
+ },
+ {
+  "id": "C13-infhp-scr_damage-elec",
+  "variants": [
+   "elec"
+  ],
+  "entry": "gml_GlobalScript_scr_damage",
+  "find": "global\\.hp\\[chartarget\\] -= ([^;\\n]+);",
+  "replace": "global.hp[chartarget] -= knight_infhp_cut(\\1);",
+  "why": "INFINITE HP: a hit still lands (number, flash, No-Hit) but takes no HP, so nobody goes down.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 3
+ },
+ {
+  "id": "C13-infhp-scr_damage_fixed-elec",
+  "variants": [
+   "elec"
+  ],
+  "entry": "gml_GlobalScript_scr_damage_fixed",
+  "find": "global\\.hp\\[chartarget\\] -= ([^;\\n]+);",
+  "replace": "global.hp[chartarget] -= knight_infhp_cut(\\1);",
+  "why": "INFINITE HP: a hit still lands (number, flash, No-Hit) but takes no HP, so nobody goes down.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 3
+ },
+ {
+  "id": "C13-infhp-scr_damage_maxhp-elec",
+  "variants": [
+   "elec"
+  ],
+  "entry": "gml_GlobalScript_scr_damage_maxhp",
+  "find": "global\\.hp\\[chartarget\\] -= ([^;\\n]+);",
+  "replace": "global.hp[chartarget] -= knight_infhp_cut(\\1);",
+  "why": "INFINITE HP: a hit still lands (number, flash, No-Hit) but takes no HP, so nobody goes down.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 3
+ },
+ {
+  "id": "C13-infhp-scr_damage_proportional-elec",
+  "variants": [
+   "elec"
+  ],
+  "entry": "gml_GlobalScript_scr_damage_proportional",
+  "find": "global\\.hp\\[chartarget\\] -= ([^;\\n]+);",
+  "replace": "global.hp[chartarget] -= knight_infhp_cut(\\1);",
+  "why": "INFINITE HP: a hit still lands (number, flash, No-Hit) but takes no HP, so nobody goes down.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 3
+ },
+ {
+  "id": "C13-infhp-scr_damage_sneo_final_attack-elec",
+  "variants": [
+   "elec"
+  ],
+  "entry": "gml_GlobalScript_scr_damage_sneo_final_attack",
+  "find": "global\\.hp\\[chartarget\\] -= ([^;\\n]+);",
+  "replace": "global.hp[chartarget] -= knight_infhp_cut(\\1);",
+  "why": "INFINITE HP: a hit still lands (number, flash, No-Hit) but takes no HP, so nobody goes down.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 3
+ },
+ {
+  "id": "C14-infhp-drain-elec",
+  "variants": [
+   "elec"
+  ],
+  "entry": "gml_Object_obj_battlecontroller_Step_0",
+  "find": "global\\.hp\\[(\\d)\\]--;",
+  "replace": "global.hp[\\1] -= knight_infhp_cut(1);",
+  "why": "INFINITE HP: the ThornRing's drain takes nothing.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 1
+ },
+ {
+  "id": "C13-infhp-scr_damage-violet",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_GlobalScript_scr_damage",
+  "find": "global\\.hp\\[chartarget\\] -= ([^;\\n]+);",
+  "replace": "global.hp[chartarget] -= knight_infhp_cut(\\1);",
+  "why": "INFINITE HP: a hit still lands (number, flash, No-Hit) but takes no HP, so nobody goes down.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 3
+ },
+ {
+  "id": "C13-infhp-scr_damage_fixed-violet",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_GlobalScript_scr_damage_fixed",
+  "find": "global\\.hp\\[chartarget\\] -= ([^;\\n]+);",
+  "replace": "global.hp[chartarget] -= knight_infhp_cut(\\1);",
+  "why": "INFINITE HP: a hit still lands (number, flash, No-Hit) but takes no HP, so nobody goes down.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 3
+ },
+ {
+  "id": "C13-infhp-scr_damage_maxhp-violet",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_GlobalScript_scr_damage_maxhp",
+  "find": "global\\.hp\\[chartarget\\] -= ([^;\\n]+);",
+  "replace": "global.hp[chartarget] -= knight_infhp_cut(\\1);",
+  "why": "INFINITE HP: a hit still lands (number, flash, No-Hit) but takes no HP, so nobody goes down.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 3
+ },
+ {
+  "id": "C13-infhp-scr_damage_proportional-violet",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_GlobalScript_scr_damage_proportional",
+  "find": "global\\.hp\\[chartarget\\] -= ([^;\\n]+);",
+  "replace": "global.hp[chartarget] -= knight_infhp_cut(\\1);",
+  "why": "INFINITE HP: a hit still lands (number, flash, No-Hit) but takes no HP, so nobody goes down.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 3
+ },
+ {
+  "id": "C13-infhp-scr_damage_sneo_final_attack-violet",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_GlobalScript_scr_damage_sneo_final_attack",
+  "find": "global\\.hp\\[chartarget\\] -= ([^;\\n]+);",
+  "replace": "global.hp[chartarget] -= knight_infhp_cut(\\1);",
+  "why": "INFINITE HP: a hit still lands (number, flash, No-Hit) but takes no HP, so nobody goes down.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 3
+ },
+ {
+  "id": "C14-infhp-drain-violet",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_battlecontroller_Step_0",
+  "find": "global\\.hp\\[(\\d)\\]--;",
+  "replace": "global.hp[\\1] -= knight_infhp_cut(1);",
+  "why": "INFINITE HP: the ThornRing's drain takes nothing.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 1
+ },
+ {
+  "id": "C13-infhp-scr_damage-thorn",
+  "variants": [
+   "thorn"
+  ],
+  "entry": "gml_GlobalScript_scr_damage",
+  "find": "global\\.hp\\[chartarget\\] -= ([^;\\n]+);",
+  "replace": "global.hp[chartarget] -= knight_infhp_cut(\\1);",
+  "why": "INFINITE HP: a hit still lands (number, flash, No-Hit) but takes no HP, so nobody goes down.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 3
+ },
+ {
+  "id": "C13-infhp-scr_damage_fixed-thorn",
+  "variants": [
+   "thorn"
+  ],
+  "entry": "gml_GlobalScript_scr_damage_fixed",
+  "find": "global\\.hp\\[chartarget\\] -= ([^;\\n]+);",
+  "replace": "global.hp[chartarget] -= knight_infhp_cut(\\1);",
+  "why": "INFINITE HP: a hit still lands (number, flash, No-Hit) but takes no HP, so nobody goes down.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 3
+ },
+ {
+  "id": "C13-infhp-scr_damage_maxhp-thorn",
+  "variants": [
+   "thorn"
+  ],
+  "entry": "gml_GlobalScript_scr_damage_maxhp",
+  "find": "global\\.hp\\[chartarget\\] -= ([^;\\n]+);",
+  "replace": "global.hp[chartarget] -= knight_infhp_cut(\\1);",
+  "why": "INFINITE HP: a hit still lands (number, flash, No-Hit) but takes no HP, so nobody goes down.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 3
+ },
+ {
+  "id": "C13-infhp-scr_damage_proportional-thorn",
+  "variants": [
+   "thorn"
+  ],
+  "entry": "gml_GlobalScript_scr_damage_proportional",
+  "find": "global\\.hp\\[chartarget\\] -= ([^;\\n]+);",
+  "replace": "global.hp[chartarget] -= knight_infhp_cut(\\1);",
+  "why": "INFINITE HP: a hit still lands (number, flash, No-Hit) but takes no HP, so nobody goes down.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 3
+ },
+ {
+  "id": "C13-infhp-scr_damage_sneo_final_attack-thorn",
+  "variants": [
+   "thorn"
+  ],
+  "entry": "gml_GlobalScript_scr_damage_sneo_final_attack",
+  "find": "global\\.hp\\[chartarget\\] -= ([^;\\n]+);",
+  "replace": "global.hp[chartarget] -= knight_infhp_cut(\\1);",
+  "why": "INFINITE HP: a hit still lands (number, flash, No-Hit) but takes no HP, so nobody goes down.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 3
+ },
+ {
+  "id": "C14-infhp-drain-thorn",
+  "variants": [
+   "thorn"
+  ],
+  "entry": "gml_Object_obj_battlecontroller_Step_0",
+  "find": "global\\.hp\\[(\\d)\\]--;",
+  "replace": "global.hp[\\1] -= knight_infhp_cut(1);",
+  "why": "INFINITE HP: the ThornRing's drain takes nothing.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 5
+ },
+ {
+  "id": "C13-infhp-scr_damage-cyan",
+  "variants": [
+   "cyan"
+  ],
+  "entry": "gml_GlobalScript_scr_damage",
+  "find": "global\\.hp\\[chartarget\\] -= ([^;\\n]+);",
+  "replace": "global.hp[chartarget] -= knight_infhp_cut(\\1);",
+  "why": "INFINITE HP: a hit still lands (number, flash, No-Hit) but takes no HP, so nobody goes down.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 3
+ },
+ {
+  "id": "C13-infhp-scr_damage_fixed-cyan",
+  "variants": [
+   "cyan"
+  ],
+  "entry": "gml_GlobalScript_scr_damage_fixed",
+  "find": "global\\.hp\\[chartarget\\] -= ([^;\\n]+);",
+  "replace": "global.hp[chartarget] -= knight_infhp_cut(\\1);",
+  "why": "INFINITE HP: a hit still lands (number, flash, No-Hit) but takes no HP, so nobody goes down.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 3
+ },
+ {
+  "id": "C13-infhp-scr_damage_maxhp-cyan",
+  "variants": [
+   "cyan"
+  ],
+  "entry": "gml_GlobalScript_scr_damage_maxhp",
+  "find": "global\\.hp\\[chartarget\\] -= ([^;\\n]+);",
+  "replace": "global.hp[chartarget] -= knight_infhp_cut(\\1);",
+  "why": "INFINITE HP: a hit still lands (number, flash, No-Hit) but takes no HP, so nobody goes down.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 3
+ },
+ {
+  "id": "C13-infhp-scr_damage_proportional-cyan",
+  "variants": [
+   "cyan"
+  ],
+  "entry": "gml_GlobalScript_scr_damage_proportional",
+  "find": "global\\.hp\\[chartarget\\] -= ([^;\\n]+);",
+  "replace": "global.hp[chartarget] -= knight_infhp_cut(\\1);",
+  "why": "INFINITE HP: a hit still lands (number, flash, No-Hit) but takes no HP, so nobody goes down.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 3
+ },
+ {
+  "id": "C13-infhp-scr_damage_sneo_final_attack-cyan",
+  "variants": [
+   "cyan"
+  ],
+  "entry": "gml_GlobalScript_scr_damage_sneo_final_attack",
+  "find": "global\\.hp\\[chartarget\\] -= ([^;\\n]+);",
+  "replace": "global.hp[chartarget] -= knight_infhp_cut(\\1);",
+  "why": "INFINITE HP: a hit still lands (number, flash, No-Hit) but takes no HP, so nobody goes down.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 3
+ },
+ {
+  "id": "C14-infhp-drain-cyan",
+  "variants": [
+   "cyan"
+  ],
+  "entry": "gml_Object_obj_battlecontroller_Step_0",
+  "find": "global\\.hp\\[(\\d)\\]--;",
+  "replace": "global.hp[\\1] -= knight_infhp_cut(1);",
+  "why": "INFINITE HP: the ThornRing's drain takes nothing.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 1
+ },
+ {
+  "id": "C15-infhp-kz-snowgrave",
+  "variants": [
+   "kaizo"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Step_0",
+  "find": "global.hp[_char] -= _frdmg;",
+  "replace": "global.hp[_char] -= knight_infhp_cut(_frdmg);",
+  "why": "INFINITE HP: the SnowGrave the Kaizo Knight turns back takes nothing.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "C16-infhp-kz-gloom",
+  "variants": [
+   "kaizo"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Step_2",
+  "find": "global.hp[i]--;",
+  "replace": "global.hp[i] -= knight_infhp_cut(1);",
+  "why": "INFINITE HP: GLOOM drains nothing.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "C17-infhp-kz-gloomadd-scr_damage",
+  "variants": [
+   "kaizo"
+  ],
+  "entry": "gml_GlobalScript_scr_damage",
+  "find": "obj_knight_enemy.k_gloom[chartarget] += _gloomdmg;",
+  "replace": "obj_knight_enemy.k_gloom[chartarget] += knight_infhp_cut(_gloomdmg);",
+  "why": "INFINITE HP: hits build no GLOOM.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "C17-infhp-kz-gloomadd-scr_damage_maxhp",
+  "variants": [
+   "kaizo"
+  ],
+  "entry": "gml_GlobalScript_scr_damage_maxhp",
+  "find": "obj_knight_enemy.k_gloom[chartarget] += _gloomdmg;",
+  "replace": "obj_knight_enemy.k_gloom[chartarget] += knight_infhp_cut(_gloomdmg);",
+  "why": "INFINITE HP: hits build no GLOOM.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ }
+]

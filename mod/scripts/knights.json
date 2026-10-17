@@ -1,0 +1,1090 @@
+{
+ "songs": [
+  {
+   "name": "Mod default",
+   "file": "",
+   "id": "",
+   "credit": ""
+  },
+  {
+   "name": "RANDOM",
+   "file": "@random",
+   "by": "",
+   "src": "",
+   "id": "@random",
+   "credit": ""
+  },
+  {
+   "name": "Dusttale: Sonata of the Shattered",
+   "file": "kh_dusttale_sonata.ogg",
+   "by": "aMan",
+   "src": "soundcloud.com/user-153140308/lacrimosa-dusttale-sonata-of",
+   "id": "kh_dusttale_sonata.ogg",
+   "hid": "song_21",
+   "sort": "aMan",
+   "credit": "Music, AU take, art and thumbnail: aMan (shown on SoundCloud as アマンaMan). Full title: [Lacrimosa] Dusttale: Sonata of the Shattered {Undyne x... Napstablook encounter?}",
+   "credit_game": "Music, AU take, art and thumbnail: aMan (his name on SoundCloud is written in Japanese). Full title: [Lacrimosa] Dusttale: Sonata of the Shattered {Undyne x... Napstablook encounter?}"
+  },
+  {
+   "name": "Close To Inevitability (PHASE 2)",
+   "file": "kh_close_to_inevitability.ogg",
+   "by": "Andrimal",
+   "src": "soundcloud.com/ulb-take/close-to-inevitability-ulb-renewed-phase-2",
+   "id": "kh_close_to_inevitability.ogg",
+   "hid": "song_01",
+   "sort": "Andrimal",
+   "credit": "Composer: Andrimal. From ULB: Renewed, PHASE 2. Uploaded by ULB: Renewed OFFICIAL SOUNDTRACK."
+  },
+  {
+   "name": "KNIGHTMARE",
+   "file": "knightmare_knight.ogg",
+   "by": "Ann (nahghyperfresh)",
+   "src": "soundcloud.com/nahghyperfresh/knightmare",
+   "id": "knightmare_knight.ogg",
+   "credit": ""
+  },
+  {
+   "name": "NEOTECH:ONLINE",
+   "file": "kh_neotech_online.ogg",
+   "by": "antagonist",
+   "src": "soundcloud.com/genericantagonist/neotech",
+   "id": "kh_neotech_online.ogg",
+   "credit": ""
+  },
+  {
+   "name": "DEEP WATERS",
+   "file": "kh_deep_waters.ogg",
+   "by": "DanlyDaMusician",
+   "src": "soundcloud.com/user-185212763/deep-waters-deltarune-chapter",
+   "id": "kh_deep_waters.ogg",
+   "hid": "song_02",
+   "sort": "DanlyDaMusician",
+   "credit": "Composed by DanlyDaMusician (Deltarune Chapter 7 - Side B UST). Deltarune by Toby Fox."
+  },
+  {
+   "name": "TILL THE END",
+   "file": "kh_till_the_end.ogg",
+   "by": "DanlyDaMusician",
+   "src": "soundcloud.com/user-185212763/till-the-end",
+   "id": "kh_till_the_end.ogg",
+   "hid": "song_03",
+   "credit": "Track credited to DanlyDaMusician: TILL THE END (Encounter with Friends) | Deltarune UST."
+  },
+  {
+   "name": "IT DOESN'T END HERE",
+   "file": "@kf:it_doesnt_end_here",
+   "by": "DIGITAL DESCENDANT",
+   "src": "Nullscape Vol. 3 - KF Song Pack (lyrics)",
+   "id": "@kf:it_doesnt_end_here",
+   "credit": ""
+  },
+  {
+   "name": "(Unused) MEGALO STRIKE BACK",
+   "file": "kh_megalo_strike_back.ogg",
+   "by": "EVAERDRAD",
+   "src": "soundcloud.com/modestbbq/storyspin-99-unused",
+   "id": "kh_megalo_strike_back.ogg",
+   "credit": ""
+  },
+  {
+   "name": "HELL HAMMER",
+   "file": "kh_hell_hammer.ogg",
+   "by": "Geefel",
+   "src": "soundcloud.com/geefel/hhammer",
+   "id": "kh_hell_hammer.ogg",
+   "credit": ""
+  },
+  {
+   "name": "NEO CHAOS",
+   "file": "kh_neo_chaos.ogg",
+   "by": "geefel",
+   "src": "soundcloud.com/geefel/neo-chaos",
+   "id": "kh_neo_chaos.ogg",
+   "hid": "song_04",
+   "sort": "geefel",
+   "credit": "Version by geefel. Original by redmatazz. Devyne & Crystalswitch by mr-rattel-m-bones-1. Voice lines by Toby Fox and geefel."
+  },
+  {
+   "name": "MEGALO VANIA",
+   "file": "kh_megalo_vania.ogg",
+   "by": "igorsantusa",
+   "src": "soundcloud.com/casserole12345/megalo-vania",
+   "id": "kh_megalo_vania.ogg",
+   "credit": ""
+  },
+  {
+   "name": "LOST DREAM // VS NOELLE.EXE",
+   "file": "kh_lost_dream.ogg",
+   "by": "ImperfectNORE",
+   "src": "soundcloud.com/imperfectnore/lost-dream-vs-noelle-exe",
+   "id": "kh_lost_dream.ogg",
+   "credit": ""
+  },
+  {
+   "name": "RISEN UP // VS EMBERED",
+   "file": "kh_risen_up.ogg",
+   "by": "ImperfectNORE, AximSC",
+   "src": "soundcloud.com/imperfectnore/risen-up-vs-embered-deltarune",
+   "id": "kh_risen_up.ogg",
+   "hid": "song_05",
+   "sort": "ImperfectNORE, AximSC",
+   "credit": "By ImperfectNORE and AximSC (uploaded by Imperfect). Vocals sampled from chaitealeaves' Raise Up Your Bat cover."
+  },
+  {
+   "name": "M.E.G.A.L.O.V.A.N.I.A.",
+   "file": "kh_megalovania_itsaleccio.ogg",
+   "by": "itsaleccio",
+   "src": "soundcloud.com/aleccio6/megalovania-1",
+   "id": "kh_megalovania_itsaleccio.ogg",
+   "hid": "song_06",
+   "sort": "itsaleccio",
+   "credit": "Version by itsaleccio. Original by keno9988v-official. MEGALOVANIA composed by Toby Fox (Undertale)."
+  },
+  {
+   "name": "Wheel of Misfortune [Arrangement]",
+   "file": "kh_wheel_of_misfortune.ogg",
+   "by": "itsaleccio",
+   "src": "soundcloud.com/aleccio6/wheel-of-misfortune-arrangement",
+   "id": "kh_wheel_of_misfortune.ogg",
+   "hid": "song_22",
+   "sort": "itsaleccio",
+   "credit": "Arrangement by itsaleccio. Original by jacksqrd. Death By Glamour composed by Toby Fox (Undertale)."
+  },
+  {
+   "name": "STORYSHIFT ~ 100. BLACK",
+   "file": "kh_storyshift_black.ogg",
+   "by": "Jay",
+   "src": "soundcloud.com/jay_josh1212/jackblack",
+   "id": "kh_storyshift_black.ogg",
+   "credit": ""
+  },
+  {
+   "name": "Ice Shock",
+   "file": "kh_ice_shock.ogg",
+   "by": "Jayze, Tory Fox",
+   "src": "soundcloud.com/toryfox3/battle_ogg",
+   "id": "kh_ice_shock.ogg",
+   "hid": "song_07",
+   "sort": "Jayze, Tory Fox",
+   "credit": "By Jayze and Tory Fox (uploaded by DARKHEART). Heavily inspired by Florogenesis - Castle Battle (soundcloud.com/rg3b8xeoe7i7/florogenesis-castle-battle)."
+  },
+  {
+   "name": "Venari",
+   "file": "kh_venari.ogg",
+   "by": "Jayze, Tory Fox",
+   "src": "soundcloud.com/toryfox3/creepychase_ogg",
+   "id": "kh_venari.ogg",
+   "hid": "song_08",
+   "sort": "Jayze, Tory Fox",
+   "credit": "By Jayze and Tory Fox (uploaded by DARKHEART). Music assistance: 1jayze."
+  },
+  {
+   "name": "FORGET ME NOT V3",
+   "file": "kh_forget_me_not.ogg",
+   "by": "JustStereo",
+   "src": "soundcloud.com/juststereo/forget-me-not-v3-deltarune-chapter-6",
+   "id": "kh_forget_me_not.ogg",
+   "hid": "song_09",
+   "credit": "By JustStereo: FORGET ME NOT V3 (DELTARUNE Chapter 6)."
+  },
+  {
+   "name": "IDENTITY CRISIS (Arrangement)",
+   "file": "kh_identity_crisis.ogg",
+   "by": "lexxiemow",
+   "src": "soundcloud.com/realhodgepodge/identity-crisis-arrangement",
+   "id": "kh_identity_crisis.ogg",
+   "credit": "By lexxiemow (formerly credited here as moved accounts!!)."
+  },
+  {
+   "name": "ANYWHERE YOU GO [LEGACY]",
+   "file": "kh_anywhere_you_go.ogg",
+   "by": "lexxiemoww",
+   "src": "soundcloud.com/lexxiemow/x_cc",
+   "id": "kh_anywhere_you_go.ogg",
+   "credit": ""
+  },
+  {
+   "name": "EVER ASCENDING",
+   "file": "kh_ever_ascending.ogg",
+   "by": "lexxiemoww",
+   "src": "soundcloud.com/lexxiemow/trinky_finale",
+   "id": "kh_ever_ascending.ogg",
+   "credit": ""
+  },
+  {
+   "name": "Chrysalis",
+   "file": "kh_chrysalis.ogg",
+   "by": "lexycat",
+   "src": "soundcloud.com/lexycat2005/chrysalis",
+   "id": "kh_chrysalis.ogg",
+   "hid": "song_10",
+   "sort": "lexycat",
+   "credit": "By lexycat."
+  },
+  {
+   "name": "Hell for Frandle",
+   "file": "kh_hell_for_frandle.ogg",
+   "by": "Pastry",
+   "src": "youtube.com/watch?v=yY9FZTP93Kc",
+   "id": "kh_hell_for_frandle.ogg",
+   "hid": "song_20",
+   "sort": "Pastry",
+   "credit": "Artist: Pastry. Album: RE+. Original: U.N. Owen Was Her? (ZUN, Touhou). Uploaded to YouTube by UnknownSquid."
+  },
+  {
+   "name": "N1GHT OF N1GH+COR3 >:3",
+   "file": "kh_n1ght_of_n1ghtcore.ogg",
+   "by": "plush",
+   "src": "soundcloud.com/plushcat/n1ght-of-n1ghcoya3-3",
+   "id": "kh_n1ght_of_n1ghtcore.ogg",
+   "credit": ""
+  },
+  {
+   "name": "FRAIGHT FEST",
+   "file": "kh_fraight_fest.ogg",
+   "by": "RazFraz",
+   "src": "soundcloud.com/razfraz/jackenstein-tv-time",
+   "id": "kh_fraight_fest.ogg",
+   "hid": "song_11",
+   "sort": "RazFraz",
+   "credit": "By RazFraz [MaldyneSwap]: Ann-Rachnid's TV Time replacement (Tenna <> Jackenstein)."
+  },
+  {
+   "name": "Our Flower Power!",
+   "file": "kh_our_flower_power.ogg",
+   "by": "RazFraz",
+   "src": "soundcloud.com/razfraz/our-flower-power",
+   "id": "kh_our_flower_power.ogg",
+   "hid": "song_12",
+   "sort": "RazFraz",
+   "credit": "By RazFraz [Ch3 <> Ch5 Swap]."
+  },
+  {
+   "name": "PETAL DANCE!!!!!",
+   "file": "kh_petal_dance.ogg",
+   "by": "reverienova",
+   "src": "soundcloud.com/reverienova-starborn/petaldance",
+   "id": "kh_petal_dance.ogg",
+   "hid": "song_13",
+   "sort": "reverienova",
+   "credit": "Version by ★reverienova. Original song by Toby Fox.",
+   "credit_game": "Version by reverienova (written with a star in front on SoundCloud). Original song by Toby Fox."
+  },
+  {
+   "name": "Vs. Susie NEO",
+   "file": "kh_vs_susie_neo.ogg",
+   "by": "romber",
+   "src": "soundcloud.com/thatbratcohen/vs_susie_neo",
+   "id": "kh_vs_susie_neo.ogg",
+   "hid": "song_14",
+   "sort": "romber",
+   "credit": "Version / mashup by romber, from Vs. Susie and Battle Against a True Hero (Toby Fox)."
+  },
+  {
+   "name": "VOID STAR",
+   "file": "kh_void_star.ogg",
+   "by": "rundown",
+   "src": "soundcloud.com/rundownsd/void-star",
+   "id": "kh_void_star.ogg",
+   "credit": ""
+  },
+  {
+   "name": "L.V. CRUSHER",
+   "file": "kh_lv_crusher.ogg",
+   "by": "saknol",
+   "src": "soundcloud.com/saknol/lvcrusher",
+   "id": "kh_lv_crusher.ogg",
+   "credit": ""
+  },
+  {
+   "name": "In My Way",
+   "file": "kh_in_my_way.ogg",
+   "by": "SEWNPUARD",
+   "src": "soundcloud.com/sewnpard/zzz_cree_ogg",
+   "id": "kh_in_my_way.ogg",
+   "credit": ""
+  },
+  {
+   "name": "80. White Cell",
+   "file": "kh_white_cell.ogg",
+   "by": "STORYSPIN",
+   "src": "soundcloud.com/sspin-st/storyspin-80",
+   "id": "kh_white_cell.ogg",
+   "hid": "song_15",
+   "sort": "STORYSPIN",
+   "credit": "Uploaded by STORYSPIN (artist field: BOBBYSPIN)."
+  },
+  {
+   "name": "MEGALOVANIA (Ft. Eleanor Forte)",
+   "file": "kh_megalovania_sunhatgirl.ogg",
+   "by": "sunhatgirl",
+   "src": "soundcloud.com/keep-smyling-2/megalovania",
+   "id": "kh_megalovania_sunhatgirl.ogg",
+   "hid": "song_16",
+   "sort": "sunhatgirl",
+   "credit": "Version by sunhatgirl. Undertale by Toby Fox. Turn the Lights Off by Tally Hall. Vocals made with Eleanor Forte (Synthesizer V)."
+  },
+  {
+   "name": "That Feeling (In Your Bones)",
+   "file": "kh_that_feeling.ogg",
+   "by": "sunhatgirl",
+   "src": "soundcloud.com/keep-smyling-2/legendaryfartmaster",
+   "id": "kh_that_feeling.ogg",
+   "credit": ""
+  },
+  {
+   "name": "Penumbra Phantasm",
+   "file": "kh_penumbra_phantasm.ogg",
+   "by": "surreal",
+   "src": "soundcloud.com/surreal012/x-angel",
+   "id": "kh_penumbra_phantasm.ogg",
+   "hid": "song_17",
+   "sort": "surreal",
+   "credit": "Version by surreal. Penumbra Phantasm and DELTARUNE by Toby Fox. Special thanks: saltysquiffer and xnqqq."
+  },
+  {
+   "name": "Flower Man (feat. Camellia)",
+   "file": "Flowerman_Arrangement.ogg",
+   "by": "Toby Fox",
+   "src": "soundcloud.com/tobyfox-music/flower-man-feat-camellia",
+   "id": "Flowerman_Arrangement.ogg",
+   "credit": ""
+  },
+  {
+   "name": "Guardian",
+   "file": "titan_battle.ogg",
+   "by": "Toby Fox",
+   "src": "the game's own file (DELTARUNE Chapter 4, mus/titan_battle.ogg)",
+   "id": "titan_battle.ogg",
+   "credit": ""
+  },
+  {
+   "name": "Raise Up Your Bat",
+   "file": "ch3_karaoke_full.ogg",
+   "by": "Toby Fox",
+   "src": "DELTARUNE Chapter 3 (Tenna's karaoke)",
+   "id": "ch3_karaoke_full.ogg",
+   "credit": ""
+  },
+  {
+   "name": "HEIR OF GRIEF",
+   "file": "kh_heir_of_grief.ogg",
+   "by": "Tory Fox",
+   "src": "soundcloud.com/toryfox2/mus_z_papyrusboss_ogg",
+   "id": "kh_heir_of_grief.ogg",
+   "hid": "song_18",
+   "sort": "Tory Fox",
+   "credit": "Version by Tory Fox [DISC 2]. Original song by Tensei."
+  },
+  {
+   "name": "Wrong Enemy....?",
+   "file": "kh_wrong_enemy.ogg",
+   "by": "Tory Fox",
+   "src": "soundcloud.com/toryfox/mus_waterdragon1_ogg",
+   "id": "kh_wrong_enemy.ogg",
+   "credit": ""
+  },
+  {
+   "name": "TRUE HERO",
+   "file": "kh_true_hero.ogg",
+   "by": "Tory Fox [DISC 2]",
+   "src": "soundcloud.com/toryfox2/mus_undynex_ogg",
+   "id": "kh_true_hero.ogg",
+   "credit": ""
+  },
+  {
+   "name": "RED, CRIMSON DEATH",
+   "file": "kh_red_crimson_death.ogg",
+   "by": "Tory Fox, Igorsantusa",
+   "src": "soundcloud.com/toryfox2/mus_xpart_ogg",
+   "id": "kh_red_crimson_death.ogg",
+   "credit": ""
+  },
+  {
+   "name": "BLOOD",
+   "file": "kh_blood.ogg",
+   "by": "Vision Crew",
+   "src": "soundcloud.com/visioncrew-deltarune/blood",
+   "id": "kh_blood.ogg",
+   "hid": "song_19",
+   "sort": "Vision Crew",
+   "credit": "By Vision Crew (Chapter 6 \"Organic\" battle theme). Based on SPAWN by Toby Fox."
+  }
+ ],
+ "variants": [
+  {
+   "id": 0,
+   "key": "base",
+   "name": "Normal Knight",
+   "author": "Toby Fox",
+   "desc": "The Roaring Knight fight exactly as#it plays in DELTARUNE Chapter 3.",
+   "skip_flag": 4,
+   "has_practice": true,
+   "patch": null,
+   "joke": false,
+   "rush": true,
+   "weird": false,
+   "needs_kris": false,
+   "diff": "Standard: the fight exactly as shipped.",
+   "mech": [
+    "Vanilla Roaring Knight fight.",
+    "Uses the game's normal phases and final roar sequence.",
+    "Weird Route (hub): halfway through the attack list the Knight takes one member (never the last one standing); the others react and the Knight hits 25% harder.",
+    "Credits: Toby Fox."
+   ],
+   "party": "Any party. Kris, Susie and Ralsei are the intended party; other parties are code-audited, not played.",
+   "prac": "Practice: a named attack picker (Phase and Turn) added by this hub, modelled on Kaizo's. The Knight and your party can't be defeated; end-attack button and HoldBreath toggle included. Attacks listed after a phase's last turn are marked (unused). Not part of the original mod and not tested in the real game.",
+   "limits": [],
+   "music": "knight.ogg",
+   "short": "NORMAL",
+   "title": "NORMAL KNIGHT",
+   "color": [
+    255,
+    255,
+    255
+   ],
+   "portrait": "spr_roaringknight_idle",
+   "credits": [
+    {
+     "g": "DELTARUNE",
+     "n": [
+      [
+       "Toby Fox",
+       "Chapter 3 and the original fight"
+      ]
+     ]
+    }
+   ],
+   "songcredit": "Black Knife - Toby Fox",
+   "pace": {
+    "gate": 0.8,
+    "tmin": 15
+   },
+   "tint": false,
+   "chapter": 3
+  },
+  {
+   "id": 1,
+   "key": "kaizo",
+   "name": "Kaizo Knight",
+   "author": "EnderCat8 & TheCyVap",
+   "desc": "A much harder remix: new attacks,#a guard to break and a Side B.",
+   "skip_flag": 4,
+   "has_practice": true,
+   "patch": "kaizo/kaizo_knight.xdelta",
+   "joke": false,
+   "rush": true,
+   "weird": true,
+   "needs_kris": false,
+   "diff": "Unrated. A remix of the base fight with new attacks.",
+   "mech": [
+    "New attack patterns, gloom meter and Side B phases.",
+    "Weird Route (Side B) with any party: Kris has an X-Slash ACT; without Kris, Susie's Rude Buster does that job.",
+    "Has its own Practice choice in the intro.",
+    "Creator not specified in the supplied files."
+   ],
+   "party": "Any party with a leader in slot 1. Party order is kept. Weird Route works with any party.",
+   "prac": "Practice: the mod's own attack-practice menu, shown at the start of the fight.",
+   "limits": [],
+   "music": "kaizoknight.ogg",
+   "short": "KAIZO",
+   "title": "KAIZO KNIGHT",
+   "color": [
+    120,
+    150,
+    255
+   ],
+   "portrait": "spr_roaringknight_idle__v1",
+   "credits": [
+    {
+     "g": "Creators",
+     "n": [
+      [
+       "EnderCat8",
+       "created the original mod"
+      ],
+      [
+       "TheCyVap",
+       "balancing help, code adjustments, a few attacks"
+      ]
+     ]
+    },
+    {
+     "g": "Some code from",
+     "n": [
+      [
+       "gameboi4784",
+       "the \"full knight restoration project\" mod"
+      ]
+     ]
+    },
+    {
+     "g": "Localization",
+     "n": [
+      [
+       "Asatsuyu",
+       "the Japanese translation"
+      ]
+     ]
+    },
+    {
+     "g": "Playtesters",
+     "n": [
+      [
+       "Looks to the Moonlight",
+       ""
+      ],
+      [
+       "Starfallensys",
+       ""
+      ],
+      [
+       "ThePuff_",
+       ""
+      ],
+      [
+       "Eenox",
+       ""
+      ],
+      [
+       "Your Local Goober",
+       ""
+      ],
+      [
+       "riyane",
+       ""
+      ]
+     ]
+    }
+   ],
+   "songcredit": "KAIZO (Remastered) - W. D Gaster",
+   "pace": {
+    "gate": 0.6,
+    "tmin": 27
+   },
+   "tint": false,
+   "chapter": 3
+  },
+  {
+   "id": 2,
+   "key": "elec",
+   "name": "Supercharged Knight",
+   "author": "Egochka11",
+   "desc": "An electric rework with all-new#attacks and a whole extra phase.",
+   "skip_flag": 4,
+   "has_practice": true,
+   "music_files": [
+    "superchargedknight/cleaver.ogg"
+   ],
+   "patch": "elec/elecknightv3.xdelta",
+   "joke": false,
+   "rush": true,
+   "weird": false,
+   "needs_kris": false,
+   "diff": "Unrated. Electric rework of the Roaring Knight.",
+   "mech": [
+    "Lightning and rain effects, spark buttons.",
+    "Final phase (Unleash) is an ACT for Kris and for the party leader.",
+    "Creator not specified in the supplied files.",
+    "Weird Route (hub): halfway through the attack list the Knight takes one member (never the last one standing); the others react and the Knight hits 25% harder."
+   ],
+   "party": "Any party. The last phase's UNLEASH is used by Kris and by whoever leads the party (top slot).",
+   "prac": "Practice: a named attack picker (Phase and Turn) added by this hub, modelled on Kaizo's. The Knight and your party can't be defeated; end-attack button and HoldBreath toggle included. Attacks listed after a phase's last turn are marked (unused). Not part of the original mod and not tested in the real game.",
+   "limits": [],
+   "music": "superchargedknight/cleaver.ogg",
+   "short": "SUPERCHARGED",
+   "title": "SUPERCHARGED KNIGHT",
+   "color": [
+    255,
+    235,
+    90
+   ],
+   "portrait": "spr_roaringknight_idle",
+   "credits": [
+    {
+     "g": "Key authors",
+     "n": [
+      [
+       "Egochka11",
+       ""
+      ]
+     ]
+    },
+    {
+     "g": "Contributors",
+     "n": [
+      [
+       "@DreadImpulse",
+       "composer"
+      ]
+     ]
+    },
+    {
+     "g": "Special thanks",
+     "n": [
+      [
+       "ThePuff_",
+       "inspiring content creator"
+      ],
+      [
+       "Sens2011",
+       "inspiring Thorn Knight / Knightmare creator"
+      ],
+      [
+       "The CD Bagel in my inventory",
+       "carrying all of my test runs"
+      ]
+     ]
+    }
+   ],
+   "songcredit": "Sparkling Cleaver - @DreadImpulse",
+   "pace": {
+    "gate": 0.8,
+    "tmin": 17
+   },
+   "tint": true,
+   "chapter": 3
+  },
+  {
+   "id": 3,
+   "key": "violet",
+   "name": "Violet Knight",
+   "author": "Looks to the Moonlight",
+   "desc": "20+ new attacks, and a stranger#Side B on Weird Route saves.",
+   "skip_flag": 4,
+   "has_practice": true,
+   "patch": "violet/violet_knight_2_2.xdelta",
+   "joke": false,
+   "rush": true,
+   "weird": true,
+   "needs_kris": false,
+   "diff": "Unrated. Builds on Kaizo Knight's code.",
+   "mech": [
+    "Violet-themed attacks and tension changes.",
+    "Weird Route with any party: with Kris, Ralsei (else the Angel) is lost, then Susie, and Kris ends it with X-Slash. Without Kris the Knight takes the Angel first (Ralsei: 'this wasn't in the prophecy'), then Ralsei; Susie (else Ralsei, else Noelle) gets a power-up scene and ends it with Rude Buster / FireShock / SnowGrave.",
+    "Creator not specified in the supplied files."
+   ],
+   "party": "Any party. Weird Route works with every party; who is lost and who finishes depends on who is there.",
+   "prac": "Practice: a named attack picker (Phase and Turn) added by this hub, modelled on Kaizo's. The Knight and your party can't be defeated; end-attack button and HoldBreath toggle included. With Weird Route on it lists the Weird Route attacks (their own names). Attacks listed after a phase's last turn are marked (unused). Not part of the original mod and not tested in the real game.",
+   "limits": [],
+   "music": "knight.ogg",
+   "short": "VIOLET",
+   "title": "VIOLET KNIGHT",
+   "color": [
+    200,
+    130,
+    255
+   ],
+   "portrait": "spr_roaringknight_idle__v3",
+   "credits": [
+    {
+     "g": "Developers",
+     "n": [
+      [
+       "Looks to the Moonlight",
+       "lead developer"
+      ],
+      [
+       "EnderCat8",
+       "co-developer"
+      ],
+      [
+       "LexxyNoHit",
+       "final attack"
+      ]
+     ]
+    },
+    {
+     "g": "Composer",
+     "n": [
+      [
+       "The Stranger",
+       "Side B song (@ShroudedStrangerVevo)"
+      ]
+     ]
+    },
+    {
+     "g": "Playtesters",
+     "n": [
+      [
+       "Starfallensys",
+       ""
+      ],
+      [
+       "Snowloaf",
+       ""
+      ]
+     ]
+    }
+   ],
+   "songcredit": "",
+   "pace": {
+    "gate": 0.65,
+    "tmin": 22,
+    "gate_b": 0.13,
+    "tmin_b": 27
+   },
+   "tint": false,
+   "chapter": 3
+  },
+  {
+   "id": 4,
+   "key": "thorn",
+   "name": "Thorn Knight",
+   "author": "Sens2011",
+   "desc": "KNIGHTMARE: harder and brand-new#attacks. Every hit erodes max HP.",
+   "skip_flag": 4,
+   "has_practice": true,
+   "music_rename": {
+    "knight.ogg": "thorn_knight.ogg"
+   },
+   "patch": "thorn/THORN KNIGHT/THORN KNIGHT/THORN KNIGHT.xdelta",
+   "joke": false,
+   "rush": true,
+   "weird": false,
+   "needs_kris": false,
+   "diff": "Unrated. Thorn Knight rework.",
+   "mech": [
+    "Hits can erode max HP.",
+    "Own music file: thorn_knight.ogg.",
+    "Weird Route (hub): halfway through the attack list the Knight takes one member (never the last one standing); the others react and the Knight hits 25% harder.",
+    "Credits: Sens2011."
+   ],
+   "party": "Any party. Code-audited, not played, for parties other than Kris, Susie and Ralsei.",
+   "prac": "Practice: a named attack picker (Phase and Turn) added by this hub, modelled on Kaizo's. The Knight and your party can't be defeated; end-attack button and HoldBreath toggle included. Attacks listed after a phase's last turn are marked (unused). Not part of the original mod and not tested in the real game.",
+   "limits": [
+    "Max HP loss is restored when you leave."
+   ],
+   "music": "thorn_knight.ogg",
+   "short": "THORN",
+   "title": "THORN KNIGHT",
+   "color": [
+    255,
+    90,
+    90
+   ],
+   "portrait": "spr_roaringknight_idle__v4",
+   "credits": [
+    {
+     "g": "Key authors",
+     "n": [
+      [
+       "Sens2011",
+       "made the mod"
+      ]
+     ]
+    },
+    {
+     "g": "Contributors",
+     "n": [
+      [
+       "EnderCat8",
+       "balanced and made some attacks"
+      ],
+      [
+       "LexxyNoHit",
+       "some attacks, including the final attack"
+      ],
+      [
+       "Egochka11",
+       "helped with some attacks"
+      ],
+      [
+       "The UTY team",
+       "the max HP mechanic"
+      ]
+     ]
+    }
+   ],
+   "songcredit": "Song by grapheman",
+   "pace": {
+    "gate": 0.5,
+    "tmin": 20
+   },
+   "tint": false,
+   "chapter": 3
+  },
+  {
+   "id": 5,
+   "key": "cyan",
+   "name": "Cyan Knight",
+   "author": "Starfallensys & EnderCat8",
+   "desc": "CYAN KNIGHT 2: a joke fight. No#records, no Rush, no Random.",
+   "skip_flag": 4,
+   "has_practice": true,
+   "patch": "cyan/the_bible.xdelta",
+   "joke": true,
+   "rush": false,
+   "weird": false,
+   "needs_kris": false,
+   "diff": "JOKE FIGHT. Not balanced and not meant to be scored.",
+   "mech": [
+    "A joke fight with gags, not a real challenge.",
+    "Excluded from Knight Rush, Random and records.",
+    "Creator not specified in the supplied files.",
+    "Weird Route (hub): halfway through the attack list the Knight takes one member (never the last one standing); the others react and the Knight hits 25% harder."
+   ],
+   "party": "Any party. Code-audited, not played.",
+   "prac": "Practice: a named attack picker (Phase and Turn) added by this hub, modelled on Kaizo's. The Knight and your party can't be defeated; end-attack button and HoldBreath toggle included. Attacks listed after a phase's last turn are marked (unused). Not part of the original mod and not tested in the real game.",
+   "limits": [
+    "JOKE FIGHT: no records, no No-Hit, no Rush, no Random."
+   ],
+   "music": "its_nothing_but_garbage_noise.ogg",
+   "short": "CYAN",
+   "title": "CYAN KNIGHT 2",
+   "color": [
+    80,
+    255,
+    255
+   ],
+   "portrait": "spr_roaringknight_idle__v5",
+   "credits": [
+    {
+     "g": "Creators",
+     "n": [
+      [
+       "Starfallensys",
+       "\"this is still my mod\""
+      ],
+      [
+       "EnderCat8",
+       "\"tried to marry cyan knight 2, there were no survivors\""
+      ]
+     ]
+    },
+    {
+     "g": "In the fight",
+     "n": [
+      [
+       "Pink lines",
+       "attacks by Starfall"
+      ],
+      [
+       "Yellow lines",
+       "attacks by EnderCat8"
+      ],
+      [
+       "Green lines",
+       "made by both"
+      ]
+     ]
+    }
+   ],
+   "songcredit": "\"nothing but garbage noise\"",
+   "pace": {
+    "gate": 0,
+    "tmin": 0
+   },
+   "tint": false,
+   "chapter": 3
+  }
+ ],
+ "hub_credits": [
+  {
+   "g": "Made by",
+   "n": [
+    [
+     "ImperfectNORE",
+     "every knight fight in one game"
+    ]
+   ]
+  },
+  {
+   "g": "Music",
+   "n": [
+    [
+     "Ann (nahghyperfresh)",
+     "\"KNIGHTMARE\" - soundcloud.com/nahghyperfresh"
+    ],
+    [
+     "rundown",
+     "\"VOID STAR\" - soundcloud.com/rundownsd"
+    ],
+    [
+     "saknol",
+     "\"L.V. CRUSHER\" (custom Chara fight theme) - soundcloud.com/saknol"
+    ],
+    [
+     "Tory Fox [DISC 2]",
+     "\"TRUE HERO\" - soundcloud.com/toryfox2"
+    ],
+    [
+     "antagonist",
+     "\"NEOTECH:ONLINE\" (2024 Arrangement) - soundcloud.com/genericantagonist"
+    ],
+    [
+     "Jay",
+     "\"STORYSHIFT ~ 100. BLACK\" (arrangement) - soundcloud.com/jay_josh1212"
+    ],
+    [
+     "new account: lexxiemoww",
+     "\"ANYWHERE YOU GO [LEGACY]\", \"EVER ASCENDING\" - soundcloud.com/lexxiemow"
+    ],
+    [
+     "Toby Fox",
+     "\"Flower Man (feat. Camellia)\" - the game's own file (mus folder)"
+    ],
+    [
+     "ImperfectNORE",
+     "\"LOST DREAM // VS NOELLE.EXE\" - soundcloud.com/imperfectnore"
+    ],
+    [
+     "JustStereo",
+     "\"FORGET ME NOT V3 (DELTARUNE Chapter 6)\" - soundcloud.com/juststereo"
+    ],
+    [
+     "Geefel",
+     "\"HELL HAMMER\" (cover; original by amt1179, AU: Chapter Rewritten) - soundcloud.com/geefel"
+    ],
+    [
+     "SEWNPUARD",
+     "\"In My Way\" - soundcloud.com/sewnpard"
+    ],
+    [
+     "DanlyDaMusician",
+     "\"TILL THE END (Encounter with Friends)\" - soundcloud.com/user-185212763"
+    ],
+    [
+     "igorsantusa",
+     "\"MEGALO VANIA\" (original: mcswordguy) - soundcloud.com/casserole12345"
+    ],
+    [
+     "EVAERDRAD",
+     "\"(Unused) MEGALO STRIKE BACK\" (STORYSPIN) - soundcloud.com/modestbbq"
+    ],
+    [
+     "Tory Fox, Igorsantusa",
+     "\"RED, CRIMSON DEATH\" - soundcloud.com/toryfox2"
+    ],
+    [
+     "Tory Fox",
+     "\"Wrong Enemy....?\" - soundcloud.com/toryfox"
+    ],
+    [
+     "plush",
+     "\"N1GHT OF N1GH+COR3 >:3\" - soundcloud.com/plushcat"
+    ],
+    [
+     "sunhatgirl",
+     "\"That Feeling (In Your Bones)\" (title: d3adeyes) - soundcloud.com/keep-smyling-2"
+    ],
+    [
+     "moved accounts!!",
+     "\"IDENTITY CRISIS (Arrangement)\" (original: DIRECT-TO-DARKNESS) - soundcloud.com/realhodgepodge"
+    ],
+    [
+     "Toby Fox",
+     "\"Guardian\" - the game's own file (Chapter 4, mus folder)"
+    ]
+   ]
+  },
+  {
+   "g": "DELTARUNE",
+   "n": [
+    [
+     "Toby Fox",
+     "the game, its music and its art"
+    ]
+   ]
+  },
+  {
+   "g": "The fights",
+   "n": [
+    [
+     "Each knight's makers",
+     "are on that knight's page"
+    ]
+   ]
+  }
+ ],
+ "pages": [
+  {
+   "ch": 1,
+   "title": "CHAPTER 1"
+  },
+  {
+   "ch": 2,
+   "title": "CHAPTER 2"
+  },
+  {
+   "ch": 3,
+   "title": "CHAPTER 3"
+  },
+  {
+   "ch": 4,
+   "title": "CHAPTER 4"
+  }
+ ],
+ "planned": [
+  {
+   "ch": 1,
+   "key": "jevil",
+   "short": "JEVIL",
+   "name": "Jevil",
+   "online": true
+  },
+  {
+   "ch": 1,
+   "key": "king",
+   "short": "KING",
+   "name": "King",
+   "online": true
+  },
+  {
+   "ch": 2,
+   "key": "spamton_neo",
+   "short": "SPAMTON NEO",
+   "name": "Spamton NEO",
+   "online": true
+  },
+  {
+   "ch": 2,
+   "key": "queen",
+   "short": "QUEEN",
+   "name": "Queen",
+   "online": true
+  },
+  {
+   "ch": 4,
+   "key": "titan",
+   "short": "TITAN",
+   "name": "Titan",
+   "online": true
+  },
+  {
+   "ch": 4,
+   "key": "gerson",
+   "short": "GERSON",
+   "name": "The Hammer of Justice",
+   "online": true
+  }
+ ],
+ "songs_order_v49": [
+  "",
+  "knightmare_knight.ogg",
+  "kh_void_star.ogg",
+  "kh_lv_crusher.ogg",
+  "kh_true_hero.ogg",
+  "kh_neotech_online.ogg",
+  "kh_storyshift_black.ogg",
+  "kh_anywhere_you_go.ogg",
+  "kh_ever_ascending.ogg",
+  "Flowerman_Arrangement.ogg",
+  "kh_lost_dream.ogg",
+  "kh_forget_me_not.ogg",
+  "kh_hell_hammer.ogg",
+  "kh_in_my_way.ogg",
+  "kh_till_the_end.ogg",
+  "kh_megalo_vania.ogg",
+  "kh_megalo_strike_back.ogg",
+  "kh_red_crimson_death.ogg",
+  "kh_wrong_enemy.ogg",
+  "kh_n1ght_of_n1ghtcore.ogg",
+  "kh_that_feeling.ogg",
+  "kh_identity_crisis.ogg",
+  "titan_battle.ogg",
+  "ch3_karaoke_full.ogg",
+  "@random",
+  "@kf:it_doesnt_end_here"
+ ]
+}

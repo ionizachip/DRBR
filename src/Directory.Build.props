@@ -1,0 +1,17 @@
+<Project>
+  <!-- DRBR's Windows programs: .NET Framework 4.8 (in every Windows 10/11), built with the .NET SDK on Windows or Linux -->
+  <PropertyGroup>
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <Deterministic>true</Deterministic>
+    <DebugType>none</DebugType>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <Company>DRBR</Company>
+    <Product>DRBR - DELTARUNE BATTLE ROYALE</Product>
+    <Copyright>DRBR is a fan mod. DELTARUNE (c) Toby Fox. Not affiliated with Toby Fox.</Copyright>
+    <Version>$([System.IO.File]::ReadAllText('$(MSBuildThisFileDirectory)VERSION').Trim())</Version>
+    <NoWarn>$(NoWarn);CA1416;SYSLIB0014;SYSLIB0021;SYSLIB0022;SYSLIB0023;CS0618</NoWarn>
+  </PropertyGroup>
+</Project>

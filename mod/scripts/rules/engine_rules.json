@@ -1,0 +1,539 @@
+[
+ {
+  "id": "E01-heart_follower_Create_0",
+  "variants": [
+   "kaizo",
+   "violet",
+   "cyan"
+  ],
+  "entry": "gml_Object_obj_heart_follower_Create_0",
+  "find": "target = 1462;",
+  "replace": "target = obj_heart;",
+  "why": "Decompiled int literal from the mod's OWN asset index space: obj_heart is 1462 in kaizo/violet/cyan but 1463 in base/merged, where 1462 = obj_bulletdeleter. obj_heart_follower Step_0 does target.x / target.y -> 'Unable to find instance for object index 1462 at gml_Object_obj_heart_follower_Step_0'.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "severity": "CRASH",
+  "expected_count_per_variant": 1
+ },
+ {
+  "id": "E01-heart_follower_overshoot_Create_0",
+  "variants": [
+   "kaizo",
+   "violet",
+   "cyan"
+  ],
+  "entry": "gml_Object_obj_heart_follower_overshoot_Create_0",
+  "find": "target = 1462;",
+  "replace": "target = obj_heart;",
+  "why": "Decompiled int literal from the mod's OWN asset index space: obj_heart is 1462 in kaizo/violet/cyan but 1463 in base/merged, where 1462 = obj_bulletdeleter. obj_heart_follower Step_0 does target.x / target.y -> 'Unable to find instance for object index 1462 at gml_Object_obj_heart_follower_Step_0'.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "severity": "CRASH",
+  "expected_count_per_variant": 1
+ },
+ {
+  "id": "E01-knight_bullethell1_Create_0",
+  "variants": [
+   "kaizo",
+   "violet",
+   "cyan"
+  ],
+  "entry": "gml_Object_obj_knight_bullethell1_Create_0",
+  "find": "target_obj = 1462;",
+  "replace": "target_obj = obj_heart;",
+  "why": "Same mod-local-index class (1462 = obj_heart only in kaizo/violet/cyan space).",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "severity": "CRASH",
+  "expected_count_per_variant": 1
+ },
+ {
+  "id": "E01-knight_bullethell2_Create_0",
+  "variants": [
+   "kaizo",
+   "violet",
+   "cyan"
+  ],
+  "entry": "gml_Object_obj_knight_bullethell2_Create_0",
+  "find": "target_obj = 1462;",
+  "replace": "target_obj = obj_heart;",
+  "why": "Same mod-local-index class (1462 = obj_heart only in kaizo/violet/cyan space).",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "severity": "CRASH",
+  "expected_count_per_variant": 1
+ },
+ {
+  "id": "E01-kn-charbox",
+  "variants": [
+   "kaizo"
+  ],
+  "entry": "gml_GlobalScript_scr_charbox",
+  "find": "var kn = 344;",
+  "replace": "var kn = obj_knight_enemy;",
+  "why": "344 is obj_knight_enemy only in kaizo space (merged/base 344 = obj_board_grabbablegrassspawner). kn.k_gloom[] is read when kaizo_sideb() (side-B / flag[456]) -> 'Unable to find instance for object index 344'.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "severity": "CRASH",
+  "expected_count_per_variant": 1
+ },
+ {
+  "id": "E01-kn-bcdraw",
+  "variants": [
+   "kaizo"
+  ],
+  "entry": "gml_Object_obj_battlecontroller_Draw_0",
+  "find": "var kn = 344;",
+  "replace": "var kn = obj_knight_enemy;",
+  "why": "344 is obj_knight_enemy only in kaizo space (merged/base 344 = obj_board_grabbablegrassspawner). kn.k_gloom[] is read when kaizo_sideb() (side-B / flag[456]) -> 'Unable to find instance for object index 344'.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "severity": "CRASH",
+  "expected_count_per_variant": 1
+ },
+ {
+  "id": "E01-kn-roaring2",
+  "variants": [
+   "kaizo"
+  ],
+  "entry": "gml_Object_obj_knight_roaring2_Other_22",
+  "find": "var kn = 344;",
+  "replace": "var kn = obj_knight_enemy;",
+  "why": "344 is obj_knight_enemy only in kaizo space (merged/base 344 = obj_board_grabbablegrassspawner). kn.k_gloom[] is read when kaizo_sideb() (side-B / flag[456]) -> 'Unable to find instance for object index 344'.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "severity": "CRASH",
+  "expected_count_per_variant": 1
+ },
+ {
+  "id": "E01-gloomemit",
+  "variants": [
+   "kaizo"
+  ],
+  "entry": "gml_GlobalScript_kaizo_settings_init",
+  "find": "if (_ob == 1410)",
+  "replace": "if (_ob == obj_herosusie)",
+  "why": "1410 is obj_herosusie only in kaizo space (merged: obj_herokris); only widens gloom particles.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "severity": "COSMETIC",
+  "expected_count_per_variant": 1
+ },
+ {
+  "id": "E02-scr_damage-retarget",
+  "variants": [
+   "base",
+   "cyan",
+   "violet",
+   "thorn"
+  ],
+  "entry": "gml_GlobalScript_scr_damage",
+  "find": "                if (target == 0)\n                {\n                    if (global.hp[2] > 0 && global.hp[3] > 0)\n                    {\n                        target = choose(1, 2);\n                    }\n                    else if (global.hp[2] > 0)\n                    {\n                        target = 1;\n                    }\n                    else if (global.hp[3] > 0)\n                    {\n                        target = 2;\n                    }\n                }\n",
+  "replace": "                if (target == 0)\n                {\n                    var _kalts = [];\n                    var _ksl0 = (global.char[0] == 1) ? 1 : 0;\n                    for (var _ks = _ksl0; _ks < 3; _ks++)\n                    {\n                        if (global.char[_ks] != 0 && global.hp[global.char[_ks]] > 0)\n                        {\n                            array_push(_kalts, _ks);\n                        }\n                    }\n                    if (array_length(_kalts) > 0)\n                    {\n                        target = _kalts[irandom(array_length(_kalts) - 1)];\n                    }\n                }\n",
+  "why": "Vanilla 'protect Kris' redirect indexes hp[] by CHARACTER id (hp[2]=Susie,hp[3]=Ralsei) but assigns SLOT numbers (1,2). With a non-canonical party the chosen slot can be EMPTY: e.g. party [3,4,0] (Ralsei,Noelle): hp[3]>0 -> target=2 -> empty slot -> global.charinstance[2] is the never-created id 12129292 -> 'Unable to find instance for object index 12129292' in scr_damage (dmgwriter creation reads global.charinstance[target].x). Also silently depends on absent chars having hp 0. New block is slot/party based and identical to vanilla when party=[1,2,3]; when slot 0 is not Kris, damage is spread over all living slots instead of always hitting slot 0 (bullets default target=0).",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "severity": "CRASH",
+  "expected_count_per_variant": 1
+ },
+ {
+  "id": "E03-scr_damage_maxhp-retarget",
+  "variants": [
+   "base",
+   "elec",
+   "violet",
+   "thorn",
+   "cyan"
+  ],
+  "entry": "gml_GlobalScript_scr_damage_maxhp",
+  "find": "                if (target == 0)\n                {\n                    if (global.hp[2] > 0 && global.hp[3] > 0)\n                    {\n                        target = choose(1, 2);\n                    }\n                    else if (global.hp[2] > 0)\n                    {\n                        target = 1;\n                    }\n                    else if (global.hp[3] > 0)\n                    {\n                        target = 2;\n                    }\n                }\n",
+  "replace": "                if (target == 0)\n                {\n                    var _kalts = [];\n                    var _ksl0 = (global.char[0] == 1) ? 1 : 0;\n                    for (var _ks = _ksl0; _ks < 3; _ks++)\n                    {\n                        if (global.char[_ks] != 0 && global.hp[global.char[_ks]] > 0)\n                        {\n                            array_push(_kalts, _ks);\n                        }\n                    }\n                    if (array_length(_kalts) > 0)\n                    {\n                        target = _kalts[irandom(array_length(_kalts) - 1)];\n                    }\n                }\n",
+  "why": "Same defect in scr_damage_maxhp (used by obj_roaringknight_quickslash_big / splitslash in base, elec, violet, thorn, cyan; kaizo already has party-aware code).",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "severity": "CRASH",
+  "expected_count_per_variant": 1
+ },
+ {
+  "id": "E04-thorn-maxhp-erosion-a",
+  "variants": [
+   "thorn"
+  ],
+  "entry": "gml_GlobalScript_scr_damage",
+  "find": "                var _hplost_mantle = ceil(random_range(5, 10));\n                if (target == 0)\n",
+  "replace": "                var _hplost_mantle = ceil(random_range(5, 10));\n                var _tc = (target < 3) ? global.char[target] : 0;\n                if (_tc == 1)\n",
+  "why": "Thorn's per-hit max-HP erosion maps SLOT->character by hard-coding target 0/1/2 = Kris/Susie/Ralsei. In party [2,4,0] a hit on Noelle (slot 1) would erode SUSIE's maxhp (and floor it at 110), a hit on Susie erodes Kris. Noelle has no orighp/restore logic, so she is intentionally left out (_tc==4 does nothing).",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "severity": "WRONG-BEHAVIOUR",
+  "expected_count_per_variant": 1
+ },
+ {
+  "id": "E04-thorn-maxhp-erosion-b",
+  "variants": [
+   "thorn"
+  ],
+  "entry": "gml_GlobalScript_scr_damage",
+  "find": "                else if (target == 1)\n                {\n                    if (global.chararmor1[2] == 23 || global.chararmor2[2] == 23)\n",
+  "replace": "                else if (_tc == 2)\n                {\n                    if (global.chararmor1[2] == 23 || global.chararmor2[2] == 23)\n",
+  "why": "see E04-a",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "severity": "WRONG-BEHAVIOUR",
+  "expected_count_per_variant": 1
+ },
+ {
+  "id": "E04-thorn-maxhp-erosion-c",
+  "variants": [
+   "thorn"
+  ],
+  "entry": "gml_GlobalScript_scr_damage",
+  "find": "                else if (target == 2)\n                {\n                    if (global.chararmor1[3] == 23 || global.chararmor2[3] == 23)\n",
+  "replace": "                else if (_tc == 3)\n                {\n                    if (global.chararmor1[3] == 23 || global.chararmor2[3] == 23)\n",
+  "why": "see E04-a",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "severity": "WRONG-BEHAVIOUR",
+  "expected_count_per_variant": 1
+ },
+ {
+  "id": "E05-defeat-detection",
+  "variants": [
+   "base",
+   "elec",
+   "violet",
+   "thorn",
+   "cyan"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Step_0",
+  "find": "global\\.hp\\[1\\] < 1 && global\\.hp\\[2\\] < 1 && global\\.hp\\[3\\] < 1",
+  "replace": "!knight_party_alive_any()",
+  "why": "Defeat test is hard-wired to char ids 1,2,3. A party containing Noelle (id 4) whose Kris/Susie/Ralsei slots are absent (hp 0 <1) is declared defeated on the first frame of the first enemy turn (turntimer forced to 0, then scr_gameover / retry path) even while Noelle is alive. Kaizo already computes _hp[] by slot. Occurs twice per entry (turntimer reset + game-over trigger).",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "severity": "CRASH",
+  "regex": true,
+  "expected_count_per_variant": 2
+ },
+ {
+  "id": "E06-kris-mult-Step",
+  "variants": [
+   "base",
+   "cyan"
+  ],
+  "entry": "gml_Object_obj_heroparent_Step_0",
+  "find": "                if (object_index == obj_herokris)\n                {\n                    if (global.hp[2] < 0 && global.hp[3] < 0)\n                    {\n                        damage *= 2;\n                    }\n                    else if (global.hp[2] < 0 || global.hp[3] < 0)\n                    {\n                        damage *= 1;\n                    }\n                    else\n                    {\n                        damage = round(damage * 0.5);\n                    }\n                }\n",
+  "replace": "                if (object_index == obj_herokris)\n                {\n                    var _kalive = 0;\n                    for (var _kps = 0; _kps < 3; _kps++)\n                    {\n                        var _kpc = global.char[_kps];\n                        if (_kpc > 1 && global.hp[_kpc] > 0)\n                        {\n                            _kalive++;\n                        }\n                    }\n                    if (_kalive == 0)\n                    {\n                        damage *= 2;\n                    }\n                    else if (_kalive == 1)\n                    {\n                        damage *= 1;\n                    }\n                    else\n                    {\n                        damage = round(damage * 0.5);\n                    }\n                }\n",
+  "why": "Kris's attack multiplier counts 'downed' allies via hp[2]/hp[3] < 0. Absent Susie/Ralsei have hp 0 (not <0), so Kris in a party without them (or with Noelle) is treated as 'both allies alive' and deals half damage (thorn: x1) forever. Replacement counts living NON-Kris party members: 0 alive -> vanilla 'both down', 1 -> 'one down', >=2 -> 'none down'. Identical to vanilla for party [1,2,3].",
+  "scenarios": [
+   "nokris",
+   "solo",
+   "noelle"
+  ],
+  "severity": "WRONG-BEHAVIOUR",
+  "expected_count_per_variant": 1
+ },
+ {
+  "id": "E06-kris-mult-Step-violet",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_heroparent_Step_0",
+  "find": "                if (object_index == obj_herokris)\n                {\n                    if (global.hp[2] < 0 && global.hp[3] < 0)\n                    {\n                        damage *= 2;\n                    }\n                    else if (global.hp[2] < 0 || global.hp[3] < 0)\n                    {\n                        damage *= 1;\n                    }\n                    else\n                    {\n                        damage = round(damage * 0.5);\n                    }\n",
+  "replace": "                if (object_index == obj_herokris)\n                {\n                    var _kalive = 0;\n                    for (var _kps = 0; _kps < 3; _kps++)\n                    {\n                        var _kpc = global.char[_kps];\n                        if (_kpc > 1 && global.hp[_kpc] > 0)\n                        {\n                            _kalive++;\n                        }\n                    }\n                    if (_kalive == 0)\n                    {\n                        damage *= 2;\n                    }\n                    else if (_kalive == 1)\n                    {\n                        damage *= 1;\n                    }\n                    else\n                    {\n                        damage = round(damage * 0.5);\n                    }\n",
+  "why": "Kris's attack multiplier counts 'downed' allies via hp[2]/hp[3] < 0. Absent Susie/Ralsei have hp 0 (not <0), so Kris in a party without them (or with Noelle) is treated as 'both allies alive' and deals half damage (thorn: x1) forever. Replacement counts living NON-Kris party members: 0 alive -> vanilla 'both down', 1 -> 'one down', >=2 -> 'none down'. Identical to vanilla for party [1,2,3]. (violet appends its own sideb multipliers after this block, so the find stops before the closing brace)",
+  "scenarios": [
+   "nokris",
+   "solo",
+   "noelle"
+  ],
+  "severity": "WRONG-BEHAVIOUR",
+  "expected_count_per_variant": 1
+ },
+ {
+  "id": "E06-kris-mult-Other",
+  "variants": [
+   "base",
+   "cyan",
+   "elec",
+   "thorn",
+   "kaizo"
+  ],
+  "entry": "gml_Object_obj_heroparent_Other_10",
+  "find": "                if (object_index == obj_herokris)\n                {\n                    if (global.hp[2] < 0 && global.hp[3] < 0)\n                    {\n                        damage *= 2;\n                    }\n                    else if (global.hp[2] < 0 || global.hp[3] < 0)\n                    {\n                        damage *= 1;\n                    }\n                    else\n                    {\n                        damage = round(damage * 0.5);\n                    }\n                }\n",
+  "replace": "                if (object_index == obj_herokris)\n                {\n                    var _kalive = 0;\n                    for (var _kps = 0; _kps < 3; _kps++)\n                    {\n                        var _kpc = global.char[_kps];\n                        if (_kpc > 1 && global.hp[_kpc] > 0)\n                        {\n                            _kalive++;\n                        }\n                    }\n                    if (_kalive == 0)\n                    {\n                        damage *= 2;\n                    }\n                    else if (_kalive == 1)\n                    {\n                        damage *= 1;\n                    }\n                    else\n                    {\n                        damage = round(damage * 0.5);\n                    }\n                }\n",
+  "why": "Kris's attack multiplier counts 'downed' allies via hp[2]/hp[3] < 0. Absent Susie/Ralsei have hp 0 (not <0), so Kris in a party without them (or with Noelle) is treated as 'both allies alive' and deals half damage (thorn: x1) forever. Replacement counts living NON-Kris party members: 0 alive -> vanilla 'both down', 1 -> 'one down', >=2 -> 'none down'. Identical to vanilla for party [1,2,3].",
+  "scenarios": [
+   "nokris",
+   "solo",
+   "noelle"
+  ],
+  "severity": "WRONG-BEHAVIOUR",
+  "expected_count_per_variant": 1
+ },
+ {
+  "id": "E06-kris-mult-step-elec",
+  "variants": [
+   "elec"
+  ],
+  "entry": "gml_Object_obj_heroparent_Step_0",
+  "find": "                if (object_index == obj_herokris)\n                {\n                    if (global.hp[2] < 0 && global.hp[3] < 0)\n                    {\n                        damage *= 2;\n                    }\n                    else\n                    {\n                        damage *= 1;\n                    }\n                }\n",
+  "replace": "                if (object_index == obj_herokris)\n                {\n                    var _kalive = 0;\n                    for (var _kps = 0; _kps < 3; _kps++)\n                    {\n                        var _kpc = global.char[_kps];\n                        if (_kpc > 1 && global.hp[_kpc] > 0)\n                        {\n                            _kalive++;\n                        }\n                    }\n                    if (_kalive == 0)\n                    {\n                        damage *= 2;\n                    }\n                    else\n                    {\n                        damage *= 1;\n                    }\n                }\n",
+  "why": "Kris's attack multiplier counts 'downed' allies via hp[2]/hp[3] < 0. Absent Susie/Ralsei have hp 0 (not <0), so Kris in a party without them (or with Noelle) is treated as 'both allies alive' and deals half damage (thorn: x1) forever. Replacement counts living NON-Kris party members: 0 alive -> vanilla 'both down', 1 -> 'one down', >=2 -> 'none down'. Identical to vanilla for party [1,2,3].",
+  "scenarios": [
+   "nokris",
+   "solo",
+   "noelle"
+  ],
+  "severity": "WRONG-BEHAVIOUR",
+  "expected_count_per_variant": 1
+ },
+ {
+  "id": "E06-kris-mult-step-thorn",
+  "variants": [
+   "thorn"
+  ],
+  "entry": "gml_Object_obj_heroparent_Step_0",
+  "find": "                if (object_index == obj_herokris)\n                {\n                    if (global.hp[2] < 0 && global.hp[3] < 0)\n                    {\n                        damage *= 3;\n                    }\n                    else if (global.hp[2] < 0 || global.hp[3] < 0)\n                    {\n                        damage *= 2;\n                    }\n                    else\n                    {\n                        damage = round(damage * 1);\n                    }\n                }\n",
+  "replace": "                if (object_index == obj_herokris)\n                {\n                    var _kalive = 0;\n                    for (var _kps = 0; _kps < 3; _kps++)\n                    {\n                        var _kpc = global.char[_kps];\n                        if (_kpc > 1 && global.hp[_kpc] > 0)\n                        {\n                            _kalive++;\n                        }\n                    }\n                    if (_kalive == 0)\n                    {\n                        damage *= 3;\n                    }\n                    else if (_kalive == 1)\n                    {\n                        damage *= 2;\n                    }\n                    else\n                    {\n                        damage = round(damage * 1);\n                    }\n                }\n",
+  "why": "Kris's attack multiplier counts 'downed' allies via hp[2]/hp[3] < 0. Absent Susie/Ralsei have hp 0 (not <0), so Kris in a party without them (or with Noelle) is treated as 'both allies alive' and deals half damage (thorn: x1) forever. Replacement counts living NON-Kris party members: 0 alive -> vanilla 'both down', 1 -> 'one down', >=2 -> 'none down'. Identical to vanilla for party [1,2,3].",
+  "scenarios": [
+   "nokris",
+   "solo",
+   "noelle"
+  ],
+  "severity": "WRONG-BEHAVIOUR",
+  "expected_count_per_variant": 1
+ },
+ {
+  "id": "E07-dualheal-emptyslot",
+  "variants": [
+   "base",
+   "elec",
+   "violet",
+   "thorn",
+   "cyan"
+  ],
+  "entry": "gml_GlobalScript_scr_spell",
+  "find": "            for (i = 0; i < 3; i += 1)\n            {\n                scr_heal(i, healnum);\n",
+  "replace": "            for (i = 0; i < 3; i += 1)\n            {\n                if (global.char[i] == 0)\n                {\n                    continue;\n                }\n                scr_heal(i, healnum);\n",
+  "why": "Spell 6 'Dual Heal' loops 3 slots unguarded: global.charinstance[i].healnum = ... on an EMPTY slot (id 12129292) -> 'Unable to find instance'. scr_heal(emptyslot) additionally calls scr_revive(slot) which marks the empty slot targetable/movable. Reachable whenever a caster owns spell 6 and the party has <3 members.",
+  "scenarios": [
+   "solo",
+   "noelle",
+   "nokris"
+  ],
+  "severity": "CRASH",
+  "expected_count_per_variant": 1
+ },
+ {
+  "id": "E07-dualheal-emptyslot-kaizo",
+  "variants": [
+   "kaizo"
+  ],
+  "entry": "gml_GlobalScript_scr_spell",
+  "find": "            for (i = 0; i < 3; i += 1)\n            {\n                if (i_ex(obj_knight_enemy))\n                {\n                    if (obj_knight_enemy.k_freeze[_ctar])\n                    {\n                        continue;\n                    }\n                }\n                scr_heal(i, healnum);\n",
+  "replace": "            for (i = 0; i < 3; i += 1)\n            {\n                if (global.char[i] == 0)\n                {\n                    continue;\n                }\n                if (i_ex(obj_knight_enemy))\n                {\n                    if (obj_knight_enemy.k_freeze[global.char[i]])\n                    {\n                        continue;\n                    }\n                }\n                scr_heal(i, healnum);\n",
+  "why": "Same as E07 for kaizo; also the freeze test used _ctar (= char in the *target* slot, or -1 when star>=3 -> k_freeze[-1] out-of-range) instead of the member being healed.",
+  "scenarios": [
+   "solo",
+   "noelle",
+   "nokris"
+  ],
+  "severity": "CRASH",
+  "expected_count_per_variant": 1
+ },
+ {
+  "id": "E08-kaizo-hp-refill-create",
+  "variants": [
+   "kaizo"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Create_0",
+  "find": "global\\.hp\\[([1-4])\\] = global\\.maxhp\\[\\1\\];",
+  "replace": "if (scr_havechar(\\1)) { global.hp[\\1] = global.maxhp[\\1]; }",
+  "why": "Kaizo no-hit mode refills hp[1..4] for ALL four characters. That resurrects absent characters (planned hp=0 invariant) -> Susie balloon talk (global.hp[2] > 0), kaizo_* targeting and the vanilla hp[2]/hp[3] tests see phantom members. Guard with scr_havechar.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "severity": "WRONG-BEHAVIOUR",
+  "regex": true,
+  "expected_count_per_variant": 4
+ },
+ {
+  "id": "E08-kaizo-hp-refill-step",
+  "variants": [
+   "kaizo"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Step_0",
+  "find": "global\\.hp\\[([1-4])\\] = global\\.maxhp\\[\\1\\];",
+  "replace": "if (scr_havechar(\\1)) { global.hp[\\1] = global.maxhp[\\1]; }",
+  "why": "Same (full-heal in the retry/reset branch).",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "severity": "WRONG-BEHAVIOUR",
+  "regex": true,
+  "expected_count_per_variant": 4
+ },
+ {
+  "id": "E08-kaizo-hp-refill-damage",
+  "variants": [
+   "kaizo"
+  ],
+  "entry": "gml_GlobalScript_scr_damage",
+  "find": "global\\.hp\\[([1-4])\\] = global\\.maxhp\\[\\1\\]( \\* 2)?;",
+  "replace": "if (scr_havechar(\\1)) { global.hp[\\1] = global.maxhp[\\1]\\2; }",
+  "why": "Kaizo practice mode: every hit re-fills (x2) hp of all four characters, incl. absent ones.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "severity": "WRONG-BEHAVIOUR",
+  "regex": true,
+  "expected_count_per_variant": 8
+ },
+ {
+  "id": "E09-hit-hook",
+  "variants": [
+   "base",
+   "kaizo",
+   "elec",
+   "violet",
+   "thorn",
+   "cyan"
+  ],
+  "entry": "gml_GlobalScript_scr_damage_cache",
+  "find": "function scr_damage_cache()\n{\n    global.damage_cache = [];\n",
+  "replace": "function scr_damage_cache()\n{\n    if (global.chapter == 3 && i_ex(obj_knight_enemy))\n    {\n        knight_hit_event();\n    }\n    global.damage_cache = [];\n",
+  "why": "No-Hit mode hook. scr_damage_cache() is the first statement inside the `global.inv < 0` gate of scr_damage, scr_damage_maxhp, scr_damage_fixed, scr_damage_proportional (scr_damage_all/_manual/_all_maxhp only loop over those), i.e. exactly once per hostile hit that is not absorbed by i-frames, before any retargeting/armour/damage reduction (so zero/clamped damage still counts). Graze never reaches it (grazebox only does TP); scripted hp edits (items, gloom, drains, Kaizo/Violet scenes, Elec spark-menu self damage) never call it. The hub resets global.knight_hits=0 at fight start and polls it (AOE hits count once per living member).",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "severity": "FEATURE",
+  "expected_count_per_variant": 1
+ },
+ {
+  "id": "E10-kaizo-endcutscene-ghosts",
+  "variants": [
+   "kaizo"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Step_0",
+  "find": "                if (!i_ex(obj_herokris))\n                {\n                    instance_create(2356, 104, obj_herokris);\n                }\n",
+  "replace": "                with (obj_heroparent)\n                {\n                    if (variable_instance_exists(id, \"knight_ghost\"))\n                    {\n                        instance_destroy();\n                    }\n                }\n                if (!i_ex(obj_herokris))\n                {\n                    instance_create(2356, 104, obj_herokris);\n                }\n",
+  "why": "Kaizo's end-of-fight (end_cutscene_version==1, char_change) code creates the missing Kris/Susie/Ralsei ONLY if !i_ex(obj_hero*), then positions them for the overworld cutscene. A ghost child object makes i_ex() true so no visible hero is created (ghost draws nothing). Destroy ghosts (marker var knight_ghost set in ghost Create) first.",
+  "scenarios": [
+   "solo",
+   "noelle",
+   "nokris"
+  ],
+  "severity": "WRONG-BEHAVIOUR",
+  "expected_count_per_variant": 1
+ },
+ {
+  "id": "E11-charbox-duplicates",
+  "variants": [
+   "base",
+   "kaizo",
+   "elec",
+   "violet",
+   "thorn",
+   "cyan"
+  ],
+  "entry": "gml_GlobalScript_scr_charbox",
+  "find": "    for (c = 0; c < 4; c += 1)\n    {\n        if (havechar[c] == 1)\n        {\n",
+  "replace": "    for (var _sl = 0; _sl < 3; _sl += 1)\n    {\n        c = global.char[_sl] - 1;\n        if (c >= 0)\n        {\n            charpos[c] = _sl;\n",
+  "why": "battlecontroller/darkcontroller Create build havechar[]/charpos[] per CHARACTER (last slot wins), so a duplicate party [2,2,2] draws ONE status box (at slot 2) and the slot-0/1 turns have no raised box. Iterating slots and refreshing charpos[c] draws one box per slot; identical for unique parties.",
+  "scenarios": [
+   "dup"
+  ],
+  "severity": "COSMETIC",
+  "expected_count_per_variant": 1
+ },
+ {
+  "id": "E12-charbox-mmy-per-slot",
+  "variants": [
+   "base",
+   "kaizo",
+   "elec",
+   "violet",
+   "thorn",
+   "cyan"
+  ],
+  "entry": "gml_GlobalScript_scr_charbox",
+  "regex": true,
+  "find": "mmy\\[c\\]",
+  "replace": "mmy[_sl]",
+  "why": "Raise/lower animation state mmy[] was keyed by character id: with duplicate members the slots shared one value, each frame the current slot lifted it and the other slots dropped it again, so the active status box stalled part-way up and never animated. Keyed by slot (0-2, array already has 4 entries) every box animates independently; identical for unique parties.",
+  "scenarios": [
+   "dup"
+  ],
+  "severity": "COSMETIC"
+ }
+]

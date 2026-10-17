@@ -1,0 +1,124 @@
+DRBR - DELTARUNE BATTLE ROYALE: THE BOSSES AND HOW CLOSE THEY ARE TO THE ORIGINAL GAME
+Knight Hub v2, build 51 (update 9). Online only: offline DELTARUNE and the offline Knight Hub are not changed by any of this.
+
+WHERE THE BOSSES COME FROM
+Every boss below is built from the game's own code and art, taken from the player's own DELTARUNE files when the patch is
+built (Chapter 1, 2, 4 and 5 data.win, decompiled with UndertaleModTool). Nothing is redrawn or rewritten from memory: the
+attack pieces are the original objects renamed with a prefix (obj_jv_* Jevil, obj_hj_* Gerson, obj_fl_* Flowery, obj_sn_*
+Spamton NEO, obj_pk_* Pink) so they cannot clash with Chapter 3's own objects, and their code is changed only where the
+shared online match needs it (listed per boss). The surveys that mapped each fight before it was ported are in
+online/notes/src_gerson.md, src_flowery.md, src_spamton.md and src_pink.md (Jevil: JEVIL_SPEC.txt).
+
+WHAT IS THE SAME FOR EVERY BOSS (the online rules, and why)
+- ONE SHARED FIGHT. In DRBR every player in the room fights the same boss at the same time, each in their own game. So each
+  boss's turn order is kept (the original fixed script where the game has one), but every attack starts and ends on the same
+  tick in every game: the attack's length is the original turn timer, measured in the emulator with nobody touching a key.
+- NO MENU TURNS. There is no FIGHT / ACT / SPARE / ITEM between attacks online, so the fights' talk-and-mercy parts (Jevil's
+  "chaos" ACTs, Gerson's progress meter, Flowery's ACTs, Pink's DOKI dates, Spamton's deals) are replaced by the room's
+  stages: a boss moves to its next phase as the match goes on (Flowery: through the GROUP MERCY, below). The bosses' own
+  endings (Gerson's haircut, Flowery's climb, Pink's confession, Spamton's [BIG SHOT] ending) are not part of a match.
+- DAMAGE goes through the room's settings (DAMAGE %, the knights' table) instead of each chapter's party stats; an attack
+  that took a share of everyone's HP in its chapter (Pink's bombs, Jevil's laser scythe) is one normal hit.
+- RANDOMNESS. What decides an attack's shape (which pattern, where pieces appear) comes from the match's shared random
+  stream, so every game sees the same attack. What a player DOES (a parry, a shot, a block, a kicked bomb) uses the piece's
+  own stream, so one player's play never changes another player's bullets.
+- THE SOUL MODES are per player: your SOUL turns green / yellow / orange / purple only in your own game, for that boss's
+  attacks, and turns red again after. A cosmetic SOUL COLOR never replaces a mode's colour.
+- SENDS: each boss has a family of attacks a player can send at another (SKILLS, the red ones). A send is built around the
+  TARGET's SOUL in the target's game only, from the same original objects, scaled so it stays dodgeable on top of the boss's
+  own attack (smaller, fewer, slower where needed); nobody else is hurt by it.
+- The boss music is the game's own file from the shared DELTARUNE "mus" folder.
+- A boss whose art or code is missing from a copy of the game is never offered (it is greyed out and named "missing" in
+  the BOSSES page; presets that need it are hidden).
+
+JEVIL - Chapter 1's secret boss (obj_joker, encounter 25)  [SECRET BOSS, RED SOUL]
+Taken as it is: his 16 attacks in his own order (obj_dbulletcontroller types 70 65 49 75 62 50 73 68 61 48 72 76 71 46 74
+77), their 15 piece objects, 29 sprites, 10 sounds, his body (idle, dance, shadow dance, sinking into the box, becoming the
+Devilsknife), his lines, the carousel background and THE WORLD REVOLVING (joker.ogg). Phases: his turns 0-3, then 0-7, then
+all; BYE-BYE is his finale in the Roaring's place.
+Changed: the SOUL's middle (+10, Chapter 3's SOUL), Chapter 1's view enum replaced by Chapter 3's camera (63 reads, update
+8b), his body and background tied to his battle object, the laser scythe's "30% of everyone's HP" made a normal hit.
+Sends (6): spade ring, rising diamonds, dark clubs, carousel, Devilsknife, suit bombs.
+
+GERSON, THE HAMMER OF JUSTICE - Chapter 4's secret boss (obj_hammer_of_justice_enemy, encounter 160)  [SECRET BOSS, GREEN SOUL]
+Taken as it is: his shipped turn order exactly - patterns 0, 1, 2, 3, 4, 72, 70, 6, 7, 12, 9, 47, 13, 14, 53, 55, 56, 220
+and the finale 19 (Green Switch, Spear Lesson, Crossfire, Diagonals, Red Hammer, Shell Kick, Hammer Toss, Diagonal Barrage,
+Shell Bounce, Shell Storm, Hammer Swings, Box Squish, Double Bounce, Shell Gauntlet, Spiral, Random Rush, Slow Flood, Shell
+Medley, Final Rounds); his pattern builder (user event 0) and scr_spearpattern / scr_spearshot / scr_sonic_boom /
+scr_jump_arc; the GREEN SOUL's shield and spears (obj_spearblocker / obj_spearshot: the arrows turn the shield, the
+diagonal shield from Diagonals on, spears hit by Chapter 4's own geometry), the hammer swings and their telegraphs, the
+box squish / shrink / throw, the shells, the fake heart, the teleports and decoy Gersons; his body, the church-arena
+background, his lines (Chapter 4's English text) and HAMMER OF JUSTICE (ch4_extra_boss.ogg).
+Changed: the pieces' turn-timer writes (they ended Chapter 4's turn) are gone - the shared timeline ends an attack; reads of
+his battle object go through kbr_hj_gv() so a send can run while a knight is on stage; the spear / shield / shell
+randomness stays the game's own (a block or a hit never moves the shared stream); the giant shell kick's room coordinates
+are on Chapter 3's camera; Chapter 4's "Turn 0 again if you were hit" repeat and the Sound of Justice (another fight that
+shares these objects) are not reached; the box-throw search for a free spot is capped (it could loop forever when the SOUL
+was off the box - a fix found by the bot tests).
+Sends (6): thrown hammers, shell pinball, swing down, spear volley (turns the target's SOUL green), the bells (the bell
+attack is real Chapter 4 content the shipped fight never uses), the giant hammer.
+
+FLOWERY - Chapter 5's boss (obj_flowery_enemy, encounter 225)  [BOSS, ORANGE SOUL]
+Taken as it is: the ORANGE SOUL (obj_orangeheart: hold the confirm key to charge, let go to DASH; up / down only) and its
+scrolling board (obj_debug_orangeheartcontroller: the course, its spawning), every hazard (bamboo with blue joints, vases,
+cacti, petals, lilypads, the thorn wall that chases, Seth's boxes / book / words and the word flower, Aqua's knife chains,
+Blue's flowers and Yellow's beam, Orange's tag team, Green's JUST KIDDING), Flowery's JARONA lunges and decoys
+(obj_orangeheart_floweryjarona), the tower background (obj_flowery_towery with Chapter 5's own shaders), his friends'
+entrances, his lines and FLOWER MAN (Flowerman_Arrangement.ogg). His 13 attacks are the shipped ones (obj_dbulletcontroller
+types 623 620 624 634 630 641 631 636 638 632 635 622 639): Bamboo Run, Jarona!, Thorn Chase, Petal Jarona, Seth's Book,
+Aqua's Knives, Seth's Book II, Tag Team, Just Kidding!, Cactus Chase, Justice Chase, Max Jarona, The Final Jarona.
+His phases are Chapter 5's (each with its own friends on stage).
+Changed: Chapter 5's ACT / MERCY (POSEY, BLOWAWAY, SPIN, PRAISE, JUSTICE, SUSIE'S IDEA) became the GROUP MERCY - each game
+counts its own player's FLOWERY TP with Chapter 5's own TP numbers (a blue piece broken, a Jarona struck, a fast parry, a
+lilypad, a word flower), the host adds a tenth of the average of the SOULs still standing (at most 8 % an attack), and each
+threshold moves him to his next phase in every game on the same cycle; at 60 % his next attack is THE FINAL JARONA. The
+course is drawn from the attack's own stream (the same course in every game; each player's dashes scroll their own board);
+global.time (the save's play time) became the attack's own clock; the dash tutorial (type 637) and the blow-kiss / Justice
+/ Susie's Idea scenes are not part of an online match; the decompiler's raw asset numbers became names; the SOUL's
+clean-up only removes the board's own pieces. The debug-only types (621, 625-629, 633, 640, 647) are not used.
+Sends (7, only in a match Flowery is in - they are pieces of his board): a Jarona copy, bamboo, Aqua's knives, Seth's books,
+Orange & Green, Blue & Yellow, LAST JARONA (the Omega fight's four rushes).
+
+SPAMTON NEO - Chapter 2's secret boss (obj_spamton_neo_enemy, encounter 61)  [SECRET BOSS, YELLOW SOUL]
+Taken as it is: his attack controller (obj_sneo_bulletcontroller: Flying Heads / the BIG SHOT dance, Pipis, Heart Attack,
+the RECREW mail walls, Phonehands, the Face, the Finale), every piece they make, his fixed turn script in its order (15
+attacks: Flying Heads, RECREW Columns, Heart Attack, Pipis Call, Phonehands, Look In My Eyes, then the II versions, then the
+III ones and the NEO Finale), his body's own drawing (wings, arms, legs, wires, his dances, the hearts he pulls from his
+chest), the YELLOW SOUL (Z shoots, hold Z for a BIG SHOT; Chapter 2's shot objects, renamed because the hub's own
+obj_yheart_shot belongs to the Thorn Knight), his lines and BIG SHOT (spamton_neo_mix_ex_wip.ogg). 150 of his sprites are
+already in Chapter 3 pixel for pixel; the rest come from Chapter 2.
+Changed: his Step (talk, ACTs, deals, endings) is the hub's; he has no HP online, so the pieces' writes to his HP are gone;
+a good shot that ends a Chapter 2 attack early (the big heart, the face, the pipis) still does - in THAT player's game only
+(they then wait for the next shared attack, which starts on the same tick everywhere); a sent piece never ends anyone's
+attack; each piece's randomness is its own stream (a broken egg in one game never moves another game's hearts); the phone's
+skip keys are off (fixed lengths keep the games in step); Chapter 2's view enum became Chapter 3's camera. Bots cannot
+shoot, so the RECREW walls are played by the odds for them (a roll per wall, by their skill). The weird-route Pipis
+Explosion is not used.
+Sends (6): pipis, flying heads, wire heart, [[KROMER]] rain, a mail wall (with its own controller per send), [[BIG SHOT]].
+
+PINK ("MEW MEW") - Chapter 5's secret boss (obj_pink_enemy, encounter 224)  [SECRET BOSS, PURPLE SOUL]
+Taken as it is: the PURPLE SOUL's engine (obj_purplecontrols: the three lanes, the 4x4 bomb grid, the rolling box, the 3D
+tunnel, the node maze), Pink in the battle (her ball jump onto the box, her bomb throws, the stage), her cats, hearts, fuse
+bombs, big bombs and explosions, the rolling box's lane bullets and the ghost's huge face, the tunnel's zaps, the concert
+(curtains, fans with their hearts, haters), her lines and her theme (pink.ogg); obj_dbulletcontroller's types 199-210.
+Her 19 attacks follow her own per-phase turn table (types 200 203 200 203 209 200 / 202 208 203 209 202 / 202 203 200 208
+200 203 209, with the table's difficulties) and end with the date-3 node maze (type 210) as her finale.
+Changed: her DOKI meter and the dates are not part of a match (her phases follow the match's stages); team damage (her
+bombs: a share of every member's HP) is one hit; her HEARTS (Chapter 5: TP and the TP cap) feed the online gauge; the
+tunnel's tutorial pause (it waited for the player's UP) is off; each piece's randomness is its own stream; the bomb dial
+follows the room's HARD ATTACKS. The never-chosen types (201, 204-207) are used only as sends.
+Sends (6): kitty parade, kitty rain (the unused vertical-lanes type 204's columns), heart shots on the lanes, fuse bombs, a
+mega bomb, an encore (fans and haters).
+
+THE KNIGHTS (the hub's own fights: Normal, Kaizo, Elecknight, Violet, Thorn, the Knightmare)  [RED SOUL]
+Unchanged by this update. The Cyan Knight stays offline only. Kaizo's online HP fix (build 47) stays.
+
+HOW THIS WAS CHECKED (all in the emulator - the real merged code running in a GameMaker stand-in, NOT the real game)
+Per boss: every attack in its own practice match (it starts on the shared tick, makes its pieces, ends by its own turn timer,
+leaves nothing behind, the SOUL mode turns on and off, no error); a player who plays (dashes, shoots, blocks, changes lanes)
+and one who does not; three games over the simulated network (the same attacks, the same bullets where nobody plays, no
+desync); every send built only in the target's game and hurting only the target; six bots per boss (from DUMMY to PERFECT:
+more skill, fewer hits); all bosses in one rush (Knight Rush between every boss, nothing left from the last one). The
+numbers are in TESTING_REPORT.txt (BUILD 51 UPDATE 9). Not checked: how each one looks and feels in the real game - the
+emulator does not draw shaders (Flowery's tower) or surfaces the way the GPU does, and its timing is frame-exact rather than
+real time.

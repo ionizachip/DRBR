@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "profile": "drbr_default",
+  "save_template_version": 1,
+  "save_template_sha256": "fa956269ee3ee98e7df04356bb575e3afd5455a538bb5568b2ac931fdb0aa082",
+  "migration_version": 1,
+  "starting_location": "room_dw_snow_zone",
+  "starting_room_id": 30108,
+  "starting_plot": 320,
+  "default_settings": {
+    "start_mode": "template",
+    "check_updates_on_start": true
+  },
+  "start_modes": {
+    "template": "Start from the DRBR starting save every time (default)",
+    "continue": "Continue from my last DRBR save; the starting save when there is none or it is not valid"
+  },
+  "profile_folder": "%LOCALAPPDATA%\\DELTARUNE\\drbr_profile",
+  "redirected_files": [
+    "filech<N>_<M>",
+    "dr.ini",
+    "keyconfig_<N>.ini",
+    "config_<N>.ini"
+  ],
+  "shared_with_vanilla": [
+    "true_config.ini",
+    "knight_hub.ini",
+    "knightfights_online.ini",
+    "keyconfig_mod.ini"
+  ],
+  "notes": "The DRBR save profile. This file matches drbr.json's save_profile (scripts/validate-save.py checks it). DRBR Launcher writes the installed profile's versions to %LOCALAPPDATA%\\DRBR\\save-profile\\profile.json, and the game reads drbr_data\\drbr_profile.cfg. See docs/SAVE_SYSTEM.md."
+}

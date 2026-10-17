@@ -1,0 +1,336 @@
+KNIGHT HUB build 50 - FLOWERY: implementation notes
+===================================================
+These notes answer the Flowery rebuild spec (part 15): the asset manifest, the character-slot audit and the ability docs.
+TESTING_REPORT.txt says what was actually tested and what was not.
+Short version: everything here was checked by building the data.win and by running emulator tests (a GML interpreter that
+runs the hub's own code). NOTHING was played in the real game. How he looks and sounds on a real screen is not checked.
+
+1. CHARACTER SLOT
+-----------------
+Flowery is character 5, his own slot. He is not Noelle (4) and not a Noelle reskin; he and Noelle can be in one party.
+His battle hero is obj_knight_herocc. Its parent is obj_heroparent, the game's own hero logic. All of his data lives in
+one registry entry (cc50.gml: knight_cc_register). That covers his poses, frame counts, face, voice, HP colour, gear,
+techniques and stat script. The registry takes ids 5 and up, so a future custom character is one more entry like his
+(see flowery50.gml: knight_fl_register).
+
+2. SLOT AUDIT: places where he used another character, what changed, and why
+------------------------------------------------------------------------------
+ a. Battle hero. Before, obj_heroparent's Create gave every hero Kris's sprites, and SPELL / SPELLREADY were Ralsei's
+    (spr_ralseib_*). That is why he "shifted into Ralsei" when casting. Now knight_cc_dress sets every pose (idle, walk,
+    ready, attack, act, spellready, spell, item, defend, hurt, defeat, victory) and the frame counts. It runs again
+    whenever a pose is not his.
+    The SECOND place it came from (fixed in this update): scr_spellconsumeb copies remspellsprite back into spellsprite
+    on every cast, and obj_heroparent's Create had filled remspellsprite with Ralsei's Chapter 1 spell pose
+    (spr_ralseib_spell) before his poses were put on. knight_cc_dress now sets remspellsprite / remspellframes too.
+    Checked: t_flowery50_cc compares his hero's sprites to spr_knfl_* for every knight variant.
+ b. Build 50's first version used Noelle's slot (4) and her hero. Now he has his own id (5) and obj_knight_herocc.
+    The Flowery-on-Noelle code paths were removed from rules / b38 / b39 / weird.
+ c. Follower and leader in the cold place. The game's caterpillar built number 5 as Berdly, or as nobody. Now
+    knight_cc_follower and knight_cc_cater_dress make him follow as himself, and the leader walks as him.
+    Checked: t_online_flowery50.
+ d. HP box. scr_charbox drew Noelle's head and name and the default colour. Now knight_cc_charbox draws his own head,
+    name and golden colour (189950). It applies to every version of scr_charbox in the game.
+ e. FIGHT bar. obj_attackpress used Noelle's bar colour and head. Now it uses his gold bar and his own head
+    (spr_knfl_pressfront).
+ f. FIGHT hit. obj_heroparent ran Noelle's / Kris's hit effect and sound. Now it uses his crescent hit (spr_knfl_hitfx)
+    and swing sound.
+ g. Damage-number colour. Before it was the "type = char - 1" of whoever had that number. Now it comes from
+    knight_cc_dmtype.
+ h. Text: face, typer and voice. Before, his lines had no face of his own, so the game fell back to Ralsei / Noelle
+    style typers and snd_text. Now the battle's spell-text writer is made with his face (spr_face_flowery, fc 23), his
+    expression and his voice typer (302: his Chapter 5 blips snd_flowery_voicenoise_1-3) from the start
+    (knight_cc_battletext, hooked into obj_spellphase). Switching the face on mid-text (the first way this was done)
+    put only the first line beside the face and wrapped the rest under it - that is the garbled box that was reported.
+    A narration line ("Everyone's TP went up!") is its own page after his line is closed: no face, the battle's
+    normal text voice (knight_cc_narrate).
+ i. Techniques, gear and info. scr_spellinfo / scr_spell / scr_spelltext / scr_weaponinfo / scr_armorinfo now hand ids
+    16-39 and gear ids 30-35 to the registry. Nothing of his is in another character's tables.
+ j. Hub knight switches (Tag Team / Remix / online). His hero was put away as one of the knight's own objects
+    (obj_knight_*). That is why he vanished during the Violet and Thorn fights and online. Fixed in knight_lu_owned.
+ k. Online kit. kfo_kit_apply read a 5-entry table at index 5, which crashed the game. Fixed (the table is guarded).
+ l. Pronouns: "him" for 5. knight_hero_obj(5) returns obj_knight_herocc.
+Not changed: the game's own global arrays still have room for 20 characters, so nothing was resized there.
+
+3. ASSET MANIFEST
+-----------------
+Source: DELTARUNE Chapter 5's data.win (your copy). Exported with UndertaleModTool (exp2.csx), then rebuilt by
+make_fl_atlas.py into anchored sprites. Every frame is lined up on his body and feet where Noelle's are. Chapter 5
+frames that faced left (he was the enemy) are mirrored to face the knight.
+Atlas: fl_atlas.png / fl_atlas.json (in toolkit.zip). Sizes and origins are in sprite pixels; battle draws them at 2x.
+  spr_knfl_act          1 frames   42x59  origin    4,12    from spr_flowery_pose_point_cooler_right
+      use: ACT / F-ACTION pose (26 frames)
+  spr_knfl_attack       7 frames   59x60  origin   19,13    from spr_flowery_punch_windup f1-4 (mirrored) + spr_flowery_puuunch f0 x3
+      use: FIGHT swing (attackframes 6, attackspeed 0.5)
+  spr_knfl_attackready  1 frames   31x60  origin    7,13    from spr_flowery_punch_windup f0 (mirrored)
+      use: FIGHT ready
+  spr_knfl_dance       16 frames   88x75  origin   33,25    from spr_flowery_pirouette + spr_flowery_spin_to_idle (mirrored)
+      use: Ez2Dance (frame = t/3.5, 56 frames)
+  spr_knfl_defeat       1 frames   28x47  origin    2,0     from spr_flowery_kneel_hurt_right (mirrored)
+      use: downed
+  spr_knfl_defend       1 frames   71x87  origin   24,40    from spr_flowery_crouch
+      use: DEFEND
+  spr_knfl_flashkick    3 frames   71x87  origin   25,38    from spr_omegaflowery_flashkick (mirrored)
+      use: Sanfrandisco (0 run 1-14, 1 crouch 15-20, 2 kick 21-29)
+  spr_knfl_hitfx        6 frames   48x48  origin   24,24    from spr_flowery_crescent_only, scaled/rotated/faded
+      use: his FIGHT hit / move hits (image_speed 0.5)
+  spr_knfl_hurt         1 frames   47x61  origin   13,11    from spr_flowery_hurt (mirrored)
+      use: hurt
+  spr_knfl_idle         5 frames   54x58  origin   31,11    from spr_flowery_idle3 (mirrored)
+      use: hero idle (obj_heroparent, image_speed of the hero)
+  spr_knfl_item         1 frames   31x60  origin    1,13    from spr_flowery_gestureup_right
+      use: ITEM (itemframes 0)
+  spr_knfl_kiss         4 frames   40x65  origin   10,13    from spr_flowery_kiss (mirrored)
+      use: Honey Kiss (image_speed 1/6)
+  spr_knfl_omega       23 frames   68x74  origin   27,24    from spr_omegaflowery_pose/powerup/jarona/clash/windup/punch/idle (white silhouettes, mirrored)
+      use: Prism Rush Omega (pose 0-2 /6f, powerup 3-5 /4f, rush 6-8 /3f, clash 9-11 /4f, windup 12-16 /4f, punch 17-19 /3f)
+  spr_knfl_pose         1 frames   45x59  origin    6,11    from spr_flowery_pose (mirrored)
+      use: My Jarona finish
+  spr_knfl_powerup      7 frames   34x74  origin    3,26    from spr_flowery_powering_up_kneel (0-1) + spr_flowery_powering_up_finish (2-6)
+      use: Prism Rush power-up (0-1 alternate every 8 frames until 130, then 2-6 one per 4 frames)
+  spr_knfl_pressfront   1 frames   75x38  origin    0,0     from spr_headflowery, recoloured gold
+      use: FIGHT bar head
+  spr_knfl_jarona       7 frames   59x65  origin   19,13    from spr_flowery_punch_windup (mirrored) + spr_flowery_puuunch
+                                                            + spr_flowery_deflected (mirrored)
+      use: My Jarona (0-4 wind-up / charge, 5 punch lunge, 6 knocked back; 30-frame cycle x4)
+  spr_knfl_runner       (no longer used by a move; kept in the file)
+  spr_knfl_spell        5 frames   34x74  origin    3,26    from spr_flowery_poweringup (mirrored: it faced away)
+      use: MAGIC cast (spellframes 4)
+  spr_knfl_spellready   1 frames   34x74  origin    3,26    from spr_flowery_poweringup f0 (mirrored)
+      use: MAGIC ready (also shown while F-ACTION is chosen)
+  spr_knfl_victory      1 frames   45x59  origin   15,11    from spr_flowery_pose_r (mirrored)
+      use: victory; Afinihug; Prism Rush recovery
+  spr_knfl_walk         4 frames   21x60  origin   -1,13    from spr_flowery_walk_right
+      use: hero walk
+Copied straight from Chapter 5 (used as they are):
+  spr_flowery_walk_down/up/left/right, spr_flowery_equipchar, spr_headflowery, spr_bnameflowery (+ _ja), spr_face_flowery
+  (35 expressions); spr_flowery_crescent_only (My Jarona crescent); spr_omegaflowery_explosion_a/b/c (Prism Rush hits);
+  spr_omegaflowery_heart; spr_spin_petal (Honey Kiss petals, scale 2, image_speed 0.1-0.3); spr_bellsparkle (Prism
+  Rush sparkles); spr_sparestar_anim (the flowers' sparkles, as in his Chapter 5 fight).
+  The other flowers for Prism Rush's power-up, the same sprites his Chapter 5 fight uses for them (scale 2, 1/6 speed):
+    Aqua   spr_enemy_aqua_idle            38x32, 8 frames, origin 8,-4   colour 40,230,230
+    Seth   spr_seth_idle_serious_flowery  70x70, 12 frames, origin 18,14 colour 170,90,210 (Seth is the purple one:
+           Chapter 5's own speaker list treats "purple" and "seth" as the same character)
+    Orange spr_enemy_orange_idle_base     24x16, 4 frames, origin 0,0    colour 255,140,40
+    Green  spr_green_together             36x47, 1 frame, origin 0,-1    colour 120,225,90
+    Blue   spr_enemy_blue_ballet          49x66, 8 frames, origin 0,0    colour 110,140,255
+    Yellow spr_yellow_idle                41x62, 5 frames, origin 0,-8   colour 255,205,40
+    Pink   spr_pink_sing_idle             36x46, 9 frames, origin 24,24  colour 255,130,190
+  Also from Chapter 3: spr_swatchling_shockwave (My Jarona's shockwave).
+Sounds: snd_flowery_voiceclip_* (37 clips: hereicomesanfrandisco_strong, jarona1-4, heh_it_s_my_jarona, spiral_dance,
+  lend_me_your_power, omega_flowery, last_jarona, take_that, flowers_blooms_in_your_heart, prism_blow, give_to_you,
+  leaf_it_to_me, try_my_flavor, thatsgreat, ...), snd_flowery_voicenoise_1-3 (text blips), snd_flowery_power_up,
+  snd_strongwind_loop, snd_japanese_yo_hit2. Game sounds used: snd_swing, snd_ultraswing, snd_damage, snd_boost,
+  snd_power, snd_great_shine, snd_punchheavythunder, snd_explosion_mmx/mmx3, snd_criticalswing, snd_wing, snd_spare,
+  snd_spearrise, snd_weaponpull.
+Shaders: NONE. Chapter 5 draws Omega Flowery with shd_chromatic_reflection. That shader is NOT ported (see section 5);
+  his Omega frames are white silhouettes recoloured every 2 frames through Chapter 5's rainbow list (flrainbow),
+  blended between neighbours and softened 35% toward white (pastel, as the spec asks).
+
+4. ABILITIES
+------------
+TP is out of 250. AT / MAG are his battle stats. Damage = ceil(AT*a + MAG*m - foe DF*3), times the knight's damage
+reduction + 0.65 (the same as the game's spells), at least 1, and 0 if it misses. 1 frame = 1/30 s.
+Network: online matches use the room's kit (no techniques, no items), so none of these are cast online. Online players
+see his sprites as a SKIN only. Nothing is sent over the network for them.
+Completion: every move is a timed sequence (knight_fl_kspell_tick). It removes all its markers, puts his hero back and
+stops its sounds when it ends. If the fight ends mid-move, or a move runs past 600 frames, it is cleaned up at once.
+The battle's spelldelay is always longer than the move.
+
+ F-ACTION (id 22). 0 TP. No target. The whole party's TP goes up 16% (40), with his line (one page, his face and
+   voice: give_to_you / leaf_it_to_me / try_my_flavor / thatsgreat, in turn). Animation: the pointing pose with a flash,
+   26 frames. His line is one page with his face and voice; "Everyone's TP went up!" is the next page, without them.
+   (The battle waits for you to close each page, as it does for the game's own spell texts.)
+ SANFRANDISCO (16). 0 TP. One foe. Damage AT*4.4 + MAG*0.8, plus 5 TP.
+   Animation: voice hereicomesanfrandisco_strong; the dash at the foe in rainbow afterimages (1-12, easing in); a beat
+   in the crouch (13-18); the crescent kick with its hit, effect and snd_ultraswing on the same frame (19); held to 30;
+   lands (31); slides back to his place (37-47). Ends at 49. spelldelay 50.
+ MY JARONA (17). 125 TP (50%). One foe. Damage AT*8 + MAG*2.5: four hits of 1/5, then the rest.
+   Animation: Chapter 5's Jarona rush (obj_orangeheart_floweryjarona), four times, 30 frames each: he charges in his
+   wind-up with a white flash, voice jarona1-4 and snd_boost (rising pitch); lunges at the foe punching, tinted blue
+   with blue afterimages (snd_swing); the hit (blue crescent, snd_punchheavythunder); knocked back, sliding back to
+   his place as the blue fades - and charges again. Then his pose, voice heh_it_s_my_jarona, the last hit and
+   snd_great_shine (124). Ends at 146. spelldelay 150.
+ EZ2DANCE (18). 50 TP (20%). Party. On the next enemy turn the SOUL moves 1 px faster on 2 of every 5 frames (about
+   10%). Animation: voice spiral_dance, pirouette then spin-to-idle with rainbow afterimages, snd_power (30), 60 frames.
+   spelldelay 60.
+ PRISM RUSH (19). 250 TP (100%). One foe. Damage AT*12 + MAG*4.5: three rushes of 15%, the clash 20%, the punch the
+   rest. spelldelay 340.
+   0-155 power-up: "Everyone! Lend me your power!" (voice lend_me_your_power, snd_flowery_power_up). The seven other
+     flowers (Aqua, Seth, Orange, Green, Blue, Yellow, Pink) fade in one after another in a ring round him and hover,
+     each sending sparkles of its own colour drifting into him. He kneels and powers up, glowing in their colours.
+     From 60, every 9 frames one flower flashes (snd_power, rising pitch) and flies into him in a light trail of its
+     colour; as it arrives: snd_japanese_yo_hit2 and one sparkle of its colour (he flashes once, with the last). At 130
+     he rises pointing up (snd_weaponpull). At 146 a ring of 7 sparkles, one per flower, and snd_great_shine.
+     (Cleaned up in this update: fewer sparkles and afterimages, a gentler glow, one effect per hit.)
+   156-331 OMEGA FLOWERY, in a soft rainbow (afterimages and hits in the flowers' colours): voice omega_flowery + snd_boost; pose; power-up with
+     afterimages; three rushes through the foe (voice last_jarona, snd_ultraswing, explosions a/b/c,
+     snd_punchheavythunder); the clash (snd_explosion_mmx; since build 50 Kris no longer jumps in); the
+     wind-up; the punch (voice take_that, three explosions, snd_explosion_mmx3, screen shake). Then his victory pose
+     (snd_great_shine) and he is himself again.
+   With Flowery himself that makes eight flowers. The spec named six; Pink is Chapter 5's seventh flower, so she is in too.
+ AFINIHUG (20). 88 TP (35%). One ally. That ally takes 20% less damage on the next enemy turn (x0.8). Animation: voice
+   flowers_blooms_in_your_heart, his arms-wide pose; the ally flashes with a gold afterimage, snd_power (18), 44 frames.
+   spelldelay 55.
+ HONEY KISS (21). 100 TP (40%). One foe. A normal enemy gets MERCY +20 (scr_mercyadd). A knight has no MERCY, so it is
+   charmed instead: its next attack hurts 15% less (x0.85).
+   Animation: Chapter 5's blow kiss: spr_flowery_kiss at 1/6, voice prism_blow, a step in (speed 4) and back
+   (speed 10, 9) with snd_wing and the wind loop. From 20 to 80, a petal every frame: spr_spin_petal, blown right at
+   hspeed 5 under gravity 0.75 in a random direction within +-55 degrees, fading in over 6 frames. The foe flashes
+   (40); the charm and snd_spare land (60); the petals fade out (86-98). Ends at 100. spelldelay 105.
+
+5. NOT DONE / LIMITS (honest)
+-----------------------------
+ - Omega shader: Chapter 5's shd_chromatic_reflection is not ported. A shader is compiled code inside data.win, and
+   copying one between game versions can stop the game from starting, so it was left out. The rainbow tint is a
+   stand-in.
+ - Speech bubbles: his lines use the battle text box with his face, typer and voice, not Chapter 5's speech balloons.
+ - Online: his techniques are not part of online matches (the kit has none). Not tested with several real players.
+ - Nothing here was seen or heard in the running game.
+
+6. WEIRD ROUTE / VIOLET KNIGHT WITH FLOWERY (this update)
+--------------------------------------------------------
+ - The party-order rules count him like the others. On top, he stays to the end, and the Knight takes the members
+   below him (Kris too). At the bottom, he is taken first. Alone, he is the last member and parries the blade.
+   Before this, he was invisible to these rules: with Flowery on top and Kris below, Kris was treated as "on top"
+   and Kris did the parry.
+ - The parry and the power-up flurry show his own frames on his own hero. Before, the game's act-sprite helper fell
+   back to Kris.
+ - The talk after a loss: he speaks in a speech balloon like Susie's, in his own text voice.
+   Shock: "...Kris?" / "Hey.. get up.. That's not funny." Resolve: "...Hey. Nobody hurts my team on my watch."
+   The others call out to him when he is taken: Susie "F-Flowery...?", Noelle "F-Flowery...?!".
+ - The Violet Knight calls him "The Flower Man" in its lines ("... was completely obliterated", "... stands alone"),
+   the same way it has The Cage / The Girl / The Prince / The Angel. Everywhere else he is Flowery.
+ - His finisher when he is on top: LAST JARONA (technique 23). After the power-up scene his MAGIC is only it and
+   PRISM RUSH. 100 TP (40%), always. Damage AT*18 + MAG*6 over three rushes (30% / 25% / 45%), with explosions at the foe.
+   After the Knight's Roaring it ends the fight the same way the other finishers do (the Knight's death scene).
+
+7. THE THREE NEW SPECS (Prism Rush visuals, Jarona, last stand / ending)
+------------------------------------------------------------------------
+7.1 How Chapter 5 draws Omega Flowery and the flowers (found in its code, obj_plat_finalflowery)
+ - Omega Flowery: scr_draw_outline(2, hue) - his sprite as one solid colour, 2 px out in 4 directions, the hue cycling
+   (hsvslider += 0.3 a frame, make_color_hsv((hsvslider / 14) * 255 mod 255, 255, 255)); then his white sprite at
+   alpha 0.8; then the same sprite again ADDITIVE through the shader shd_chromatic_reflection (iAlpha 0.5).
+ - shd_chromatic_reflection (its GLSL source, read from Chapter 5's file): per pixel, hue = 0.5 + frac((iTime.x +
+   (fragX + fragY) * 0.01) * 0.5), saturation 1, brightness 3.7 x (angle term), times the sprite's alpha - a rainbow
+   running diagonally across the SCREEN, shown only where the sprite is.
+ - The flowers (draw_ghost): the OVERLAY sprite (spr_omegaf_<name>_o - the solid shape behind; this is the outline
+   region the sprite sheet's notes describe) in the flower's colour darkened 20%; the MAIN sprite (spr_omegaf_<name>:
+   white with grey detail tones) in #EEEEEE mixed half with the colour; then the same additive shader pass.
+   Colours: Green 7864183, Aqua 16777079, Yellow 7864319, Blue 16742263, Seth 16742399, Orange 7829503 (GameMaker
+   BGR: #77FF77, #77FFFF, #FFFF77, #7777FF, #FF77FF, #FF7777).
+ - Its explosions: spr_omegaflowery_explosion_a/b/c, white, turning a random flower hue after 2 or 4 frames; its
+   "bwoosh" ripples (scr_make_ripple) in flower hues at radii 440 / 330 / 220 for the big hit.
+7.2 What was built (obj_knight_omega, omega50.gml)
+ - The same three layers, in the same order, with the same colours. The shader itself is NOT copied: Chapter 3's game
+   file does not have it, and copying a compiled shader between game files can stop the game from starting. Its
+   rainbow is made the same way without it: the sprite is drawn into a surface, the diagonal rainbow (the shader's own
+   formula, 16 px bands) is multiplied in by the sprite's alpha, and the surface is added to the screen at 0.45.
+   It keeps every pixel of the sprite's shape (no rectangle, nothing outside the sprite), and the grey detail tones
+   stay visible because the base sprite is drawn separately. The angle term of the shader is taken as a constant.
+ - Omega Flowery's frames: spr_knfl_omega (27 frames: pose, power-up, rush, clash, wind-up, punch, idle, hurt,
+   deflect), lined up on his body like his normal poses.
+ - A preview of the method, drawn outside the game with the same steps (see the delivery message), matches the
+   formation of your first reference picture. It is NOT a screenshot of the game.
+7.3 Prism Rush (the phases, frames at 30 fps): 1-49 he steps into the middle and kneels, powering up; the six Omega
+   flowers glide in one by one to their places in the reference's formation (Aqua upper left, Blue top, Green upper
+   right, Seth left, Yellow right, Orange below). 50-79 they hover (Chapter 5's own hover speeds), sparkles of their
+   colours drifting into him. 80-99 they glow full; a ripple from each. 100-149 one by one they flash, rush into him
+   shrinking, trailing their overlay in their colour, and are gone (a small ring and yo_hit2 as each arrives).
+   150-169 he rises pointing up; six ripples ring out from him. 170-189 OMEGA FLOWERY ("Omega Flowery!").
+   190-365 the attack: power-up with afterimages in the outline hue; three rushes - at each contact an explosion
+   (white, then a hue), a ripple and a white orb at the foe, and the hit; the clash (Flowery alone - Kris no longer jumps in); the wind-up
+   (three rings closing in); the punch - three explosions, the 220/330/440 ripples, an orb, a shake, the last hit;
+   then his Omega form fades and he is himself again in his place. Damage and TP as before (100%, AT*12 + MAG*4.5;
+   hits 15% x3, 20%, the rest). spelldelay 380 (190 when he is already Omega Flowery for good: no transformation,
+   no change back).
+7.4 My Jarona: three charges (25% / 30% / 45%). Each: wind-up with a white flash and "Jarona!", a 5-frame lunge in
+   blue with blue afterimages; the hit lands on the frame he reaches the foe, with a blue flash, the crescent and a
+   shockwave there (a shake on the last); knocked back to his place, the blue fading. Then his pose, "Heh. It's my
+   Jarona." spelldelay 125.
+7.5 FIGHT: one Jarona. The game's own FIGHT (the attack bar, its damage, its one hit) is kept; what you see is his
+   Jarona timed on it: wind-up with a white flash (0-5), the lunge (6-11) reaching the foe on the frame the game's
+   hit lands (obj_heroparent deals it 11 frames after the swing starts), a blue flash and a shockwave there, knocked
+   back (15-26).
+   About "hit detection": Deltarune's battles have no collision between a hero and the enemy - every hit is dealt
+   by the battle code at a set moment. So the moves are timed so that the visible contact and the damage happen on
+   the same frame; there is no hitbox to tunnel through, and no hit can land twice.
+7.6 His last stand (every knight's hub fight; not online): at the end of an enemy turn, when Flowery is up and
+   every teammate has been TAKEN by the Knight (swooned and killed off by its taking scene - right after it; the Violet
+   Knight's taking removes them from the party, the hub's Weird Route marks them slain). In the Violet Knight's Side B
+   with Flowery on top, his transformation IS the power-up scene after its second taking (in place of the generic
+   flurry), and LAST JARONA is unlocked with it. A teammate
+   who is only knocked down does NOT count (they can be revived, and the two would stack); alone from the start: no
+   last stand (OMEGA FORM, 7.10, is the way to transform otherwise). Then the battle holds (the way the Weird Route's scenes hold
+   it), his scene plays - he kneels hurt ("Huh?"), the Knight flashes at him, he stands ("With your powers
+   combined..."), the six flowers give him their power (Prism Rush's power-up), OMEGA FLOWERY - and the text
+   "Flowery became OMEGA FLOWERY!". Then the turn goes on.
+   For the rest of the fight: EVERY battle pose of his hero is Omega Flowery's (idle, attack-ready, FIGHT = Omega
+   wind-up and punch, hurt, defend = deflect, spell-ready / spell = power-up, item / act / victory = pose, defeat =
+   hurt) - set on his hero and on his registry entry, so nothing in the battle puts Flowery's own sprites back. His
+   hero draws itself the way Chapter 5 draws Omega Flowery (its own Draw event in place of obj_heroparent's: the
+   2 px outline in the cycling hue, the white sprite at 0.8, the additive diagonal rainbow), floating up and down
+   like the Knight (+-6 px, about 3 seconds a round). After the scene he glides to the middle of the party's line -
+   the middle member's place in a party of three (Susie's), halfway in a party of two - and stays there between moves.
+   Flower Man (the game's own mus/Flowerman_Arrangement.ogg) starts again from the top in place of the fight's song,
+   with its lyrics. Every punch of LAST JARONA has his "JARONA!" (as My Jarona and FIGHT do). His moves show in Omega
+   frames. AT +25%, DF +50%, MAG +20%, max HP +20% and 30% of it back, and he takes 25% less damage. His MAGIC is then
+   ONLY LAST JARONA, PRISM RUSH and his heal SMILE AGAIN (F-ACTION and his other techniques are gone for the fight). Prism Rush just goes off: no
+   transformation (he already is Omega Flowery) and no changing back. LAST JARONA costs 100 TP (40%) every time,
+   no charging. His HP box shows his head and name in the cycling Omega hue. His own poses come back at the start
+   of the next fight.
+   Once per fight; it all goes when the fight ends. Speed +10% from the spec is not done (Deltarune battles have no
+   speed stat).
+7.7 The Weird Route's end with Flowery on top (Violet Knight Side B, after its Roaring, LAST JARONA): in place of the
+   black and red screen, his last clash with the Knight - the Violet Knight's purple on the screen's edges, the
+   music fading, "...Heh. Last one, pal." in his balloon, the Knight raises its blade, both charge, they clash in the
+   middle (rings, sparks, impacts, both pushing, then harder), he breaks through ("Take that!"), three explosions
+   and the big ripples on the Knight - and then the Knight's own death scene of this fight from its dissolve on
+   (its dissolve, the fade, the end of the fight, its rewards as the game had them). Your win stays a win.
+   The Chapter 5 clash itself (Flowery vs the Roaring Knight) is a platformer scene built from its own objects; it
+   is not copied - the clash is made from Flowery's frames, the Knight's attack sprite of this fight and the effects
+   above. No timed button press was added (the spec made it optional).
+7.8 "The Flower Man": the Violet Knight's lines name him that (section 6).
+7.9 Multiplayer (online): online matches use the room's kit, which has no techniques, so Prism Rush, Jaronas and the
+   last stand do not happen online; nothing of them is sent over the network. Online he is a skin.
+7.10 OMEGA FORM (technique 24, optional): not in his starting set or in the loadouts - give it to him on the POWER page
+   (it comes after his six techniques). 100 TP (40%). He stays in his place, the six flowers gather and give him their
+   power (Prism Rush's power-up) and he becomes OMEGA FLOWERY for the rest of the fight, exactly as in the last stand
+   (Omega poses and look, float, Flower Man from the top, MAGIC only LAST JARONA + PRISM RUSH). He moves to the middle of
+   the line only once everyone else has been taken. No last stand after it.
+7.11 PRISM RUSH as OMEGA FLOWERY: half as hard again (AT*18 + MAG*6.75 instead of AT*12 + MAG*4.5), no transformation.
+7.12 Timed press on his Jaronas (MY JARONA and LAST JARONA): a gold ring closes on the foe just before each punch
+   connects - press [Z] (CONFIRM) then for a STRONG punch: x1.5 damage, a gold ring burst and a bell. One press a punch:
+   pressing too early makes that punch a plain one (no mashing).
+7.13 LAST JARONA, smoother (40 frames a punch): he draws back a little in his wind-up (eased), the lunge accelerates
+   from there, a hit-stop holds the punch on the foe (4 frames, 6 on the last) with the shake dying down, then an
+   eased-out bounce back in an arc (higher on the last), a small dip on landing and his idle frames before the next
+   wind-up. He starts from where he is drawn while floating. The move is 148 frames (was 130).
+7.14 SMILE AGAIN (technique 25, only in his Omega form): 80 TP (32%). His Omega pose, the six flowers' rings closing on
+   him, then he (and anyone still up) heals 40% of max HP with the game's own heal numbers.
+7.15 Flower Man stays on in his Omega form: if the fight puts another song in its place (a taking scene's music, a
+   phase's song), Flower Man comes back where it was (its position is kept every frame) once his moves are done.
+7.16 Safety net: in his Omega form, if his hero is left hidden for 10 frames with no move of his and no scene pose of
+   him on screen (and the Knight has not taken him), he is shown again.
+7.17 No speech balloon for his moves any more: his voice clips say the line; the battle box still says what he did
+   ("* Flowery used LAST JARONA!"). (The Weird Route's talk scenes still use balloons.)
+7.18 His Omega form ends with its fight: when a fight is won, lost or left (and again when the next one starts) his own
+   poses go back on his registry entry AND on a hero the next battle already made - so he is never Omega Flowery in a
+   later fight without having transformed there.
+7.19 Only the Violet Knight takes party members (its Side B). The other knights never take anyone, so his automatic
+   last stand only happens in the Violet Knight's Side B; OMEGA FORM (7.10) transforms him in any fight.
+7.20 Pausing during any of his moves or scenes: they wait and go on after the pause.
+7.21 His FIGHT as OMEGA FLOWERY is done by his hero itself (its Omega drawing with the Jarona's frames and an offset), so
+   he never blinks out between his hero and a separate drawing.
+7.22 His ACT (build 50, after your request): the first entry of his MAGIC is now "ACT" (in the ACT colour, where F-Action
+   was). Picking it turns his MAGIC list into his ACT list, in the same menu (like Kris's ACT entry in Kris's MAGIC):
+     Check       - "* Flowery analyzed the enemy!" (then "points into the distance", as Kris's Check does)
+     HoldBreath  - the knight's own hold-breath: the SOUL moves faster (a second one: "felt dizzy, nothing happened")
+     Unleash     - Elec Knight phase 5 only, 200 TP: "* Your SOUL emitted a brilliant light!" and the SOUL's light comes out
+                   of him (the same purify light as Kris's / Susie's Unleash, which ends phase 5); the turn waits for it.
+                   If another Unleash is already under way that turn, his does nothing.
+     Bravery     - Elec Knight phase 5 only, 12.5 TP: GRAZE SIZE up this turn (Kris's Bravery)
+     F-Action    - as before (TP +32%)
+   [X] in the ACT list goes back to his MAGIC (cursor on ACT). After a pick, or when his turn is over, his MAGIC is his
+   normal list again.
+   As OMEGA FLOWERY his MAGIC stays LAST JARONA / PRISM RUSH / SMILE AGAIN - except in the Elec Knight's phase 5, where
+   ACT is put back first so he can still Unleash.

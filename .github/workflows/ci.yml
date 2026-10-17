@@ -1,0 +1,50 @@
+# DRBR - checks on every push / pull request. Nothing here needs (or may receive) DELTARUNE's files.
+name: ci
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  programs:
+    name: build the Windows programs + core tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: build DRBR Launcher / DRBR Updater / DRBR-Setup (.NET Framework 4.8 targets, built on Linux)
+        run: bash scripts/build-installer.sh
+      - name: core tests that need no game files
+        run: |
+          dotnet build src/Drbr.Tests -c Release -o build/tests
+          dotnet build/tests/drbr-tests.dll basics
+      - uses: actions/upload-artifact@v4
+        with:
+          name: drbr-programs
+          path: build/bin/*.exe
+  save:
+    name: the provided starting save
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 scripts/validate-save.py
+      - name: exact bytes (CRLF kept)
+        run: echo "fa956269ee3ee98e7df04356bb575e3afd5455a538bb5568b2ac931fdb0aa082  save-profile/starting-save/start_filech3" | sha256sum -c
+  emulator:
+    name: the GameMaker emulator's own selftest
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: cd tools/gmlsim && python3 -m gmlsim.selftest
+  no-secrets:
+    name: nothing private in the repository
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: no keys, no game data, no saves other than the provided one
+        run: |
+          bad=$(git ls-files | grep -Ei '\.pem$|\.key$|\.win$|\.xdelta|(^|/)filech[0-9]|knight_hub\.ini|knightfights_online\.ini' | grep -v '^save-profile/starting-save/start_filech3$' || true)
+          if [ -n "$bad" ]; then echo "Refused files in the repository:"; echo "$bad"; exit 1; fi
+          if git grep -nE 'BEGIN (RSA |)PRIVATE KEY' -- ':!*.md'; then echo "a private key is in the repository"; exit 1; fi

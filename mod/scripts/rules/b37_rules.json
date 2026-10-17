@@ -1,0 +1,1396 @@
+[
+ {
+  "id": "B01-moveheart-violet",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_GlobalScript_scr_moveheart",
+  "find": "return instance_create(obj_herokris.x + 10, obj_herokris.y + 40, obj_moveheart);",
+  "replace": "return instance_create(knight_soul_x(), knight_soul_y(), obj_moveheart);",
+  "why": "CRASH without Kris in Violet Knight (\"Unable to find any instance for object obj_herokris\" at gml_Script_scr_moveheart): the heart comes out of the leader.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "B01-moveheart-kaizo",
+  "variants": [
+   "kaizo"
+  ],
+  "entry": "gml_GlobalScript_scr_moveheart",
+  "find": "    var _hX = camerax() - 120;\n    var _hY = cameray() + 170;\n    if (i_ex(obj_herokris))\n    {\n        _hX = obj_herokris.x + 10;\n        _hY = obj_herokris.y + 40;\n    }\n",
+  "replace": "    var _hX = knight_soul_x();\n    var _hY = knight_soul_y();\n",
+  "why": "Kaizo flew the heart in from off-screen when Kris was missing; now from the leader.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "B02-returnheart-violet",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_returnheart_Create_0",
+  "find": "distx = obj_herokris.x + 10;\ndisty = obj_herokris.y + 40;\n",
+  "replace": "distx = knight_soul_x();\ndisty = knight_soul_y();\n",
+  "why": "CRASH without Kris in Violet Knight at the end of every enemy turn (same as scr_moveheart).",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "B02-returnheart-kaizo",
+  "variants": [
+   "kaizo"
+  ],
+  "entry": "gml_Object_obj_returnheart_Create_0",
+  "find": "distx = camerax() - 120;\ndisty = cameray() + 170;\nif (i_ex(obj_herokris))\n{\n    distx = obj_herokris.x + 10;\n    disty = obj_herokris.y + 40;\n}\n",
+  "replace": "distx = knight_soul_x();\ndisty = knight_soul_y();\n",
+  "why": "Kaizo: the heart went back off-screen when Kris was missing; now to the leader.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "B03-actcount-base",
+  "variants": [
+   "base"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Step_0",
+  "find": "global\\.battleactcount\\[1\\] = 0;",
+  "replace": "knight_actcount_fix();",
+  "why": "The fights reset the ACT row count of party slot 2 (Susie in the story party) when an S/R-Action is used up; with another party the real member kept a blank first row and slot 2 lost its count. All slots are recounted by scr_spellmenu_setup right after.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true
+ },
+ {
+  "id": "B03-actcount-kaizo",
+  "variants": [
+   "kaizo"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Step_0",
+  "find": "global\\.battleactcount\\[1\\] = 0;",
+  "replace": "knight_actcount_fix();",
+  "why": "The fights reset the ACT row count of party slot 2 (Susie in the story party) when an S/R-Action is used up; with another party the real member kept a blank first row and slot 2 lost its count. All slots are recounted by scr_spellmenu_setup right after.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true
+ },
+ {
+  "id": "B03-actcount-elec",
+  "variants": [
+   "elec"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Step_0",
+  "find": "global\\.battleactcount\\[1\\] = 0;",
+  "replace": "knight_actcount_fix();",
+  "why": "The fights reset the ACT row count of party slot 2 (Susie in the story party) when an S/R-Action is used up; with another party the real member kept a blank first row and slot 2 lost its count. All slots are recounted by scr_spellmenu_setup right after.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true
+ },
+ {
+  "id": "B03-actcount-violet",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Step_0",
+  "find": "global\\.battleactcount\\[1\\] = 0;",
+  "replace": "knight_actcount_fix();",
+  "why": "The fights reset the ACT row count of party slot 2 (Susie in the story party) when an S/R-Action is used up; with another party the real member kept a blank first row and slot 2 lost its count. All slots are recounted by scr_spellmenu_setup right after.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true
+ },
+ {
+  "id": "B03-actcount-thorn",
+  "variants": [
+   "thorn"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Step_0",
+  "find": "global\\.battleactcount\\[1\\] = 0;",
+  "replace": "knight_actcount_fix();",
+  "why": "The fights reset the ACT row count of party slot 2 (Susie in the story party) when an S/R-Action is used up; with another party the real member kept a blank first row and slot 2 lost its count. All slots are recounted by scr_spellmenu_setup right after.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true
+ },
+ {
+  "id": "B03-actcount-cyan",
+  "variants": [
+   "cyan"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Step_0",
+  "find": "global\\.battleactcount\\[1\\] = 0;",
+  "replace": "knight_actcount_fix();",
+  "why": "The fights reset the ACT row count of party slot 2 (Susie in the story party) when an S/R-Action is used up; with another party the real member kept a blank first row and slot 2 lost its count. All slots are recounted by scr_spellmenu_setup right after.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true
+ },
+ {
+  "id": "B04-susie-balloons-base",
+  "variants": [
+   "base"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Step_0",
+  "find": "if \\(global\\.hp\\[2\\] > 0\\)(\\s*\\{\\s*balloonturn\\+\\+;)",
+  "replace": "if (scr_havechar(2) && global.hp[2] > 0 && !practicemode)\\1",
+  "why": "Susie's taunts to the Knight played from an empty spot when she was not in the party (her HP is kept while she is away), practice included. Kaizo and Violet already check this.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 1
+ },
+ {
+  "id": "B04-susie-balloons-elec",
+  "variants": [
+   "elec"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Step_0",
+  "find": "if \\(global\\.hp\\[2\\] > 0\\)(\\s*\\{\\s*balloonturn\\+\\+;)",
+  "replace": "if (scr_havechar(2) && global.hp[2] > 0 && !practicemode)\\1",
+  "why": "Susie's taunts to the Knight played from an empty spot when she was not in the party (her HP is kept while she is away), practice included. Kaizo and Violet already check this.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 1
+ },
+ {
+  "id": "B04-susie-balloons-thorn",
+  "variants": [
+   "thorn"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Step_0",
+  "find": "if \\(global\\.hp\\[2\\] > 0\\)(\\s*\\{\\s*balloonturn\\+\\+;)",
+  "replace": "if (scr_havechar(2) && global.hp[2] > 0 && !practicemode)\\1",
+  "why": "Susie's taunts to the Knight played from an empty spot when she was not in the party (her HP is kept while she is away), practice included. Kaizo and Violet already check this.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 1
+ },
+ {
+  "id": "B04-susie-balloons-cyan",
+  "variants": [
+   "cyan"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Step_0",
+  "find": "if \\(global\\.hp\\[2\\] > 0\\)(\\s*\\{\\s*balloonturn\\+\\+;)",
+  "replace": "if (scr_havechar(2) && global.hp[2] > 0 && !practicemode)\\1",
+  "why": "Susie's taunts to the Knight played from an empty spot when she was not in the party (her HP is kept while she is away), practice included. Kaizo and Violet already check this.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 1
+ },
+ {
+  "id": "B05-thorn-erode",
+  "variants": [
+   "thorn"
+  ],
+  "entry": "gml_GlobalScript_scr_damage",
+  "find": "                var _tc = (target < 3) ? global.char[target] : 0;\n                if (_tc == 1)\n                {\n                    if (global.chararmor1[1] == 23 || global.chararmor2[1] == 23)\n                    {\n                        global.maxhp[1] -= _hplost_mantle;\n                    }\n                    else\n                    {\n                        global.maxhp[1] -= _hplost;\n                    }\n                    if (global.maxhp[1] < 90)\n                    {\n                        global.maxhp[1] = 90;\n                    }\n                }\n                else if (_tc == 2)\n                {\n                    if (global.chararmor1[2] == 23 || global.chararmor2[2] == 23)\n                    {\n                        global.maxhp[2] -= _hplost_mantle;\n                    }\n                    else\n                    {\n                        global.maxhp[2] -= _hplost;\n                    }\n                    if (global.maxhp[2] < 110)\n                    {\n                        global.maxhp[2] = 110;\n                    }\n                }\n                else if (_tc == 3)\n                {\n                    if (global.chararmor1[3] == 23 || global.chararmor2[3] == 23)\n                    {\n                        global.maxhp[3] -= _hplost_mantle;\n                    }\n                    else\n                    {\n                        global.maxhp[3] -= _hplost;\n                    }\n                    if (global.maxhp[3] < 70)\n                    {\n                        global.maxhp[3] = 70;\n                    }\n                }\n",
+  "replace": "                target = knight_fix_target(target);\n                knight_thorn_erode(target, _hplost, _hplost_mantle);\n",
+  "why": "Thorn Knight's max-HP erosion (already by character since an engine rule) had no case for Noelle: she never lost max HP. Now whoever is actually hit (after the knight's retarget) loses it, Noelle included (floor 50), and the mantle is checked on that slot.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "B06-mantle-a-base-damage",
+  "variants": [
+   "base"
+  ],
+  "entry": "gml_GlobalScript_scr_damage",
+  "find": "if \\(global\\.chararmor1\\[1\\] == 23 \\|\\| global\\.chararmor2\\[1\\] == 23 \\|\\| global\\.chararmor1\\[2\\] == 23 \\|\\| global\\.chararmor2\\[2\\] == 23 \\|\\| global\\.chararmor1\\[3\\] == 23 \\|\\| global\\.chararmor2\\[3\\] == 23\\)",
+  "replace": "if (knight_mantle_party())",
+  "why": "Shadow Mantle (draws hits, takes a third of the damage) was checked on Kris for slot 1, Susie for slot 2 and Ralsei for slot 3 whoever stood there: with any other party it protected the wrong member (or nobody, or redirected hits to an empty slot). Now it is the mantle of the member in that slot.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 1
+ },
+ {
+  "id": "B06-mantle-b-base-damage",
+  "variants": [
+   "base"
+  ],
+  "entry": "gml_GlobalScript_scr_damage",
+  "find": "if \\(global\\.hp\\[([123])\\] > 0 && \\(global\\.chararmor1\\[\\1\\] == 23 \\|\\| global\\.chararmor2\\[\\1\\] == 23\\)\\)",
+  "replace": "if (knight_slot_up(\\1 - 1) && knight_mantle_slot(\\1 - 1))",
+  "why": "Shadow Mantle (draws hits, takes a third of the damage) was checked on Kris for slot 1, Susie for slot 2 and Ralsei for slot 3 whoever stood there: with any other party it protected the wrong member (or nobody, or redirected hits to an empty slot). Now it is the mantle of the member in that slot.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 3
+ },
+ {
+  "id": "B06-mantle-c-base-damage",
+  "variants": [
+   "base"
+  ],
+  "entry": "gml_GlobalScript_scr_damage",
+  "find": "if \\(global\\.hp\\[([123])\\] < 1 && target == (\\d)\\)",
+  "replace": "if (knight_slot_down(\\2) && target == \\2)",
+  "why": "Shadow Mantle (draws hits, takes a third of the damage) was checked on Kris for slot 1, Susie for slot 2 and Ralsei for slot 3 whoever stood there: with any other party it protected the wrong member (or nobody, or redirected hits to an empty slot). Now it is the mantle of the member in that slot.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 3
+ },
+ {
+  "id": "B06-mantle-d-base-damage",
+  "variants": [
+   "base"
+  ],
+  "entry": "gml_GlobalScript_scr_damage",
+  "find": "if \\(\\(target == (\\d) && global\\.chararmor1\\[([123])\\] == 23\\) \\|\\| global\\.chararmor2\\[\\2\\] == 23\\)",
+  "replace": "if (target == \\1 && knight_mantle_slot(\\1))",
+  "why": "Shadow Mantle (draws hits, takes a third of the damage) was checked on Kris for slot 1, Susie for slot 2 and Ralsei for slot 3 whoever stood there: with any other party it protected the wrong member (or nobody, or redirected hits to an empty slot). Now it is the mantle of the member in that slot.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 3
+ },
+ {
+  "id": "B06-mantle-f-base-damage",
+  "variants": [
+   "base"
+  ],
+  "entry": "gml_GlobalScript_scr_damage",
+  "find": "if \\(\\(global\\.chararmor1\\[([123])\\] == 23 \\|\\| global\\.chararmor2\\[\\1\\] == 23\\) && (target|hpi) == (\\d)\\)",
+  "replace": "if (knight_mantle_slot(\\3) && \\2 == \\3)",
+  "why": "Shadow Mantle (draws hits, takes a third of the damage) was checked on Kris for slot 1, Susie for slot 2 and Ralsei for slot 3 whoever stood there: with any other party it protected the wrong member (or nobody, or redirected hits to an empty slot). Now it is the mantle of the member in that slot.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 6
+ },
+ {
+  "id": "B06-mantle-a-base-damage_maxhp",
+  "variants": [
+   "base"
+  ],
+  "entry": "gml_GlobalScript_scr_damage_maxhp",
+  "find": "if \\(global\\.chararmor1\\[1\\] == 23 \\|\\| global\\.chararmor2\\[1\\] == 23 \\|\\| global\\.chararmor1\\[2\\] == 23 \\|\\| global\\.chararmor2\\[2\\] == 23 \\|\\| global\\.chararmor1\\[3\\] == 23 \\|\\| global\\.chararmor2\\[3\\] == 23\\)",
+  "replace": "if (knight_mantle_party())",
+  "why": "Shadow Mantle (draws hits, takes a third of the damage) was checked on Kris for slot 1, Susie for slot 2 and Ralsei for slot 3 whoever stood there: with any other party it protected the wrong member (or nobody, or redirected hits to an empty slot). Now it is the mantle of the member in that slot.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 1
+ },
+ {
+  "id": "B06-mantle-b-base-damage_maxhp",
+  "variants": [
+   "base"
+  ],
+  "entry": "gml_GlobalScript_scr_damage_maxhp",
+  "find": "if \\(global\\.hp\\[([123])\\] > 0 && \\(global\\.chararmor1\\[\\1\\] == 23 \\|\\| global\\.chararmor2\\[\\1\\] == 23\\)\\)",
+  "replace": "if (knight_slot_up(\\1 - 1) && knight_mantle_slot(\\1 - 1))",
+  "why": "Shadow Mantle (draws hits, takes a third of the damage) was checked on Kris for slot 1, Susie for slot 2 and Ralsei for slot 3 whoever stood there: with any other party it protected the wrong member (or nobody, or redirected hits to an empty slot). Now it is the mantle of the member in that slot.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 3
+ },
+ {
+  "id": "B06-mantle-c-base-damage_maxhp",
+  "variants": [
+   "base"
+  ],
+  "entry": "gml_GlobalScript_scr_damage_maxhp",
+  "find": "if \\(global\\.hp\\[([123])\\] < 1 && target == (\\d)\\)",
+  "replace": "if (knight_slot_down(\\2) && target == \\2)",
+  "why": "Shadow Mantle (draws hits, takes a third of the damage) was checked on Kris for slot 1, Susie for slot 2 and Ralsei for slot 3 whoever stood there: with any other party it protected the wrong member (or nobody, or redirected hits to an empty slot). Now it is the mantle of the member in that slot.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 3
+ },
+ {
+  "id": "B06-mantle-e-base-damage_maxhp",
+  "variants": [
+   "base"
+  ],
+  "entry": "gml_GlobalScript_scr_damage_maxhp",
+  "find": "if \\(target == (\\d) && \\(global\\.chararmor1\\[([123])\\] == 23 \\|\\| global\\.chararmor2\\[\\2\\] == 23\\)\\)",
+  "replace": "if (target == \\1 && knight_mantle_slot(\\1))",
+  "why": "Shadow Mantle (draws hits, takes a third of the damage) was checked on Kris for slot 1, Susie for slot 2 and Ralsei for slot 3 whoever stood there: with any other party it protected the wrong member (or nobody, or redirected hits to an empty slot). Now it is the mantle of the member in that slot.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 6
+ },
+ {
+  "id": "B06-mantle-f-kaizo-damage",
+  "variants": [
+   "kaizo"
+  ],
+  "entry": "gml_GlobalScript_scr_damage",
+  "find": "if \\(\\(global\\.chararmor1\\[([123])\\] == 23 \\|\\| global\\.chararmor2\\[\\1\\] == 23\\) && (target|hpi) == (\\d)\\)",
+  "replace": "if (knight_mantle_slot(\\3) && \\2 == \\3)",
+  "why": "Shadow Mantle (draws hits, takes a third of the damage) was checked on Kris for slot 1, Susie for slot 2 and Ralsei for slot 3 whoever stood there: with any other party it protected the wrong member (or nobody, or redirected hits to an empty slot). Now it is the mantle of the member in that slot.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 3
+ },
+ {
+  "id": "B06-mantle-c-elec-damage",
+  "variants": [
+   "elec"
+  ],
+  "entry": "gml_GlobalScript_scr_damage",
+  "find": "if \\(global\\.hp\\[([123])\\] < 1 && target == (\\d)\\)",
+  "replace": "if (knight_slot_down(\\2) && target == \\2)",
+  "why": "Shadow Mantle (draws hits, takes a third of the damage) was checked on Kris for slot 1, Susie for slot 2 and Ralsei for slot 3 whoever stood there: with any other party it protected the wrong member (or nobody, or redirected hits to an empty slot). Now it is the mantle of the member in that slot.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 3
+ },
+ {
+  "id": "B06-mantle-a-elec-damage_maxhp",
+  "variants": [
+   "elec"
+  ],
+  "entry": "gml_GlobalScript_scr_damage_maxhp",
+  "find": "if \\(global\\.chararmor1\\[1\\] == 23 \\|\\| global\\.chararmor2\\[1\\] == 23 \\|\\| global\\.chararmor1\\[2\\] == 23 \\|\\| global\\.chararmor2\\[2\\] == 23 \\|\\| global\\.chararmor1\\[3\\] == 23 \\|\\| global\\.chararmor2\\[3\\] == 23\\)",
+  "replace": "if (knight_mantle_party())",
+  "why": "Shadow Mantle (draws hits, takes a third of the damage) was checked on Kris for slot 1, Susie for slot 2 and Ralsei for slot 3 whoever stood there: with any other party it protected the wrong member (or nobody, or redirected hits to an empty slot). Now it is the mantle of the member in that slot.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 1
+ },
+ {
+  "id": "B06-mantle-b-elec-damage_maxhp",
+  "variants": [
+   "elec"
+  ],
+  "entry": "gml_GlobalScript_scr_damage_maxhp",
+  "find": "if \\(global\\.hp\\[([123])\\] > 0 && \\(global\\.chararmor1\\[\\1\\] == 23 \\|\\| global\\.chararmor2\\[\\1\\] == 23\\)\\)",
+  "replace": "if (knight_slot_up(\\1 - 1) && knight_mantle_slot(\\1 - 1))",
+  "why": "Shadow Mantle (draws hits, takes a third of the damage) was checked on Kris for slot 1, Susie for slot 2 and Ralsei for slot 3 whoever stood there: with any other party it protected the wrong member (or nobody, or redirected hits to an empty slot). Now it is the mantle of the member in that slot.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 3
+ },
+ {
+  "id": "B06-mantle-c-elec-damage_maxhp",
+  "variants": [
+   "elec"
+  ],
+  "entry": "gml_GlobalScript_scr_damage_maxhp",
+  "find": "if \\(global\\.hp\\[([123])\\] < 1 && target == (\\d)\\)",
+  "replace": "if (knight_slot_down(\\2) && target == \\2)",
+  "why": "Shadow Mantle (draws hits, takes a third of the damage) was checked on Kris for slot 1, Susie for slot 2 and Ralsei for slot 3 whoever stood there: with any other party it protected the wrong member (or nobody, or redirected hits to an empty slot). Now it is the mantle of the member in that slot.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 3
+ },
+ {
+  "id": "B06-mantle-e-elec-damage_maxhp",
+  "variants": [
+   "elec"
+  ],
+  "entry": "gml_GlobalScript_scr_damage_maxhp",
+  "find": "if \\(target == (\\d) && \\(global\\.chararmor1\\[([123])\\] == 23 \\|\\| global\\.chararmor2\\[\\2\\] == 23\\)\\)",
+  "replace": "if (target == \\1 && knight_mantle_slot(\\1))",
+  "why": "Shadow Mantle (draws hits, takes a third of the damage) was checked on Kris for slot 1, Susie for slot 2 and Ralsei for slot 3 whoever stood there: with any other party it protected the wrong member (or nobody, or redirected hits to an empty slot). Now it is the mantle of the member in that slot.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 6
+ },
+ {
+  "id": "B06-mantle-a-violet-damage",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_GlobalScript_scr_damage",
+  "find": "if \\(global\\.chararmor1\\[1\\] == 23 \\|\\| global\\.chararmor2\\[1\\] == 23 \\|\\| global\\.chararmor1\\[2\\] == 23 \\|\\| global\\.chararmor2\\[2\\] == 23 \\|\\| global\\.chararmor1\\[3\\] == 23 \\|\\| global\\.chararmor2\\[3\\] == 23\\)",
+  "replace": "if (knight_mantle_party())",
+  "why": "Shadow Mantle (draws hits, takes a third of the damage) was checked on Kris for slot 1, Susie for slot 2 and Ralsei for slot 3 whoever stood there: with any other party it protected the wrong member (or nobody, or redirected hits to an empty slot). Now it is the mantle of the member in that slot.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 1
+ },
+ {
+  "id": "B06-mantle-b-violet-damage",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_GlobalScript_scr_damage",
+  "find": "if \\(global\\.hp\\[([123])\\] > 0 && \\(global\\.chararmor1\\[\\1\\] == 23 \\|\\| global\\.chararmor2\\[\\1\\] == 23\\)\\)",
+  "replace": "if (knight_slot_up(\\1 - 1) && knight_mantle_slot(\\1 - 1))",
+  "why": "Shadow Mantle (draws hits, takes a third of the damage) was checked on Kris for slot 1, Susie for slot 2 and Ralsei for slot 3 whoever stood there: with any other party it protected the wrong member (or nobody, or redirected hits to an empty slot). Now it is the mantle of the member in that slot.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 3
+ },
+ {
+  "id": "B06-mantle-c-violet-damage",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_GlobalScript_scr_damage",
+  "find": "if \\(global\\.hp\\[([123])\\] < 1 && target == (\\d)\\)",
+  "replace": "if (knight_slot_down(\\2) && target == \\2)",
+  "why": "Shadow Mantle (draws hits, takes a third of the damage) was checked on Kris for slot 1, Susie for slot 2 and Ralsei for slot 3 whoever stood there: with any other party it protected the wrong member (or nobody, or redirected hits to an empty slot). Now it is the mantle of the member in that slot.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 3
+ },
+ {
+  "id": "B06-mantle-d-violet-damage",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_GlobalScript_scr_damage",
+  "find": "if \\(\\(target == (\\d) && global\\.chararmor1\\[([123])\\] == 23\\) \\|\\| global\\.chararmor2\\[\\2\\] == 23\\)",
+  "replace": "if (target == \\1 && knight_mantle_slot(\\1))",
+  "why": "Shadow Mantle (draws hits, takes a third of the damage) was checked on Kris for slot 1, Susie for slot 2 and Ralsei for slot 3 whoever stood there: with any other party it protected the wrong member (or nobody, or redirected hits to an empty slot). Now it is the mantle of the member in that slot.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 3
+ },
+ {
+  "id": "B06-mantle-f-violet-damage",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_GlobalScript_scr_damage",
+  "find": "if \\(\\(global\\.chararmor1\\[([123])\\] == 23 \\|\\| global\\.chararmor2\\[\\1\\] == 23\\) && (target|hpi) == (\\d)\\)",
+  "replace": "if (knight_mantle_slot(\\3) && \\2 == \\3)",
+  "why": "Shadow Mantle (draws hits, takes a third of the damage) was checked on Kris for slot 1, Susie for slot 2 and Ralsei for slot 3 whoever stood there: with any other party it protected the wrong member (or nobody, or redirected hits to an empty slot). Now it is the mantle of the member in that slot.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 6
+ },
+ {
+  "id": "B06-mantle-a-violet-damage_maxhp",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_GlobalScript_scr_damage_maxhp",
+  "find": "if \\(global\\.chararmor1\\[1\\] == 23 \\|\\| global\\.chararmor2\\[1\\] == 23 \\|\\| global\\.chararmor1\\[2\\] == 23 \\|\\| global\\.chararmor2\\[2\\] == 23 \\|\\| global\\.chararmor1\\[3\\] == 23 \\|\\| global\\.chararmor2\\[3\\] == 23\\)",
+  "replace": "if (knight_mantle_party())",
+  "why": "Shadow Mantle (draws hits, takes a third of the damage) was checked on Kris for slot 1, Susie for slot 2 and Ralsei for slot 3 whoever stood there: with any other party it protected the wrong member (or nobody, or redirected hits to an empty slot). Now it is the mantle of the member in that slot.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 1
+ },
+ {
+  "id": "B06-mantle-b-violet-damage_maxhp",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_GlobalScript_scr_damage_maxhp",
+  "find": "if \\(global\\.hp\\[([123])\\] > 0 && \\(global\\.chararmor1\\[\\1\\] == 23 \\|\\| global\\.chararmor2\\[\\1\\] == 23\\)\\)",
+  "replace": "if (knight_slot_up(\\1 - 1) && knight_mantle_slot(\\1 - 1))",
+  "why": "Shadow Mantle (draws hits, takes a third of the damage) was checked on Kris for slot 1, Susie for slot 2 and Ralsei for slot 3 whoever stood there: with any other party it protected the wrong member (or nobody, or redirected hits to an empty slot). Now it is the mantle of the member in that slot.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 3
+ },
+ {
+  "id": "B06-mantle-c-violet-damage_maxhp",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_GlobalScript_scr_damage_maxhp",
+  "find": "if \\(global\\.hp\\[([123])\\] < 1 && target == (\\d)\\)",
+  "replace": "if (knight_slot_down(\\2) && target == \\2)",
+  "why": "Shadow Mantle (draws hits, takes a third of the damage) was checked on Kris for slot 1, Susie for slot 2 and Ralsei for slot 3 whoever stood there: with any other party it protected the wrong member (or nobody, or redirected hits to an empty slot). Now it is the mantle of the member in that slot.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 3
+ },
+ {
+  "id": "B06-mantle-e-violet-damage_maxhp",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_GlobalScript_scr_damage_maxhp",
+  "find": "if \\(target == (\\d) && \\(global\\.chararmor1\\[([123])\\] == 23 \\|\\| global\\.chararmor2\\[\\2\\] == 23\\)\\)",
+  "replace": "if (target == \\1 && knight_mantle_slot(\\1))",
+  "why": "Shadow Mantle (draws hits, takes a third of the damage) was checked on Kris for slot 1, Susie for slot 2 and Ralsei for slot 3 whoever stood there: with any other party it protected the wrong member (or nobody, or redirected hits to an empty slot). Now it is the mantle of the member in that slot.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 6
+ },
+ {
+  "id": "B06-mantle-a-thorn-damage",
+  "variants": [
+   "thorn"
+  ],
+  "entry": "gml_GlobalScript_scr_damage",
+  "find": "if \\(global\\.chararmor1\\[1\\] == 23 \\|\\| global\\.chararmor2\\[1\\] == 23 \\|\\| global\\.chararmor1\\[2\\] == 23 \\|\\| global\\.chararmor2\\[2\\] == 23 \\|\\| global\\.chararmor1\\[3\\] == 23 \\|\\| global\\.chararmor2\\[3\\] == 23\\)",
+  "replace": "if (knight_mantle_party())",
+  "why": "Shadow Mantle (draws hits, takes a third of the damage) was checked on Kris for slot 1, Susie for slot 2 and Ralsei for slot 3 whoever stood there: with any other party it protected the wrong member (or nobody, or redirected hits to an empty slot). Now it is the mantle of the member in that slot.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 1
+ },
+ {
+  "id": "B06-mantle-b-thorn-damage",
+  "variants": [
+   "thorn"
+  ],
+  "entry": "gml_GlobalScript_scr_damage",
+  "find": "if \\(global\\.hp\\[([123])\\] > 0 && \\(global\\.chararmor1\\[\\1\\] == 23 \\|\\| global\\.chararmor2\\[\\1\\] == 23\\)\\)",
+  "replace": "if (knight_slot_up(\\1 - 1) && knight_mantle_slot(\\1 - 1))",
+  "why": "Shadow Mantle (draws hits, takes a third of the damage) was checked on Kris for slot 1, Susie for slot 2 and Ralsei for slot 3 whoever stood there: with any other party it protected the wrong member (or nobody, or redirected hits to an empty slot). Now it is the mantle of the member in that slot.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 3
+ },
+ {
+  "id": "B06-mantle-c-thorn-damage",
+  "variants": [
+   "thorn"
+  ],
+  "entry": "gml_GlobalScript_scr_damage",
+  "find": "if \\(global\\.hp\\[([123])\\] < 1 && target == (\\d)\\)",
+  "replace": "if (knight_slot_down(\\2) && target == \\2)",
+  "why": "Shadow Mantle (draws hits, takes a third of the damage) was checked on Kris for slot 1, Susie for slot 2 and Ralsei for slot 3 whoever stood there: with any other party it protected the wrong member (or nobody, or redirected hits to an empty slot). Now it is the mantle of the member in that slot.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 3
+ },
+ {
+  "id": "B06-mantle-d-thorn-damage",
+  "variants": [
+   "thorn"
+  ],
+  "entry": "gml_GlobalScript_scr_damage",
+  "find": "if \\(\\(target == (\\d) && global\\.chararmor1\\[([123])\\] == 23\\) \\|\\| global\\.chararmor2\\[\\2\\] == 23\\)",
+  "replace": "if (target == \\1 && knight_mantle_slot(\\1))",
+  "why": "Shadow Mantle (draws hits, takes a third of the damage) was checked on Kris for slot 1, Susie for slot 2 and Ralsei for slot 3 whoever stood there: with any other party it protected the wrong member (or nobody, or redirected hits to an empty slot). Now it is the mantle of the member in that slot.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 3
+ },
+ {
+  "id": "B06-mantle-f-thorn-damage",
+  "variants": [
+   "thorn"
+  ],
+  "entry": "gml_GlobalScript_scr_damage",
+  "find": "if \\(\\(global\\.chararmor1\\[([123])\\] == 23 \\|\\| global\\.chararmor2\\[\\1\\] == 23\\) && (target|hpi) == (\\d)\\)",
+  "replace": "if (knight_mantle_slot(\\3) && \\2 == \\3)",
+  "why": "Shadow Mantle (draws hits, takes a third of the damage) was checked on Kris for slot 1, Susie for slot 2 and Ralsei for slot 3 whoever stood there: with any other party it protected the wrong member (or nobody, or redirected hits to an empty slot). Now it is the mantle of the member in that slot.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 6
+ },
+ {
+  "id": "B06-mantle-a-thorn-damage_maxhp",
+  "variants": [
+   "thorn"
+  ],
+  "entry": "gml_GlobalScript_scr_damage_maxhp",
+  "find": "if \\(global\\.chararmor1\\[1\\] == 23 \\|\\| global\\.chararmor2\\[1\\] == 23 \\|\\| global\\.chararmor1\\[2\\] == 23 \\|\\| global\\.chararmor2\\[2\\] == 23 \\|\\| global\\.chararmor1\\[3\\] == 23 \\|\\| global\\.chararmor2\\[3\\] == 23\\)",
+  "replace": "if (knight_mantle_party())",
+  "why": "Shadow Mantle (draws hits, takes a third of the damage) was checked on Kris for slot 1, Susie for slot 2 and Ralsei for slot 3 whoever stood there: with any other party it protected the wrong member (or nobody, or redirected hits to an empty slot). Now it is the mantle of the member in that slot.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 1
+ },
+ {
+  "id": "B06-mantle-b-thorn-damage_maxhp",
+  "variants": [
+   "thorn"
+  ],
+  "entry": "gml_GlobalScript_scr_damage_maxhp",
+  "find": "if \\(global\\.hp\\[([123])\\] > 0 && \\(global\\.chararmor1\\[\\1\\] == 23 \\|\\| global\\.chararmor2\\[\\1\\] == 23\\)\\)",
+  "replace": "if (knight_slot_up(\\1 - 1) && knight_mantle_slot(\\1 - 1))",
+  "why": "Shadow Mantle (draws hits, takes a third of the damage) was checked on Kris for slot 1, Susie for slot 2 and Ralsei for slot 3 whoever stood there: with any other party it protected the wrong member (or nobody, or redirected hits to an empty slot). Now it is the mantle of the member in that slot.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 3
+ },
+ {
+  "id": "B06-mantle-c-thorn-damage_maxhp",
+  "variants": [
+   "thorn"
+  ],
+  "entry": "gml_GlobalScript_scr_damage_maxhp",
+  "find": "if \\(global\\.hp\\[([123])\\] < 1 && target == (\\d)\\)",
+  "replace": "if (knight_slot_down(\\2) && target == \\2)",
+  "why": "Shadow Mantle (draws hits, takes a third of the damage) was checked on Kris for slot 1, Susie for slot 2 and Ralsei for slot 3 whoever stood there: with any other party it protected the wrong member (or nobody, or redirected hits to an empty slot). Now it is the mantle of the member in that slot.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 3
+ },
+ {
+  "id": "B06-mantle-e-thorn-damage_maxhp",
+  "variants": [
+   "thorn"
+  ],
+  "entry": "gml_GlobalScript_scr_damage_maxhp",
+  "find": "if \\(target == (\\d) && \\(global\\.chararmor1\\[([123])\\] == 23 \\|\\| global\\.chararmor2\\[\\2\\] == 23\\)\\)",
+  "replace": "if (target == \\1 && knight_mantle_slot(\\1))",
+  "why": "Shadow Mantle (draws hits, takes a third of the damage) was checked on Kris for slot 1, Susie for slot 2 and Ralsei for slot 3 whoever stood there: with any other party it protected the wrong member (or nobody, or redirected hits to an empty slot). Now it is the mantle of the member in that slot.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 6
+ },
+ {
+  "id": "B06-mantle-a-cyan-damage",
+  "variants": [
+   "cyan"
+  ],
+  "entry": "gml_GlobalScript_scr_damage",
+  "find": "if \\(global\\.chararmor1\\[1\\] == 23 \\|\\| global\\.chararmor2\\[1\\] == 23 \\|\\| global\\.chararmor1\\[2\\] == 23 \\|\\| global\\.chararmor2\\[2\\] == 23 \\|\\| global\\.chararmor1\\[3\\] == 23 \\|\\| global\\.chararmor2\\[3\\] == 23\\)",
+  "replace": "if (knight_mantle_party())",
+  "why": "Shadow Mantle (draws hits, takes a third of the damage) was checked on Kris for slot 1, Susie for slot 2 and Ralsei for slot 3 whoever stood there: with any other party it protected the wrong member (or nobody, or redirected hits to an empty slot). Now it is the mantle of the member in that slot.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 1
+ },
+ {
+  "id": "B06-mantle-b-cyan-damage",
+  "variants": [
+   "cyan"
+  ],
+  "entry": "gml_GlobalScript_scr_damage",
+  "find": "if \\(global\\.hp\\[([123])\\] > 0 && \\(global\\.chararmor1\\[\\1\\] == 23 \\|\\| global\\.chararmor2\\[\\1\\] == 23\\)\\)",
+  "replace": "if (knight_slot_up(\\1 - 1) && knight_mantle_slot(\\1 - 1))",
+  "why": "Shadow Mantle (draws hits, takes a third of the damage) was checked on Kris for slot 1, Susie for slot 2 and Ralsei for slot 3 whoever stood there: with any other party it protected the wrong member (or nobody, or redirected hits to an empty slot). Now it is the mantle of the member in that slot.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 3
+ },
+ {
+  "id": "B06-mantle-c-cyan-damage",
+  "variants": [
+   "cyan"
+  ],
+  "entry": "gml_GlobalScript_scr_damage",
+  "find": "if \\(global\\.hp\\[([123])\\] < 1 && target == (\\d)\\)",
+  "replace": "if (knight_slot_down(\\2) && target == \\2)",
+  "why": "Shadow Mantle (draws hits, takes a third of the damage) was checked on Kris for slot 1, Susie for slot 2 and Ralsei for slot 3 whoever stood there: with any other party it protected the wrong member (or nobody, or redirected hits to an empty slot). Now it is the mantle of the member in that slot.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 3
+ },
+ {
+  "id": "B06-mantle-d-cyan-damage",
+  "variants": [
+   "cyan"
+  ],
+  "entry": "gml_GlobalScript_scr_damage",
+  "find": "if \\(\\(target == (\\d) && global\\.chararmor1\\[([123])\\] == 23\\) \\|\\| global\\.chararmor2\\[\\2\\] == 23\\)",
+  "replace": "if (target == \\1 && knight_mantle_slot(\\1))",
+  "why": "Shadow Mantle (draws hits, takes a third of the damage) was checked on Kris for slot 1, Susie for slot 2 and Ralsei for slot 3 whoever stood there: with any other party it protected the wrong member (or nobody, or redirected hits to an empty slot). Now it is the mantle of the member in that slot.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 3
+ },
+ {
+  "id": "B06-mantle-f-cyan-damage",
+  "variants": [
+   "cyan"
+  ],
+  "entry": "gml_GlobalScript_scr_damage",
+  "find": "if \\(\\(global\\.chararmor1\\[([123])\\] == 23 \\|\\| global\\.chararmor2\\[\\1\\] == 23\\) && (target|hpi) == (\\d)\\)",
+  "replace": "if (knight_mantle_slot(\\3) && \\2 == \\3)",
+  "why": "Shadow Mantle (draws hits, takes a third of the damage) was checked on Kris for slot 1, Susie for slot 2 and Ralsei for slot 3 whoever stood there: with any other party it protected the wrong member (or nobody, or redirected hits to an empty slot). Now it is the mantle of the member in that slot.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 6
+ },
+ {
+  "id": "B06-mantle-a-cyan-damage_maxhp",
+  "variants": [
+   "cyan"
+  ],
+  "entry": "gml_GlobalScript_scr_damage_maxhp",
+  "find": "if \\(global\\.chararmor1\\[1\\] == 23 \\|\\| global\\.chararmor2\\[1\\] == 23 \\|\\| global\\.chararmor1\\[2\\] == 23 \\|\\| global\\.chararmor2\\[2\\] == 23 \\|\\| global\\.chararmor1\\[3\\] == 23 \\|\\| global\\.chararmor2\\[3\\] == 23\\)",
+  "replace": "if (knight_mantle_party())",
+  "why": "Shadow Mantle (draws hits, takes a third of the damage) was checked on Kris for slot 1, Susie for slot 2 and Ralsei for slot 3 whoever stood there: with any other party it protected the wrong member (or nobody, or redirected hits to an empty slot). Now it is the mantle of the member in that slot.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 1
+ },
+ {
+  "id": "B06-mantle-b-cyan-damage_maxhp",
+  "variants": [
+   "cyan"
+  ],
+  "entry": "gml_GlobalScript_scr_damage_maxhp",
+  "find": "if \\(global\\.hp\\[([123])\\] > 0 && \\(global\\.chararmor1\\[\\1\\] == 23 \\|\\| global\\.chararmor2\\[\\1\\] == 23\\)\\)",
+  "replace": "if (knight_slot_up(\\1 - 1) && knight_mantle_slot(\\1 - 1))",
+  "why": "Shadow Mantle (draws hits, takes a third of the damage) was checked on Kris for slot 1, Susie for slot 2 and Ralsei for slot 3 whoever stood there: with any other party it protected the wrong member (or nobody, or redirected hits to an empty slot). Now it is the mantle of the member in that slot.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 3
+ },
+ {
+  "id": "B06-mantle-c-cyan-damage_maxhp",
+  "variants": [
+   "cyan"
+  ],
+  "entry": "gml_GlobalScript_scr_damage_maxhp",
+  "find": "if \\(global\\.hp\\[([123])\\] < 1 && target == (\\d)\\)",
+  "replace": "if (knight_slot_down(\\2) && target == \\2)",
+  "why": "Shadow Mantle (draws hits, takes a third of the damage) was checked on Kris for slot 1, Susie for slot 2 and Ralsei for slot 3 whoever stood there: with any other party it protected the wrong member (or nobody, or redirected hits to an empty slot). Now it is the mantle of the member in that slot.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 3
+ },
+ {
+  "id": "B06-mantle-e-cyan-damage_maxhp",
+  "variants": [
+   "cyan"
+  ],
+  "entry": "gml_GlobalScript_scr_damage_maxhp",
+  "find": "if \\(target == (\\d) && \\(global\\.chararmor1\\[([123])\\] == 23 \\|\\| global\\.chararmor2\\[\\2\\] == 23\\)\\)",
+  "replace": "if (target == \\1 && knight_mantle_slot(\\1))",
+  "why": "Shadow Mantle (draws hits, takes a third of the damage) was checked on Kris for slot 1, Susie for slot 2 and Ralsei for slot 3 whoever stood there: with any other party it protected the wrong member (or nobody, or redirected hits to an empty slot). Now it is the mantle of the member in that slot.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 6
+ },
+ {
+  "id": "B07-wr-noheal-base",
+  "variants": [
+   "base"
+  ],
+  "entry": "gml_GlobalScript_scr_heal",
+  "find": "    if (knight_noheal_active())\n    {\n        abovemaxhp = 0;\n        belowzero = 0;\n        return 0;\n    }\n",
+  "replace": "    if (knight_noheal_active())\n    {\n        abovemaxhp = 0;\n        belowzero = 0;\n        return 0;\n    }\n    if (knight_wr_noheal(arg0))\n    {\n        abovemaxhp = 0;\n        belowzero = 0;\n        return 0;\n    }\n",
+  "why": "Weird Route: the member the Knight takes stays down for the rest of the fight.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "B07-wr-noheal-kaizo",
+  "variants": [
+   "kaizo"
+  ],
+  "entry": "gml_GlobalScript_scr_heal",
+  "find": "    if (knight_noheal_active())\n    {\n        abovemaxhp = 0;\n        belowzero = 0;\n        return 0;\n    }\n",
+  "replace": "    if (knight_noheal_active())\n    {\n        abovemaxhp = 0;\n        belowzero = 0;\n        return 0;\n    }\n    if (knight_wr_noheal(arg0))\n    {\n        abovemaxhp = 0;\n        belowzero = 0;\n        return 0;\n    }\n",
+  "why": "Weird Route: the member the Knight takes stays down for the rest of the fight.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "B07-wr-noheal-elec",
+  "variants": [
+   "elec"
+  ],
+  "entry": "gml_GlobalScript_scr_heal",
+  "find": "    if (knight_noheal_active())\n    {\n        abovemaxhp = 0;\n        belowzero = 0;\n        return 0;\n    }\n",
+  "replace": "    if (knight_noheal_active())\n    {\n        abovemaxhp = 0;\n        belowzero = 0;\n        return 0;\n    }\n    if (knight_wr_noheal(arg0))\n    {\n        abovemaxhp = 0;\n        belowzero = 0;\n        return 0;\n    }\n",
+  "why": "Weird Route: the member the Knight takes stays down for the rest of the fight.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "B07-wr-noheal-violet",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_GlobalScript_scr_heal",
+  "find": "    if (knight_noheal_active())\n    {\n        abovemaxhp = 0;\n        belowzero = 0;\n        return 0;\n    }\n",
+  "replace": "    if (knight_noheal_active())\n    {\n        abovemaxhp = 0;\n        belowzero = 0;\n        return 0;\n    }\n    if (knight_wr_noheal(arg0))\n    {\n        abovemaxhp = 0;\n        belowzero = 0;\n        return 0;\n    }\n",
+  "why": "Weird Route: the member the Knight takes stays down for the rest of the fight.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "B07-wr-noheal-thorn",
+  "variants": [
+   "thorn"
+  ],
+  "entry": "gml_GlobalScript_scr_heal",
+  "find": "    if (knight_noheal_active())\n    {\n        abovemaxhp = 0;\n        belowzero = 0;\n        return 0;\n    }\n",
+  "replace": "    if (knight_noheal_active())\n    {\n        abovemaxhp = 0;\n        belowzero = 0;\n        return 0;\n    }\n    if (knight_wr_noheal(arg0))\n    {\n        abovemaxhp = 0;\n        belowzero = 0;\n        return 0;\n    }\n",
+  "why": "Weird Route: the member the Knight takes stays down for the rest of the fight.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "B07-wr-noheal-cyan",
+  "variants": [
+   "cyan"
+  ],
+  "entry": "gml_GlobalScript_scr_heal",
+  "find": "    if (knight_noheal_active())\n    {\n        abovemaxhp = 0;\n        belowzero = 0;\n        return 0;\n    }\n",
+  "replace": "    if (knight_noheal_active())\n    {\n        abovemaxhp = 0;\n        belowzero = 0;\n        return 0;\n    }\n    if (knight_wr_noheal(arg0))\n    {\n        abovemaxhp = 0;\n        belowzero = 0;\n        return 0;\n    }\n",
+  "why": "Weird Route: the member the Knight takes stays down for the rest of the fight.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "B08-wr-turnend-base",
+  "variants": [
+   "base"
+  ],
+  "entry": "gml_GlobalScript_scr_mnendturn",
+  "find": "                tempitem[i][j] = global.item[i];\n            }\n        }\n    }\n}",
+  "replace": "                tempitem[i][j] = global.item[i];\n            }\n        }\n        knight_wr_turnend();\n    }\n}",
+  "why": "Weird Route on a knight without a Side B: halfway through its attack list the Knight takes one member (hub scene, knight_wr_*).",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "B08-wr-turnend-elec",
+  "variants": [
+   "elec"
+  ],
+  "entry": "gml_GlobalScript_scr_mnendturn",
+  "find": "                tempitem[i][j] = global.item[i];\n            }\n        }\n    }\n}",
+  "replace": "                tempitem[i][j] = global.item[i];\n            }\n        }\n        knight_wr_turnend();\n    }\n}",
+  "why": "Weird Route on a knight without a Side B: halfway through its attack list the Knight takes one member (hub scene, knight_wr_*).",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "B08-wr-turnend-thorn",
+  "variants": [
+   "thorn"
+  ],
+  "entry": "gml_GlobalScript_scr_mnendturn",
+  "find": "                tempitem[i][j] = global.item[i];\n            }\n        }\n    }\n}",
+  "replace": "                tempitem[i][j] = global.item[i];\n            }\n        }\n        knight_wr_turnend();\n    }\n}",
+  "why": "Weird Route on a knight without a Side B: halfway through its attack list the Knight takes one member (hub scene, knight_wr_*).",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "B08-wr-turnend-cyan",
+  "variants": [
+   "cyan"
+  ],
+  "entry": "gml_GlobalScript_scr_mnendturn",
+  "find": "                tempitem[i][j] = global.item[i];\n            }\n        }\n    }\n}",
+  "replace": "                tempitem[i][j] = global.item[i];\n            }\n        }\n        knight_wr_turnend();\n    }\n}",
+  "why": "Weird Route on a knight without a Side B: halfway through its attack list the Knight takes one member (hub scene, knight_wr_*).",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "B09-noelle-sideb-look-base",
+  "variants": [
+   "base"
+  ],
+  "entry": "gml_Object_obj_heroparent_Create_0",
+  "find": "    _sideb = 0;\n    if (_sideb == 1)\n",
+  "replace": "    _sideb = global.flag[456] > 0;\n    if (_sideb == 1)\n",
+  "why": "Weird Route: Noelle uses her Side B battle sprites (the game's own) in every fight, like Kaizo Knight shows her.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "B09-noelle-sideb-look-elec",
+  "variants": [
+   "elec"
+  ],
+  "entry": "gml_Object_obj_heroparent_Create_0",
+  "find": "    _sideb = 0;\n    if (_sideb == 1)\n",
+  "replace": "    _sideb = global.flag[456] > 0;\n    if (_sideb == 1)\n",
+  "why": "Weird Route: Noelle uses her Side B battle sprites (the game's own) in every fight, like Kaizo Knight shows her.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "B09-noelle-sideb-look-violet",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_heroparent_Create_0",
+  "find": "    _sideb = 0;\n    if (_sideb == 1)\n",
+  "replace": "    _sideb = global.flag[456] > 0;\n    if (_sideb == 1)\n",
+  "why": "Weird Route: Noelle uses her Side B battle sprites (the game's own) in every fight, like Kaizo Knight shows her.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "B09-noelle-sideb-look-thorn",
+  "variants": [
+   "thorn"
+  ],
+  "entry": "gml_Object_obj_heroparent_Create_0",
+  "find": "    _sideb = 0;\n    if (_sideb == 1)\n",
+  "replace": "    _sideb = global.flag[456] > 0;\n    if (_sideb == 1)\n",
+  "why": "Weird Route: Noelle uses her Side B battle sprites (the game's own) in every fight, like Kaizo Knight shows her.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "B09-noelle-sideb-look-cyan",
+  "variants": [
+   "cyan"
+  ],
+  "entry": "gml_Object_obj_heroparent_Create_0",
+  "find": "    _sideb = 0;\n    if (_sideb == 1)\n",
+  "replace": "    _sideb = global.flag[456] > 0;\n    if (_sideb == 1)\n",
+  "why": "Weird Route: Noelle uses her Side B battle sprites (the game's own) in every fight, like Kaizo Knight shows her.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "B10-vb-init",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Create_0",
+  "find": "kill_skipped = 0;\n",
+  "replace": "kill_skipped = 0;\nknight_vb_init();\n",
+  "why": "Side B state for parties without Kris (who finishes the fight, the extra S/R/N-Actions).",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "B11-vb-route9",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Step_0",
+  "find": "    if (kill_target == 1410)\n    {\n        knightkillcon = 30;\n    }\n    else if (!scr_havechar(2))\n    {\n        knightkillcon = 10;\n    }\n    else if (global.hp[2] > 0)\n    {\n        knightkillcon = 11;\n    }\n    else\n    {\n        knightkillcon = 50;\n    }\n",
+  "replace": "    knightkillcon = knight_vb_route9();\n",
+  "why": "After the loss: Ralsei reacts first when the Angel falls (no Kris), Susie's second reaction when she loses Ralsei too (no Kris), otherwise the mod's own route (Kris scene, Susie scene, or straight on).",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "B12-vb-endkill",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Step_0",
+  "find": "if (knightkillcon == 10 && kill_target == obj_heroralsei && !kill_skipped && scr_havechar(4)",
+  "replace": "if (knightkillcon == 10 && !knight_vb_kris())\n{\n    knight_vb_end_kill();\n}\nif (knightkillcon == 10 && kill_target == obj_heroralsei && !kill_skipped && scr_havechar(4)",
+  "why": "Without Kris the consequences of a loss are the hub's (Susie's own RED BUSTER, then the finisher scene) instead of the mod's Kris ACTs.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "B13-vb-extra",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Step_0",
+  "find": "if (knight_marker != -4)\n",
+  "replace": "knight_vb_extra();\nif (knight_marker != -4)\n",
+  "why": "Scenes added for parties without Kris: Ralsei's reaction, Susie's second reaction, the finisher's power-up flurry.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "B14-vb-acts",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Step_0",
+  "find": "if (global.myfight == 3)\n{\n    xx = __view_get(e__VW.XView, 0);\n    yy = __view_get(e__VW.YView, 0);\n",
+  "replace": "if (global.myfight == 3)\n{\n    xx = __view_get(e__VW.XView, 0);\n    yy = __view_get(e__VW.YView, 0);\n    knight_vb_acts();\n",
+  "why": "The S/R/N-Actions added without Kris (RED BUSTER, the finisher) run before the mod's own ACT handlers and use the action up.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "B15-vb-finhp",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Step_0",
+  "find": "        global.maxhp[1] += _krisiscomicallypowerfulnow;\n        global.hp[1] += _krisiscomicallypowerfulnow;\n",
+  "replace": "        var _vbfc = knight_vb_fin_char();\n        global.maxhp[_vbfc] += _krisiscomicallypowerfulnow;\n        global.hp[_vbfc] += _krisiscomicallypowerfulnow;\n",
+  "why": "The finale's joke max-HP reward goes to whoever finished the Knight.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "B16-vb-won",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Step_0",
+  "find": "        global.specialbattle = 0;\n        scr_endcombat();\n    }\n",
+  "replace": "        knight_battle_won();\n        global.specialbattle = 0;\n        scr_endcombat();\n    }\n",
+  "why": "A Side B clear never reached the battle-won hook (it skips the PTB02 con 8 step), so it was not recorded as a win.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "B17-kz-init",
+  "variants": [
+   "kaizo"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Step_0",
+  "find": "        global.actcost[myself][2] = 62.5;\n        k_tpscene = 0;\n",
+  "replace": "        global.actcost[myself][2] = 62.5;\n        knight_kz_init();\n        k_tpscene = 0;\n",
+  "why": "Side B without Kris: Susie gets a RudeBuster S-Action (25% TP) in place of the X-Slash ACT only Kris could use.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "B18-kz-acts",
+  "variants": [
+   "kaizo"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Step_0",
+  "find": "    yy = __view_get(e__VW.YView, 0);\n",
+  "replace": "    yy = __view_get(e__VW.YView, 0);\n    knight_kz_acts();\n",
+  "why": "The RudeBuster S-Action runs before the mod's own S-Action handlers (which read index 1 as HoldBreath without Kris) and uses the action up.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ }
+]

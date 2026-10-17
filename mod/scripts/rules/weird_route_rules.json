@@ -1,0 +1,507 @@
+[
+ {
+  "id": "W01-v-sideb-needs-kris",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Create_0",
+  "find": "v_sideb = global.flag[456] && scr_havechar(1) && scr_havechar(2) && scr_havechar(3);",
+  "replace": "v_sideb = global.flag[456];",
+  "why": "Weird Route (Violet) works for every party (build 37): with Kris the mod's own story plays; without Kris the member who stays to the end finishes the fight (knight_vb_* in the hub).",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "W02-kill1-target",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Other_19",
+  "find": "kill_target = 1411;",
+  "replace": "kill_target = knight_vb_victim(1);",
+  "why": "Phase-1 loss: with Kris Ralsei, else Noelle; without Kris the Angel (Noelle), else Ralsei; nobody -> scene skipped (knight_vb_victim).",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "W03-kill2-target",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Other_19",
+  "find": "kill_target = 1410;",
+  "replace": "kill_target = knight_vb_victim(2);",
+  "why": "Phase-2 loss: with Kris Susie; without Kris Ralsei (when the Angel went first); nobody -> scene skipped.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true,
+  "count": 2
+ },
+ {
+  "id": "W04-kill-skip",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Step_0",
+  "find": "if (knightkillcon == 2)\n{\n",
+  "replace": "if (knightkillcon == 2 && kill_target == -4)\n{\n    kill_skipped = 1;\n    if (knight_vb_kris())\n    {\n        if (phase == 3)\n        {\n            kill_target = obj_herosusie;\n            knightkillcon = 30;\n        }\n        else\n        {\n            kill_target = obj_heroralsei;\n            snd_stop(global.batmusic[0]);\n            knightkillcon = 10;\n        }\n    }\n    else\n    {\n        if (phase < 3)\n            snd_stop(global.batmusic[0]);\n        knightkillcon = 10;\n    }\n}\nif (knightkillcon == 2)\n{\n",
+  "why": "Nobody to lose in this phase: skip the scripted loss but still apply its consequences (stronger Knight, ACT unlock; without Kris the finisher scene).",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "W05-kill-name",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Step_0",
+  "find": "        var personwhosgonnadie = \"ralsei\";\n        if (kill_target == 1410)\n        {\n            personwhosgonnadie = \"susie\";\n        }\n",
+  "replace": "        var personwhosgonnadie = \"ralsei\";\n        if (kill_target == 1410)\n        {\n            personwhosgonnadie = \"susie\";\n        }\n        if (kill_target == obj_heronoelle)\n        {\n            personwhosgonnadie = \"noelle\";\n        }\n",
+  "why": "Noelle can take the phase-1 loss.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "W06-kill-susie-shock",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Step_0",
+  "find": "        if (kill_target == 1411)\n        {\n            snd_stop(global.batmusic[0]);\n            if (global.hp[2] > 0)\n",
+  "replace": "        if (kill_target != obj_herosusie)\n        {\n            snd_stop(global.batmusic[0]);\n            if (scr_havechar(2) && global.hp[2] > 0)\n",
+  "why": "Susie shock only if Susie is in the party; Noelle counts as the phase-1 loss too.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "W07-kill9-route",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Step_0",
+  "find": "    else if (global.hp[2] > 0)\n    {\n        knightkillcon = 11;\n    }\n    else\n    {\n        knightkillcon = 50;\n    }\n",
+  "replace": "    else if (!scr_havechar(2))\n    {\n        knightkillcon = 10;\n    }\n    else if (global.hp[2] > 0)\n    {\n        knightkillcon = 11;\n    }\n    else\n    {\n        knightkillcon = 50;\n    }\n",
+  "why": "No Susie: no reaction scene after the phase-1 loss.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "W08-msg1",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Step_0",
+  "find": "global.battlemsg[0] = stringsetsub(\"* ~1 was completely obliterated.&* The enemy became stronger.\", ralseititle);",
+  "replace": "if (variable_instance_exists(id, \"kill_skipped\") && kill_skipped)\n            global.battlemsg[0] = \"* The enemy became stronger.\";\n        else\n            global.battlemsg[0] = stringsetsub(\"* ~1 was completely obliterated.&* The enemy became stronger.\", (kill_target == obj_heronoelle) ? \"The Angel\" : ralseititle);\n        kill_skipped = 0;",
+  "why": "Message follows who was actually lost.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "W09-msg2",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Step_0",
+  "find": "global.battlemsg[0] = stringsetsub(\"* ~1 never stood a chance.&* The enemy became stronger.\", susietitle);",
+  "replace": "if (variable_instance_exists(id, \"kill_skipped\") && kill_skipped)\n            global.battlemsg[0] = \"* The enemy became stronger.\";\n        else\n            global.battlemsg[0] = stringsetsub(\"* ~1 never stood a chance.&* The enemy became stronger.\", susietitle);\n        kill_skipped = 0;",
+  "why": "Message follows who was actually lost.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "W10-redbuster-needs-susie",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Step_0",
+  "find": "        global.canact[myself][2] = 1;\n        global.actactor[myself][2] = 2;\n        global.actname[myself][2] = stringset(\"RedBuster\");\n        global.actdesc[myself][2] = stringset(\"Red#Damage\");\n        global.actcost[myself][2] = 150;\n        whatsact3 = \"redbuster\";\n",
+  "replace": "        if (scr_havechar(2))\n        {\n            global.canact[myself][2] = 1;\n            global.actactor[myself][2] = 2;\n            global.actname[myself][2] = stringset(\"RedBuster\");\n            global.actdesc[myself][2] = stringset(\"Red#Damage\");\n            global.actcost[myself][2] = 150;\n            whatsact3 = \"redbuster\";\n        }\n",
+  "why": "RED BUSTER is Susie's ACT: only unlocked when Susie is in the party.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "W11-susie-line1",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Step_0",
+  "find": "msgset(0, \"R^3-Ralsei...?\\\\s0/%\");",
+  "replace": "if (kill_target == obj_heronoelle)\n            msgset(0, \"N^3-Noelle...?\\\\s0/%\");\n        else\n            msgset(0, \"R^3-Ralsei...?\\\\s0/%\");",
+  "why": "Unique Susie reaction when it is Noelle.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "W12-susie-line2",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Step_0",
+  "find": "msgset(0, \"I'll..^2. make..^2.&YOU..^2. SUFFER!/%\");",
+  "replace": "if (kill_target == obj_heronoelle)\n    {\n        msgset(0, \"I'LL..^2. TEAR..^2.&YOU..^2. APART!!!/%\");\n        with (obj_herosusie)\n        {\n            scr_shakeobj();\n        }\n        snd_play(snd_noise);\n    }\n    else\n        msgset(0, \"I'll..^2. make..^2.&YOU..^2. SUFFER!/%\");",
+  "why": "Unique Susie reaction when it is Noelle.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "W13-susie-line3",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Step_0",
+  "find": "msgnext(\"R..^2. Ralsei...?/\");",
+  "replace": "msgnext((kill_target == obj_heronoelle) ? \"N..^2. Noelle...?/\" : \"R..^2. Ralsei...?/\");",
+  "why": "Unique Susie reaction when it is Noelle.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "W14-kill-char-any-slot",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_GlobalScript_scr_complete_save_file",
+  "find": "    if (personwhosabouttosuperdie == \"ralsei\")\n    {\n        global.hp[3] = global.hp[3] - howmuchsaidpersonisgonnasuperdie;\n        global.char[2] = 0;\n        global.faceaction[2] = 8;\n        scr_dead(2);\n        with (obj_heroralsei)\n        {\n            var rald = instance_create(x, y, obj_deathanim);\n            rald.sprite_index = sprite_index;\n            rald.depth = depth - 1;\n            rald.image_xscale = 2;\n            rald.image_yscale = 2;\n            visible = 0;\n            x -= 600;\n        }\n    }\n    else if (personwhosabouttosuperdie == \"susie\")\n    {\n        global.hp[2] = global.hp[2] - howmuchsaidpersonisgonnasuperdie;\n        global.char[1] = 0;\n        global.faceaction[1] = 8;\n        scr_dead(1);\n        with (obj_herosusie)\n        {\n            var susd = instance_create(x, y, obj_deathanim);\n            susd.sprite_index = sprite_index;\n            susd.depth = depth - 1;\n            susd.image_xscale = 2;\n            susd.image_yscale = 2;\n            visible = 0;\n            x -= 600;\n        }\n    }",
+  "replace": "    var _cid = 3;\n    var _obj = obj_heroralsei;\n    if (personwhosabouttosuperdie == \"susie\")\n    {\n        _cid = 2;\n        _obj = obj_herosusie;\n    }\n    if (personwhosabouttosuperdie == \"noelle\")\n    {\n        _cid = 4;\n        _obj = obj_heronoelle;\n    }\n    global.hp[_cid] = global.hp[_cid] - howmuchsaidpersonisgonnasuperdie;\n    for (var _s = 0; _s < 3; _s++)\n    {\n        if (global.char[_s] == _cid)\n        {\n            global.char[_s] = 0;\n            global.faceaction[_s] = 8;\n            scr_dead(_s);\n        }\n    }\n    with (_obj)\n    {\n        var _d = instance_create(x, y, obj_deathanim);\n        _d.sprite_index = sprite_index;\n        _d.depth = depth - 1;\n        _d.image_xscale = 2;\n        _d.image_yscale = 2;\n        visible = 0;\n        x -= 600;\n    }",
+  "why": "scr_vsideb_kill_char hard-coded char slots 1/2: now removes every slot holding that character (duplicates included) and supports Noelle.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "W15-kill-skipped-init",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Create_0",
+  "find": "kill_target = -4;",
+  "replace": "kill_target = -4;\nkill_skipped = 0;",
+  "why": "init",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "W16-kaizo-sideb-end",
+  "variants": [
+   "kaizo"
+  ],
+  "entry": "gml_Object_obj_ch3_PTB02_Step_0",
+  "find": "    if (con == 49 && global.flag[456])\n    {\n        con = 49.1;\n    }\n",
+  "replace": "",
+  "why": "Kaizo Side-B victory had no handler for con 49.1 (soft-lock on a white screen). It now uses the normal victory sequence.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "S01-setdirection-bounds-base",
+  "variants": [
+   "base"
+  ],
+  "entry": "gml_Object_obj_tracking_swords_manager_Step_0",
+  "find": "if \\(setdirection\\[setcount\\] != -1\\)",
+  "replace": "if (setcount < array_length(setdirection) && setdirection[setcount] != -1)",
+  "why": "Long Tracking Swords turns advance setcount past the end of setdirection (400 in Violet, 200 in Kaizo): array read out of range = crash in GameMaker. Guarded.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true
+ },
+ {
+  "id": "S01-setdirection-bounds-kaizo",
+  "variants": [
+   "kaizo"
+  ],
+  "entry": "gml_Object_obj_tracking_swords_manager_Step_0",
+  "find": "if \\(setdirection\\[setcount\\] != -1\\)",
+  "replace": "if (setcount < array_length(setdirection) && setdirection[setcount] != -1)",
+  "why": "Long Tracking Swords turns advance setcount past the end of setdirection (400 in Violet, 200 in Kaizo): array read out of range = crash in GameMaker. Guarded.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true
+ },
+ {
+  "id": "S01-setdirection-bounds-elec",
+  "variants": [
+   "elec"
+  ],
+  "entry": "gml_Object_obj_tracking_swords_manager_Step_0",
+  "find": "if \\(setdirection\\[setcount\\] != -1\\)",
+  "replace": "if (setcount < array_length(setdirection) && setdirection[setcount] != -1)",
+  "why": "Long Tracking Swords turns advance setcount past the end of setdirection (400 in Violet, 200 in Kaizo): array read out of range = crash in GameMaker. Guarded.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true
+ },
+ {
+  "id": "S01-setdirection-bounds-violet",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_tracking_swords_manager_Step_0",
+  "find": "if \\(setdirection\\[setcount\\] != -1\\)",
+  "replace": "if (setcount < array_length(setdirection) && setdirection[setcount] != -1)",
+  "why": "Long Tracking Swords turns advance setcount past the end of setdirection (400 in Violet, 200 in Kaizo): array read out of range = crash in GameMaker. Guarded.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true
+ },
+ {
+  "id": "S01-setdirection-bounds-thorn",
+  "variants": [
+   "thorn"
+  ],
+  "entry": "gml_Object_obj_tracking_swords_manager_Step_0",
+  "find": "if \\(setdirection\\[setcount\\] != -1\\)",
+  "replace": "if (setcount < array_length(setdirection) && setdirection[setcount] != -1)",
+  "why": "Long Tracking Swords turns advance setcount past the end of setdirection (400 in Violet, 200 in Kaizo): array read out of range = crash in GameMaker. Guarded.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true
+ },
+ {
+  "id": "S01-setdirection-bounds-cyan",
+  "variants": [
+   "cyan"
+  ],
+  "entry": "gml_Object_obj_tracking_swords_manager_Step_0",
+  "find": "if \\(setdirection\\[setcount\\] != -1\\)",
+  "replace": "if (setcount < array_length(setdirection) && setdirection[setcount] != -1)",
+  "why": "Long Tracking Swords turns advance setcount past the end of setdirection (400 in Violet, 200 in Kaizo): array read out of range = crash in GameMaker. Guarded.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true
+ },
+ {
+  "id": "S02-cyan-random-args",
+  "variants": [
+   "cyan"
+  ],
+  "entry": "gml_Object_obj_roaringknight_splitslash_Step_0",
+  "find": "random\\(1, -1\\)",
+  "replace": "random(1)",
+  "why": "random() takes one argument; the extra argument is dropped (value was never used for anything but a dummy variable).",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ],
+  "regex": true
+ },
+ {
+  "id": "K02-final-kill-hub",
+  "variants": [
+   "kaizo"
+  ],
+  "entry": "gml_Object_obj_knight_roaring2_Other_11",
+  "find": "                    room_goto(PLACE_FAILURE);\n",
+  "replace": "                    if (variable_global_exists(\"knight_run\") && global.knight_run == 1 && is_struct(global.krun))\n                        knight_defeat_begin();\n                    else\n                        room_goto(PLACE_FAILURE);\n",
+  "why": "Kaizo final attack jumped straight to the failure room, bypassing scr_gameover (the hub never heard about the defeat and the failure-room retry loop started inside a hub run). In a hub run it now reports a normal defeat.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "W17-angel-scared-sprite",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Step_0",
+  "find": "        with (obj_heroralsei)\n        {\n            if (global.hp[3] > 0)\n            {\n                snd_play(snd_txtral);\n                scr_shakeobj();\n                global.faceaction[2] = 5;\n            }\n            idlesprite = spr_ralsei_hurt_fixed;\n        }\n",
+  "replace": "        if (kill_target == obj_heronoelle)\n        {\n            with (obj_heronoelle)\n            {\n                if (global.hp[4] > 0)\n                {\n                    snd_play(snd_noelle_scared);\n                    scr_shakeobj();\n                    for (var _fs = 0; _fs < 3; _fs++)\n                    {\n                        if (global.char[_fs] == 4)\n                            global.faceaction[_fs] = 5;\n                    }\n                }\n                idlesprite = variable_instance_exists(id, \"hurtsprite\") ? hurtsprite : spr_noelleb_hurt;\n            }\n        }\n        else\n        {\n            with (obj_heroralsei)\n            {\n                if (global.hp[3] > 0)\n                {\n                    snd_play(snd_txtral);\n                    scr_shakeobj();\n                    global.faceaction[2] = 5;\n                }\n                idlesprite = spr_ralsei_hurt_fixed;\n            }\n        }\n",
+  "why": "The Angel (Noelle) takes the phase-1 loss: her own startled/hurt sprite, her own scared sound and her own party slot instead of Ralsei's.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "W18-noelle-snowgrave",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Step_0",
+  "find": "if (knightkillcon == 10)\n{\n    knightkillcon = 0;\n    kristitle = \"Kris\";",
+  "replace": "if (knightkillcon == 10 && kill_target == obj_heroralsei && !kill_skipped && scr_havechar(4) && global.hp[4] > 0 && !(variable_instance_exists(id, \"noe_learned\") && noe_learned))\n{\n    noe_learned = 1;\n    noe_t = 0;\n    knightkillcon = 60;\n}\nif (knightkillcon == 60)\n{\n    with (obj_heronoelle)\n    {\n        w_idle = variable_instance_exists(id, \"idlesprite\") ? idlesprite : -1;\n        idlesprite = variable_instance_exists(id, \"hurtsprite\") ? hurtsprite : spr_noelleb_hurt;\n        scr_shakeobj();\n    }\n    snd_play(snd_noelle_scared);\n    noe_t = 0;\n    knightkillcon = 61;\n}\nif (knightkillcon == 61)\n{\n    noe_t++;\n    if (noe_t >= 25 && !w_ex())\n    {\n        knight_say(4, \"R^2-Ralsei...?!/%\", 3);\n        noe_t = 0;\n        knightkillcon = 61.2;\n    }\n}\nif (knightkillcon == 61.2 && !w_ex())\n{\n    knight_say(4, \"N-no..^2. get up..^2.&please get up...!/%\", 2);\n    knightkillcon = 61.4;\n}\nif (knightkillcon == 61.4 && !w_ex())\n{\n    with (obj_heronoelle)\n    {\n        idlesprite = variable_instance_exists(id, \"spellreadysprite\") ? spellreadysprite : spr_noelleb_spellready;\n        scr_shakeobj();\n    }\n    knight_say(4, \"...^2.&Then I..^2. I have to&do it myself./%\", 3);\n    knightkillcon = 61.6;\n}\nif (knightkillcon == 61.6 && !w_ex())\n{\n    scr_speaker(\"noone\");\n    msgset(0, \"* (\" + global.charname[4] + \" can now use \\\\cYSNOWGRAVE\\\\cW.)/%\");\n    scr_battletext();\n    noe_t = 0;\n    knightkillcon = 62;\n}\nif (knightkillcon == 62 && !w_ex())\n{\n    scr_spellget(4, 10);\n    scr_spellmenu_setup();\n    snd_play(snd_power);\n    noe_t = 0;\n    knightkillcon = 63;\n}\nif (knightkillcon == 63)\n{\n    noe_t++;\n    if (noe_t >= 40)\n    {\n        with (obj_heronoelle)\n        {\n            if (variable_instance_exists(id, \"w_idle\") && w_idle >= 0)\n                idlesprite = w_idle;\n        }\n        knightkillcon = 10;\n    }\n}\nif (knightkillcon == 10)\n{\n    knightkillcon = 0;\n    kristitle = \"Kris\";",
+  "why": "After the Knight kills Ralsei, Noelle (if she is in the party) learns SnowGrave (spell 10) in her first free spell slot, with dialogue.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "W19-angel-name-create",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Create_0",
+  "find": "global.charname[3] = \"The Prince\";\n",
+  "replace": "global.charname[3] = \"The Prince\";\nglobal.charname[4] = \"The Angel\";\n",
+  "why": "Noelle is called The Angel in Violet Knight (name boxes, ACT menu, battle text) like the other party members get their titles.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "W19-angel-name-cleanup",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_CleanUp_0",
+  "find": "global.charname[3] = \"Ralsei\";\n",
+  "replace": "global.charname[3] = \"Ralsei\";\nglobal.charname[4] = \"Noelle\";\n",
+  "why": "Put Noelle's name back when the Knight is gone.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "W19-angel-name-restore",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Step_0",
+  "find": "global.charname[3] = \"Ralsei\";\n",
+  "replace": "global.charname[3] = \"Ralsei\";\n    global.charname[4] = \"Noelle\";\n",
+  "why": "Put Noelle's name back with the others when the mod restores them.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "W20-kill-gameover-susie",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Step_0",
+  "find": "if (global.hp[1] < 1 && global.hp[3] < 1)\n        {\n            gameover_delay(1);",
+  "replace": "if (!knight_party_alive_any())\n        {\n            gameover_delay(1);",
+  "why": "Loss-scene game-over check looked at Kris/Susie/Ralsei only (not Noelle, and counted absent members): now uses the party-aware check.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "W20-kill-gameover-ralsei",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_Object_obj_knight_enemy_Step_0",
+  "find": "else if (global.hp[1] < 1 && global.hp[2] < 1)\n    {\n        gameover_delay(0);",
+  "replace": "else if (!knight_party_alive_any())\n    {\n        gameover_delay(0);",
+  "why": "Loss-scene game-over check looked at Kris/Susie/Ralsei only (not Noelle, and counted absent members): now uses the party-aware check.",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ }
+]

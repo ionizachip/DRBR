@@ -1,0 +1,54 @@
+# DRBR - releases. The game patch is made on the author's machine (it needs DELTARUNE's files, which never go to GitHub):
+#   scripts/package-drbr.sh <version>   (build, sign with the private key, check)   then
+#   scripts/release-drbr.sh <version>   (a DRAFT GitHub release with every asset)
+# This workflow then, for that draft:
+#   1. builds the programs from source and runs the tests that need no game files,
+#   2. downloads every asset of the draft and checks it completely: the manifest's signature against the public key in
+#      drbr.json, every file's size and SHA-256, the payload inside DRBR-Setup.exe, SHA256SUMS.txt,
+#   3. publishes the release - only after a maintainer approves the "release" environment (Settings > Environments).
+name: release
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'DRBR version (the draft release v<version> must exist)'
+        required: true
+permissions:
+  contents: write
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - run: bash scripts/build-installer.sh
+      - run: |
+          dotnet build src/Drbr.Tests -c Release -o build/tests
+          dotnet build/tests/drbr-tests.dll basics
+      - run: python3 scripts/validate-save.py
+      - run: cd tools/gmlsim && python3 -m gmlsim.selftest
+  check-release:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: pip install cryptography
+      - name: download the draft release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p dist/check
+          gh release download "v${{ inputs.version }}" --repo "${{ github.repository }}" --dir dist/check
+      - name: check every asset (signature, checksums, the Setup's payload)
+        run: python3 packaging/release_tools.py check dist/check
+  publish:
+    needs: check-release
+    runs-on: ubuntu-latest
+    environment: release
+    steps:
+      - name: publish the release (approved)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release edit "v${{ inputs.version }}" --repo "${{ github.repository }}" --draft=false

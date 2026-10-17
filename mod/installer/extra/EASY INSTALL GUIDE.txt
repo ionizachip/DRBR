@@ -1,0 +1,67 @@
+KNIGHT HUB (build 51) - EASY INSTALL GUIDE
+==========================================
+You need: DELTARUNE on Steam (Windows), Chapter 3 installed, and Steam running.
+It takes about 2 minutes. Do the steps in order.
+
+
+STEP 1 - UNZIP
+  Right-click the zip you downloaded > "Extract All..." > Extract.
+  Open the new folder. (Do not run anything while it is still inside the zip.)
+
+STEP 2 - PUT THE SAVE IN (so you start right at the Knight Hub)
+  a. Press Windows key + R, type   %LOCALAPPDATA%\DELTARUNE   and press Enter.
+     A folder opens (DELTARUNE's save folder).
+  b. Copy the file   filech3_2   from this pack's "Save file" folder into that folder.
+     - It is SAVE SLOT 3 of Chapter 3. Your slots 1 and 2 are not touched.
+     - If you already have a filech3_2 there and want to keep it, copy it somewhere else first.
+
+STEP 3 - INSTALL AND START
+  a. Make sure Steam is open and signed in.
+  b. Double-click   PLAY_KNIGHT_HUB.bat   in this folder.
+     - If Windows says "Windows protected your PC": click "More info" > "Run anyway".
+     - If it asks for administrator rights: click Yes.
+  c. It finds DELTARUNE by itself, installs the mod (it keeps a backup of your original game file) and starts Chapter 3.
+     Wait until the game opens.
+
+STEP 4 - PLAY
+  a. In Chapter 3 pick SAVE SLOT 3 (the save from step 2) and load it.
+  b. Walk to the sign and talk to it (Z / ENTER). That is the Knight Hub.
+  c. Check the bottom right corner of the sign's menu: it must say  KNIGHT HUB V2 - BUILD 51 - (a date).
+     If it does not, the game did not load this build: close the game and do STEP 3 again.
+  d. KNIGHT tab > ONLINE for the battle royale: try PRACTICE first (bots, no internet needed).
+     To play with friends: STEAM HOST, then give them the 7-letter code; they use STEAM JOIN.
+  e. BOTS: on the room page pick BOTS (the host only): ADD A BOT / REMOVE A BOT, BOT SKILL for all of them
+     (DUMMY, EASY, NORMAL, HARD, EXPERT, PERFECT), or Z on one bot for its own preset and sliders.
+
+NEXT TIME: just double-click PLAY_KNIGHT_HUB.bat again (or start DELTARUNE from Steam as usual).
+
+
+KEYS IN AN ONLINE MATCH (change them in MORE OPTIONS > KEYBINDS)
+  arrows move      S hold breath      C (hold) charge, let go = draw a skill      Z tap = next skill, hold = use it
+  D hold slot      F quick settings   V other SOULs on/off   Q / E targeting mode   A or 1-8 pick a target
+  T or \ chat (\ sends)  TAB everyone       BACKSPACE give up
+  F3 DEBUG OVERLAY (works anywhere): shows where every SOUL and bot is and why it is (not) drawn; writes
+     knightfights_debug.log into %LOCALAPPDATA%\DELTARUNE while it is on
+
+
+IF SOMETHING GOES WRONG
+  - NO SIGN in the snow zone:
+      * A yellow note at the top says "KNIGHT HUB: no sign with this save": you loaded another save. Load SAVE SLOT 3
+        (the file from STEP 2). The sign is only there right before the Roaring Knight fight.
+      * No note at all: the mod is NOT installed in the game you started. Close the game, double-click
+        PLAY_KNIGHT_HUB.bat again and read its black window to the end. If it says the game was not started or an exit
+        code, fix that first (see below). Starting DELTARUNE from Steam after a failed install runs the normal game.
+  - "exit code 6" / it refuses your game file: in Steam, right-click DELTARUNE > Properties > Installed Files >
+    "Verify integrity of game files", then do STEP 3 again.
+  - No save slot 3 in the game: check that filech3_2 is really in %LOCALAPPDATA%\DELTARUNE (STEP 2) and that the file
+    is not named filech3_2.txt (turn on View > File name extensions in Explorer to see it).
+  - Steam rooms do not work: Steam must be open and signed in before the game starts. Steam showing "Spacewar" is normal.
+  - The game crashes: send a screenshot of the whole error text.
+  - You cannot see the other players' SOULs or the bots: press F3 in the match, take a screenshot, and send the file
+    knightfights_debug.log from %LOCALAPPDATA%\DELTARUNE.
+  - Strange SOUL settings: sign menu > CONFIG tab (the last tab) > RESET MOD SETTINGS.
+
+TO UNDO: double-click RESTORE_VANILLA.bat in  DELTARUNE\chapter3_windows  (Steam > DELTARUNE > Manage > Browse local
+files > chapter3_windows). Your original game comes back.
+
+More detail: READ ME FIRST.txt, DRBR_ONLINE_GUIDE.txt (the online guide), README_INSTALL.txt (the installer).

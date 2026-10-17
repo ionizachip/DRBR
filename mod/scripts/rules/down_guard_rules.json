@@ -1,0 +1,512 @@
+[
+ {
+  "id": "D01-downed-no-damage-base-scr_damage",
+  "variants": [
+   "base"
+  ],
+  "entry": "gml_GlobalScript_scr_damage",
+  "find": "global\\.hp\\[chartarget\\] -= round\\(tdamage / 4\\);\\n(\\s*)hpdiff = round\\(tdamage / 4\\);",
+  "replace": "hpdiff = 0;",
+  "regex": true,
+  "why": "A member who is already down takes no further damage (the original game still removed a quarter of the hit).",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "D01-downed-no-damage-base-scr_damage_fixed",
+  "variants": [
+   "base"
+  ],
+  "entry": "gml_GlobalScript_scr_damage_fixed",
+  "find": "global\\.hp\\[chartarget\\] -= round\\(tdamage / 4\\);\\n(\\s*)hpdiff = round\\(tdamage / 4\\);",
+  "replace": "hpdiff = 0;",
+  "regex": true,
+  "why": "A member who is already down takes no further damage (the original game still removed a quarter of the hit).",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "D01-downed-no-damage-base-scr_damage_maxhp",
+  "variants": [
+   "base"
+  ],
+  "entry": "gml_GlobalScript_scr_damage_maxhp",
+  "find": "global\\.hp\\[chartarget\\] -= round\\(tdamage / 4\\);\\n(\\s*)hpdiff = round\\(tdamage / 4\\);",
+  "replace": "hpdiff = 0;",
+  "regex": true,
+  "why": "A member who is already down takes no further damage (the original game still removed a quarter of the hit).",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "D01-downed-no-damage-base-scr_damage_proportional",
+  "variants": [
+   "base"
+  ],
+  "entry": "gml_GlobalScript_scr_damage_proportional",
+  "find": "global\\.hp\\[chartarget\\] -= round\\(tdamage / 4\\);\\n(\\s*)hpdiff = round\\(tdamage / 4\\);",
+  "replace": "hpdiff = 0;",
+  "regex": true,
+  "why": "A member who is already down takes no further damage (the original game still removed a quarter of the hit).",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "D01-downed-no-damage-base-scr_damage_sneo_final_attack",
+  "variants": [
+   "base"
+  ],
+  "entry": "gml_GlobalScript_scr_damage_sneo_final_attack",
+  "find": "global\\.hp\\[chartarget\\] -= round\\(tdamage / 4\\);\\n(\\s*)hpdiff = round\\(tdamage / 4\\);",
+  "replace": "hpdiff = 0;",
+  "regex": true,
+  "why": "A member who is already down takes no further damage (the original game still removed a quarter of the hit).",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "D01-downed-no-damage-kaizo-scr_damage",
+  "variants": [
+   "kaizo"
+  ],
+  "entry": "gml_GlobalScript_scr_damage",
+  "find": "global\\.hp\\[chartarget\\] -= round\\(tdamage / 4\\);\\n(\\s*)hpdiff = round\\(tdamage / 4\\);",
+  "replace": "hpdiff = 0;",
+  "regex": true,
+  "why": "A member who is already down takes no further damage (the original game still removed a quarter of the hit).",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "D01-downed-no-damage-kaizo-scr_damage_fixed",
+  "variants": [
+   "kaizo"
+  ],
+  "entry": "gml_GlobalScript_scr_damage_fixed",
+  "find": "global\\.hp\\[chartarget\\] -= round\\(tdamage / 4\\);\\n(\\s*)hpdiff = round\\(tdamage / 4\\);",
+  "replace": "hpdiff = 0;",
+  "regex": true,
+  "why": "A member who is already down takes no further damage (the original game still removed a quarter of the hit).",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "D01-downed-no-damage-kaizo-scr_damage_maxhp",
+  "variants": [
+   "kaizo"
+  ],
+  "entry": "gml_GlobalScript_scr_damage_maxhp",
+  "find": "global\\.hp\\[chartarget\\] -= round\\(tdamage / 4\\);\\n(\\s*)hpdiff = round\\(tdamage / 4\\);",
+  "replace": "hpdiff = 0;",
+  "regex": true,
+  "why": "A member who is already down takes no further damage (the original game still removed a quarter of the hit).",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "D01-downed-no-damage-kaizo-scr_damage_proportional",
+  "variants": [
+   "kaizo"
+  ],
+  "entry": "gml_GlobalScript_scr_damage_proportional",
+  "find": "global\\.hp\\[chartarget\\] -= round\\(tdamage / 4\\);\\n(\\s*)hpdiff = round\\(tdamage / 4\\);",
+  "replace": "hpdiff = 0;",
+  "regex": true,
+  "why": "A member who is already down takes no further damage (the original game still removed a quarter of the hit).",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "D01-downed-no-damage-kaizo-scr_damage_sneo_final_attack",
+  "variants": [
+   "kaizo"
+  ],
+  "entry": "gml_GlobalScript_scr_damage_sneo_final_attack",
+  "find": "global\\.hp\\[chartarget\\] -= round\\(tdamage / 4\\);\\n(\\s*)hpdiff = round\\(tdamage / 4\\);",
+  "replace": "hpdiff = 0;",
+  "regex": true,
+  "why": "A member who is already down takes no further damage (the original game still removed a quarter of the hit).",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "D01-downed-no-damage-elec-scr_damage",
+  "variants": [
+   "elec"
+  ],
+  "entry": "gml_GlobalScript_scr_damage",
+  "find": "global\\.hp\\[chartarget\\] -= round\\(tdamage / 4\\);\\n(\\s*)hpdiff = round\\(tdamage / 4\\);",
+  "replace": "hpdiff = 0;",
+  "regex": true,
+  "why": "A member who is already down takes no further damage (the original game still removed a quarter of the hit).",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "D01-downed-no-damage-elec-scr_damage_fixed",
+  "variants": [
+   "elec"
+  ],
+  "entry": "gml_GlobalScript_scr_damage_fixed",
+  "find": "global\\.hp\\[chartarget\\] -= round\\(tdamage / 4\\);\\n(\\s*)hpdiff = round\\(tdamage / 4\\);",
+  "replace": "hpdiff = 0;",
+  "regex": true,
+  "why": "A member who is already down takes no further damage (the original game still removed a quarter of the hit).",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "D01-downed-no-damage-elec-scr_damage_maxhp",
+  "variants": [
+   "elec"
+  ],
+  "entry": "gml_GlobalScript_scr_damage_maxhp",
+  "find": "global\\.hp\\[chartarget\\] -= round\\(tdamage / 4\\);\\n(\\s*)hpdiff = round\\(tdamage / 4\\);",
+  "replace": "hpdiff = 0;",
+  "regex": true,
+  "why": "A member who is already down takes no further damage (the original game still removed a quarter of the hit).",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "D01-downed-no-damage-elec-scr_damage_proportional",
+  "variants": [
+   "elec"
+  ],
+  "entry": "gml_GlobalScript_scr_damage_proportional",
+  "find": "global\\.hp\\[chartarget\\] -= round\\(tdamage / 4\\);\\n(\\s*)hpdiff = round\\(tdamage / 4\\);",
+  "replace": "hpdiff = 0;",
+  "regex": true,
+  "why": "A member who is already down takes no further damage (the original game still removed a quarter of the hit).",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "D01-downed-no-damage-elec-scr_damage_sneo_final_attack",
+  "variants": [
+   "elec"
+  ],
+  "entry": "gml_GlobalScript_scr_damage_sneo_final_attack",
+  "find": "global\\.hp\\[chartarget\\] -= round\\(tdamage / 4\\);\\n(\\s*)hpdiff = round\\(tdamage / 4\\);",
+  "replace": "hpdiff = 0;",
+  "regex": true,
+  "why": "A member who is already down takes no further damage (the original game still removed a quarter of the hit).",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "D01-downed-no-damage-violet-scr_damage",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_GlobalScript_scr_damage",
+  "find": "global\\.hp\\[chartarget\\] -= round\\(tdamage / 4\\);\\n(\\s*)hpdiff = round\\(tdamage / 4\\);",
+  "replace": "hpdiff = 0;",
+  "regex": true,
+  "why": "A member who is already down takes no further damage (the original game still removed a quarter of the hit).",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "D01-downed-no-damage-violet-scr_damage_fixed",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_GlobalScript_scr_damage_fixed",
+  "find": "global\\.hp\\[chartarget\\] -= round\\(tdamage / 4\\);\\n(\\s*)hpdiff = round\\(tdamage / 4\\);",
+  "replace": "hpdiff = 0;",
+  "regex": true,
+  "why": "A member who is already down takes no further damage (the original game still removed a quarter of the hit).",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "D01-downed-no-damage-violet-scr_damage_maxhp",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_GlobalScript_scr_damage_maxhp",
+  "find": "global\\.hp\\[chartarget\\] -= round\\(tdamage / 4\\);\\n(\\s*)hpdiff = round\\(tdamage / 4\\);",
+  "replace": "hpdiff = 0;",
+  "regex": true,
+  "why": "A member who is already down takes no further damage (the original game still removed a quarter of the hit).",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "D01-downed-no-damage-violet-scr_damage_proportional",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_GlobalScript_scr_damage_proportional",
+  "find": "global\\.hp\\[chartarget\\] -= round\\(tdamage / 4\\);\\n(\\s*)hpdiff = round\\(tdamage / 4\\);",
+  "replace": "hpdiff = 0;",
+  "regex": true,
+  "why": "A member who is already down takes no further damage (the original game still removed a quarter of the hit).",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "D01-downed-no-damage-violet-scr_damage_sneo_final_attack",
+  "variants": [
+   "violet"
+  ],
+  "entry": "gml_GlobalScript_scr_damage_sneo_final_attack",
+  "find": "global\\.hp\\[chartarget\\] -= round\\(tdamage / 4\\);\\n(\\s*)hpdiff = round\\(tdamage / 4\\);",
+  "replace": "hpdiff = 0;",
+  "regex": true,
+  "why": "A member who is already down takes no further damage (the original game still removed a quarter of the hit).",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "D01-downed-no-damage-thorn-scr_damage",
+  "variants": [
+   "thorn"
+  ],
+  "entry": "gml_GlobalScript_scr_damage",
+  "find": "global\\.hp\\[chartarget\\] -= round\\(tdamage / 4\\);\\n(\\s*)hpdiff = round\\(tdamage / 4\\);",
+  "replace": "hpdiff = 0;",
+  "regex": true,
+  "why": "A member who is already down takes no further damage (the original game still removed a quarter of the hit).",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "D01-downed-no-damage-thorn-scr_damage_fixed",
+  "variants": [
+   "thorn"
+  ],
+  "entry": "gml_GlobalScript_scr_damage_fixed",
+  "find": "global\\.hp\\[chartarget\\] -= round\\(tdamage / 4\\);\\n(\\s*)hpdiff = round\\(tdamage / 4\\);",
+  "replace": "hpdiff = 0;",
+  "regex": true,
+  "why": "A member who is already down takes no further damage (the original game still removed a quarter of the hit).",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "D01-downed-no-damage-thorn-scr_damage_maxhp",
+  "variants": [
+   "thorn"
+  ],
+  "entry": "gml_GlobalScript_scr_damage_maxhp",
+  "find": "global\\.hp\\[chartarget\\] -= round\\(tdamage / 4\\);\\n(\\s*)hpdiff = round\\(tdamage / 4\\);",
+  "replace": "hpdiff = 0;",
+  "regex": true,
+  "why": "A member who is already down takes no further damage (the original game still removed a quarter of the hit).",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "D01-downed-no-damage-thorn-scr_damage_proportional",
+  "variants": [
+   "thorn"
+  ],
+  "entry": "gml_GlobalScript_scr_damage_proportional",
+  "find": "global\\.hp\\[chartarget\\] -= round\\(tdamage / 4\\);\\n(\\s*)hpdiff = round\\(tdamage / 4\\);",
+  "replace": "hpdiff = 0;",
+  "regex": true,
+  "why": "A member who is already down takes no further damage (the original game still removed a quarter of the hit).",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "D01-downed-no-damage-thorn-scr_damage_sneo_final_attack",
+  "variants": [
+   "thorn"
+  ],
+  "entry": "gml_GlobalScript_scr_damage_sneo_final_attack",
+  "find": "global\\.hp\\[chartarget\\] -= round\\(tdamage / 4\\);\\n(\\s*)hpdiff = round\\(tdamage / 4\\);",
+  "replace": "hpdiff = 0;",
+  "regex": true,
+  "why": "A member who is already down takes no further damage (the original game still removed a quarter of the hit).",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "D01-downed-no-damage-cyan-scr_damage",
+  "variants": [
+   "cyan"
+  ],
+  "entry": "gml_GlobalScript_scr_damage",
+  "find": "global\\.hp\\[chartarget\\] -= round\\(tdamage / 4\\);\\n(\\s*)hpdiff = round\\(tdamage / 4\\);",
+  "replace": "hpdiff = 0;",
+  "regex": true,
+  "why": "A member who is already down takes no further damage (the original game still removed a quarter of the hit).",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "D01-downed-no-damage-cyan-scr_damage_fixed",
+  "variants": [
+   "cyan"
+  ],
+  "entry": "gml_GlobalScript_scr_damage_fixed",
+  "find": "global\\.hp\\[chartarget\\] -= round\\(tdamage / 4\\);\\n(\\s*)hpdiff = round\\(tdamage / 4\\);",
+  "replace": "hpdiff = 0;",
+  "regex": true,
+  "why": "A member who is already down takes no further damage (the original game still removed a quarter of the hit).",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "D01-downed-no-damage-cyan-scr_damage_maxhp",
+  "variants": [
+   "cyan"
+  ],
+  "entry": "gml_GlobalScript_scr_damage_maxhp",
+  "find": "global\\.hp\\[chartarget\\] -= round\\(tdamage / 4\\);\\n(\\s*)hpdiff = round\\(tdamage / 4\\);",
+  "replace": "hpdiff = 0;",
+  "regex": true,
+  "why": "A member who is already down takes no further damage (the original game still removed a quarter of the hit).",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "D01-downed-no-damage-cyan-scr_damage_proportional",
+  "variants": [
+   "cyan"
+  ],
+  "entry": "gml_GlobalScript_scr_damage_proportional",
+  "find": "global\\.hp\\[chartarget\\] -= round\\(tdamage / 4\\);\\n(\\s*)hpdiff = round\\(tdamage / 4\\);",
+  "replace": "hpdiff = 0;",
+  "regex": true,
+  "why": "A member who is already down takes no further damage (the original game still removed a quarter of the hit).",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ },
+ {
+  "id": "D01-downed-no-damage-cyan-scr_damage_sneo_final_attack",
+  "variants": [
+   "cyan"
+  ],
+  "entry": "gml_GlobalScript_scr_damage_sneo_final_attack",
+  "find": "global\\.hp\\[chartarget\\] -= round\\(tdamage / 4\\);\\n(\\s*)hpdiff = round\\(tdamage / 4\\);",
+  "replace": "hpdiff = 0;",
+  "regex": true,
+  "why": "A member who is already down takes no further damage (the original game still removed a quarter of the hit).",
+  "scenarios": [
+   "solo",
+   "dup",
+   "noelle",
+   "nokris"
+  ]
+ }
+]

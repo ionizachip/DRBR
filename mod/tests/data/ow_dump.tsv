@@ -1,0 +1,58 @@
+SPR	spr_krisd	19	38	0	0	0	18	25	38	4	AxisAlignedRect	2
+SPR	spr_krisd_dark	19	38	0	0	0	18	25	38	4	AxisAlignedRect	2
+SPR	spr_krisr_dark	19	38	0	0	0	18	25	38	4	AxisAlignedRect	2
+SPR	spr_krisu_dark	19	38	0	0	0	18	25	38	4	AxisAlignedRect	2
+SPR	spr_krisl_dark	19	38	0	0	0	18	25	38	4	AxisAlignedRect	2
+SPR	spr_susie_walk_down_dw	26	43	0	-2	0	24	26	42	4	AxisAlignedRect	2
+SPR	spr_susie_walk_right_dw	25	43	0	-2	3	21	32	42	4	AxisAlignedRect	2
+SPR	spr_susie_walk_up_dw	26	43	0	-2	3	21	32	42	4	AxisAlignedRect	2
+SPR	spr_susie_walk_left_dw	25	43	0	-2	3	21	32	42	4	AxisAlignedRect	2
+SPR	spr_ralsei_walk_down	21	41	0	-3	2	18	31	39	4	AxisAlignedRect	2
+SPR	spr_ralsei_walk_right	19	40	0	-3	2	18	31	39	4	AxisAlignedRect	2
+SPR	spr_ralsei_walk_up	21	41	0	-3	2	18	31	39	4	AxisAlignedRect	2
+SPR	spr_ralsei_walk_left	19	40	0	-3	2	18	31	39	4	AxisAlignedRect	2
+SPR	spr_noelle_walk_down_dw	23	48	0	0	5	17	32	47	4	AxisAlignedRect	2
+SPR	spr_noelle_walk_right_dw	23	46	0	0	0	22	30	45	4	AxisAlignedRect	2
+SPR	spr_noelle_walk_up_dw	23	48	0	0	0	22	32	47	4	AxisAlignedRect	2
+SPR	spr_noelle_walk_left_dw	23	46	0	0	0	22	30	45	4	AxisAlignedRect	2
+SPR	spr_solidsmall	20	20	0	0	0	19	0	19	1	AxisAlignedRect	1
+OBJ	obj_mainchara	spr_krisd			True	False
+OBJ	obj_solidblock	spr_solidsmall			False	False
+OBJ	obj_caterpillarchara	spr_susie_walk_down_dw_unhappy			True	False
+OBJ	obj_ch3_PTB02	spr_event			False	False
+OBJ	obj_solidblocksized	spr_block_sized		obj_solidblock	False	False
+ROOM	room_dw_snow_zone	2960	480
+INST	OBJECTS_MAIN	obj_mainchara	120	240	2	2	102298
+INST	OBJECTS_MAIN	obj_darkcontroller	0	0	1	1	102299
+INST	OBJECTS_MAIN	obj_ch3_GSB05	0	40	1	1	102300
+INST	OBJECTS_MAIN	obj_ch3_BTB04	0	80	1	1	102301
+INST	OBJECTS_MAIN	obj_ch3_PTB01	0	160	1	1	102302
+INST	OBJECTS_MAIN	obj_ch3_PTB02	0	200	1	1	102303
+INST	OBJECTS_MAIN	obj_savepoint	200	200	2	2	102304
+INST	COLLISION_DOOR	obj_solidblocksized	360	440	65	1	102305
+INST	COLLISION_DOOR	obj_solidblocksized	0	80	51	4	102306
+INST	COLLISION_DOOR	obj_solidblocksized	-40	200	2	4	102308
+INST	COLLISION_DOOR	obj_markerAny	120	240	1	1	102309
+INST	COLLISION_DOOR	obj_doorAny	18	217	1	2.95	102310
+INST	COLLISION_DOOR	obj_solidblocksized	-40	360	10	1	102311
+INST	COLLISION_DOOR	obj_solidblocksized	2000	40	24	1	102312
+INST	COLLISION_DOOR	obj_solidblock_diagonal_32	360	360	4	2	102313
+INST	COLLISION_DOOR	obj_solidblock_diagonal_32	484	422	4	2	102314
+INST	COLLISION_DOOR	obj_solidblocksized	2040	80	2	1	102315
+INST	COLLISION_DOOR	obj_solidblocksized	32	130	2	4	102316
+INST	COLLISION_DOOR	obj_sul	36	345	1	1	102317
+INST	COLLISION_DOOR	obj_sul	111	270	1	1	102318
+INST	COLLISION_DOOR	obj_sul	131	250	1	1	102319
+INST	COLLISION_DOOR	obj_sul	151	230	1	1	102320
+INST	BG_Parallax	obj_dw_snow_zone_parallax	40	0	1	1	102321
+SPR	spr_block_sized	40	40	0	0	0	39	0	39	1	AxisAlignedRect	0
+SPR	spr_solid_32	32	32	0	0	0	31	0	31	1	RotatedRect	0
+SPR	spr_sul	20	20	0	0	0	19	0	19	1	Precise	0
+SPR	spr_krisu_dark_cool	19	38	0	0	0	18	25	38	4	AxisAlignedRect	2
+SPR	spr_susie_walk_down_dw_unhappy	26	43	0	-2	0	24	26	42	4	AxisAlignedRect	2
+SPR	spr_ralsei_walk_down_blush	21	41	0	-3	2	18	31	38	4	AxisAlignedRect	2
+SPR	spr_overworldheart	MISSING
+SPR	spr_savepoint	20	19	0	0	0	19	10	19	6	AxisAlignedRect	2
+SPR	spr_doorAny	40	40	0	0	0	39	0	39	7	RotatedRect	0
+SPR	spr_markerAny	38	74	0	0	0	37	0	73	28	AxisAlignedRect	0
+SPR	spr_event	20	20	0	0	0	19	0	19	1	AxisAlignedRect	1
