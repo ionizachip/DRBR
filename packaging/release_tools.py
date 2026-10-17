@@ -4,9 +4,9 @@
   sign      <file> --key <private key .pem>            -> <file>.sig (RSA PKCS#1 v1.5 SHA-256, base64)
   verify    <file>                                       checks <file>.sig against drbr.json's public key
   setup     --exe <DRBR-Setup.exe built> --payload <dir> --out <DRBR-Setup.exe with the payload appended>
-  release   --payload <dir> --setup <DRBR-Setup.exe> --out <release dir> --key <private key> [--base-url URL]
-            -> every payload file as a release asset, update-manifest.json(.sig), DRBR-Setup.exe and DRBR-Setup-X.exe,
-               DRBR-FullPatch-X.zip, SHA256SUMS.txt
+  release   --payload <dir> --setup <DRBR-Setup.exe> --out <release dir> --key <private key> [--base-url URL] [--full]
+            -> every payload file as a release asset, update-manifest.json(.sig), DRBR-Setup.exe, RELEASE_NOTES.md,
+               SHA256SUMS.txt; --full adds DRBR-Setup-X.exe and DRBR-FullPatch-X.zip (copies of the same files)
   check     <release dir>                                validates a release dir completely (signature, every checksum,
                                                          the Setup's appended payload)
 The private key is never in the repository: pass it with --key or DRBR_SIGNING_KEY_FILE (GitHub Actions: the
@@ -125,11 +125,12 @@ def cmd_release(a):
     open(os.path.join(a.out, 'update-manifest.json'), 'wb').write(mb)
     open(os.path.join(a.out, 'update-manifest.json.sig'), 'w').write(sign_bytes(mb, key_path(a)))
     shutil.copyfile(a.setup, os.path.join(a.out, 'DRBR-Setup.exe'))
-    shutil.copyfile(a.setup, os.path.join(a.out, 'DRBR-Setup-%s.exe' % ver))
-    # the full package for a manual install (the same files as the Setup carries)
-    with zipfile.ZipFile(os.path.join(a.out, 'DRBR-FullPatch-%s.zip' % ver), 'w', zipfile.ZIP_STORED, allowZip64=True) as z:
-        for n in sorted(os.listdir(a.payload)):
-            z.write(os.path.join(a.payload, n), n)
+    if a.full:
+        shutil.copyfile(a.setup, os.path.join(a.out, 'DRBR-Setup-%s.exe' % ver))
+        # the full package for a manual install (the same files as the Setup carries)
+        with zipfile.ZipFile(os.path.join(a.out, 'DRBR-FullPatch-%s.zip' % ver), 'w', zipfile.ZIP_STORED, allowZip64=True) as z:
+            for n in sorted(os.listdir(a.payload)):
+                z.write(os.path.join(a.payload, n), n)
     notes = payload.get('notes') or ''
     open(os.path.join(a.out, 'RELEASE_NOTES.md'), 'w', encoding='utf8').write('# DRBR %s\n\n%s\n' % (ver, notes))
     with open(os.path.join(a.out, 'SHA256SUMS.txt'), 'w') as s:
@@ -154,6 +155,8 @@ def cmd_check(a):
             bad.append(f['file'] + ': size / checksum mismatch')
     for name in ('DRBR-Setup.exe', 'DRBR-Setup-%s.exe' % m['version']):
         p = os.path.join(d, name)
+        if name != 'DRBR-Setup.exe' and not os.path.exists(p):
+            continue   # the versioned copy is optional (release --full)
         z = appended_payload(p) if os.path.exists(p) else None
         if z is None:
             bad.append(name + ': no payload appended')
@@ -182,7 +185,7 @@ def main():
     s = sub.add_parser('verify'); s.add_argument('file')
     s = sub.add_parser('setup'); s.add_argument('--exe', required=True); s.add_argument('--payload', required=True); s.add_argument('--out', required=True)
     s = sub.add_parser('release'); s.add_argument('--payload', required=True); s.add_argument('--setup', required=True); s.add_argument('--out', required=True)
-    s.add_argument('--key'); s.add_argument('--base-url')
+    s.add_argument('--key'); s.add_argument('--base-url'); s.add_argument('--full', action='store_true')
     s = sub.add_parser('check'); s.add_argument('dir')
     a = ap.parse_args()
     {'sign': cmd_sign, 'verify': cmd_verify, 'setup': cmd_setup, 'release': cmd_release, 'check': cmd_check}[a.cmd](a)

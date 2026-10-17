@@ -118,7 +118,7 @@ the folder DELTARUNE\mus  (the "mus" folder next to chapter3_windows; created if
   Flower Man (feat. Camellia) - Toby Fox is the game's own file, DELTARUNE\mus\Flowerman_Arrangement.ogg: it is not
   shipped or copied; the song list uses it from there (if a game does not have it, picking it plays the fight's music).
   build 48 (knight_hub_music2.zip; credits and links also in CREDITS on the KNIGHT page):
-    mus\kh_lost_dream.ogg           LOST DREAM // VS NOELLE.EXE - ImperfectNORE (soundcloud.com/imperfectnore)
+    mus\kh_lost_dream.ogg           LOST DREAM // VS NOELLE.EXE - ionizachip (soundcloud.com/imperfectnore)
     mus\kh_forget_me_not.ogg        FORGET ME NOT V3 (DELTARUNE Chapter 6) - JustStereo (soundcloud.com/juststereo)
     mus\kh_hell_hammer.ogg          HELL HAMMER - Geefel (cover; original amt1179, AU Chapter Rewritten)
     mus\kh_in_my_way.ogg            In My Way - SEWNPUARD (soundcloud.com/sewnpard)

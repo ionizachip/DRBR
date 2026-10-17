@@ -31,7 +31,7 @@ WANT = {'kh_void_star.ogg': ('VOID STAR', 'rundown', 'soundcloud.com/rundownsd/v
         'kh_ever_ascending.ogg': ('EVER ASCENDING', 'lexxiemoww', 'soundcloud.com/lexxiemow/trinky_finale'),
         'Flowerman_Arrangement.ogg': ('Flower Man (feat. Camellia)', 'Toby Fox', 'soundcloud.com/tobyfox-music/flower-man-feat-camellia'),
         # build 48
-        'kh_lost_dream.ogg': ('LOST DREAM // VS NOELLE.EXE', 'ImperfectNORE', 'soundcloud.com/imperfectnore/lost-dream-vs-noelle-exe'),
+        'kh_lost_dream.ogg': ('LOST DREAM // VS NOELLE.EXE', 'ionizachip', 'soundcloud.com/imperfectnore/lost-dream-vs-noelle-exe'),
         'kh_forget_me_not.ogg': ('FORGET ME NOT V3', 'JustStereo', 'soundcloud.com/juststereo/forget-me-not-v3-deltarune-chapter-6'),
         'kh_hell_hammer.ogg': ('HELL HAMMER', 'Geefel', 'soundcloud.com/geefel/hhammer'),
         'kh_in_my_way.ogg': ('In My Way', 'SEWNPUARD', 'soundcloud.com/sewnpard/zzz_cree_ogg'),

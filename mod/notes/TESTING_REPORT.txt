@@ -293,7 +293,7 @@ BUILD 35 (on top of 34)
    NOT seen in the real game: the renders are my simulator's, drawn with the game's art.
  - CREDITS page per fight with the people each mod's GameBanana page credits (Kaizo, Supercharged, Violet, Thorn from the
    pages you sent; Cyan from its own files), plus a hub page. The Thorn song is credited as its page says ("grapheman"), though
-   the music file's own tags name "cinemorphaga". The hub page credits ImperfectNORE for the hub and the "Knightmare Knight"
+   the music file's own tags name "cinemorphaga". The hub page credits ionizachip for the hub and the "Knightmare Knight"
    song: tell me if that is wrong.
  - NEW RULES: TWIN KNIGHT, DARKNESS, HYPER SPEED, THORNS, TIME LIMIT (see README section 11). Simulator-tested (t_twin):
    in a battle with the real merged knight code for all six knights, the twin appears once, fires every one of its four

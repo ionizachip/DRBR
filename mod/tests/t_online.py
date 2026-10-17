@@ -41,7 +41,7 @@ def J(sim, expr):
 # ---------------------------------------------------------------- text helpers
 sim = new()
 eq(J(sim, 'kfo_clean_name("  Kris   Dree  ")'), 'Kris Dree', 'name: spaces collapsed and trimmed')
-eq(J(sim, 'kfo_clean_name("ImperfectNORE123")'), 'ImperfectNOR', 'name: 12 characters')
+eq(J(sim, 'kfo_clean_name("ionizachip12345")'), 'ionizachip12', 'name: 12 characters')
 eq(J(sim, 'kfo_clean_name(chr(7) + "Su" + chr(200) + "sie")'), 'Susie', 'name: control / non-ASCII removed')
 eq(J(sim, 'kfo_clean_name(42)'), '', 'name: not a string')
 eq(J(sim, 'kfo_clean_code("vn-r tk9")'), 'VNRTK', 'code: letters only, upper case')

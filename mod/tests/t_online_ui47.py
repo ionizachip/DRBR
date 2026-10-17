@@ -114,7 +114,7 @@ def steam(sim, ready, why='Steam is not running or not signed in.'):
     """Steam as the page sees it (the DLL is not loaded in the emulator)"""
     sim.run('global.kfo_stm = { ok: %s, init: %d, why: "%s", fns: {}, dll: "kf_steam.dll" };' % ('true' if ready else 'false', 1 if ready else -1, why))
     if ready:
-        sim.mock('kfo_steam_name', lambda s: 'IMPERFECTNORE')
+        sim.mock('kfo_steam_name', lambda s: 'IONIZACHIP')
 
 
 NAMES = ['ImperfectNOR', 'WWWWWWWWWWWW', 'Susie', 'Ralsei', 'Noelle', 'MMMMMMMMMMMM', 'Kris', 'Berdly']

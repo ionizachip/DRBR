@@ -114,10 +114,12 @@ The `release/` folder contains:
 
 - every payload file, each as its own asset (so updates download only what changed)
 - `update-manifest.json` and `update-manifest.json.sig` (signed with your key)
-- `DRBR-Setup.exe` and `DRBR-Setup-1.1.0.exe`
-- `DRBR-FullPatch-1.1.0.zip` (the package for a manual install)
+- `DRBR-Setup.exe`
 - `RELEASE_NOTES.md`
 - `SHA256SUMS.txt`
+
+(`release_tools.py release --full` also adds `DRBR-Setup-1.1.0.exe` and `DRBR-FullPatch-1.1.0.zip`, copies of the same
+files, if you want them.)
 
 At the end the script runs `release_tools.py check`, which checks the signature against `drbr.json`'s public key, every
 checksum, the Setup's appended payload and `SHA256SUMS.txt`.

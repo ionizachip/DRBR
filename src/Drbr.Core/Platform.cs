@@ -172,7 +172,7 @@ namespace Drbr
                 {
                     k.SetValue("DisplayName", "DRBR - DELTARUNE BATTLE ROYALE");
                     k.SetValue("DisplayVersion", version);
-                    k.SetValue("Publisher", "DRBR (fan mod by ImperfectNORE)");
+                    k.SetValue("Publisher", "DRBR (fan mod by ionizachip)");
                     k.SetValue("InstallLocation", p.Root);
                     k.SetValue("DisplayIcon", p.LauncherExe + ",0");
                     k.SetValue("UninstallString", "\"" + p.LauncherExe + "\" --uninstall");

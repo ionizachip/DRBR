@@ -357,7 +357,7 @@ function kbr_skin_art_draw()
 
 // ---------- the HP panel (scr_charbox, det_sent.py's hook): an online-only look's head and CHARACTER NAME ----------
 // The game's own heroes (Kris ... Flowery) keep their own head and name art. An online-only look has no name art, so its
-// name (BERDLY, AQUA) is written in the battle-name lettering (the sheet ImperfectNORE supplied), narrower letters when it
+// name (BERDLY, AQUA) is written in the battle-name lettering (the sheet ionizachip supplied), narrower letters when it
 // is long. Returns 1 when it drew them (the game's own head / name for that box are skipped then).
 function kbr_charbox(_c, _face, _hx, _hy, _nx, _ny)
 {
@@ -382,7 +382,7 @@ function kbr_charbox_col(_c, _col)
     return kfo_skin_cosmetic(_s) ? kfo_skin_col(_s) : _col;
 }
 
-// ---------- the battle-name lettering (spr_khub_bnfont: the sheet ImperfectNORE supplied, 66 glyphs in 3 widths, 14 x 19 cells) ----------
+// ---------- the battle-name lettering (spr_khub_bnfont: the sheet ionizachip supplied, 66 glyphs in 3 widths, 14 x 19 cells) ----------
 function knight_bn_order()
 {
     return "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890()[]-+!" + chr(1) + ".," + chr(2) + "?<>:;'\"=#_*$" + chr(3) + "~/\\|@" + chr(4);

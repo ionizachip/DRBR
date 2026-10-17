@@ -3,7 +3,7 @@
 An online battle royale for **DELTARUNE Chapter 3**. Up to 8 players fight the same boss at the same moment, each in
 their own game. You dodge its attacks, send attacks of your own at each other, and the last SOUL standing wins.
 
-DRBR is an unofficial fan mod by ImperfectNORE, built on the **Knight Hub** (every knight fight in one game). It needs
+DRBR is an unofficial fan mod by ionizachip, built on the **Knight Hub** (every knight fight in one game). It needs
 your own copy of DELTARUNE from Steam.
 
 ## Play
@@ -92,6 +92,6 @@ Details: [docs/UPDATING.md](docs/UPDATING.md).
 ## Credits
 
 - **DELTARUNE** is by Toby Fox. DRBR is not affiliated with or endorsed by Toby Fox or the DELTARUNE team.
-- **DRBR and the Knight Hub** are by ImperfectNORE.
+- **DRBR and the Knight Hub** are by ionizachip.
 - **The knight fights** are by their mods' makers, credited on each knight's page in the game.
 - **The fight songs** are by their artists: in the game, CONFIG > CREDITS > MUSIC. The songs belong to their artists.
