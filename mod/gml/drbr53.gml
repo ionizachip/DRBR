@@ -839,9 +839,10 @@ function kbr_soul_hint_text(_m)
 {
     switch (_m)
     {
-        case "yellow": return "Z SHOOTS, HOLD Z: BIG SHOT";
+        // (DRBR 1.0.2: and where USE SKILL went - Z is the SOUL's on these two)
+        case "yellow": return "Z SHOOTS, HOLD Z: BIG SHOT. SKILLS: HOLD " + kbr_use_key_label();
         case "green": return "THE ARROWS TURN YOUR SHIELD";
-        case "orange": return "HOLD Z, LET GO TO DASH";
+        case "orange": return "HOLD Z, LET GO TO DASH. SKILLS: HOLD " + kbr_use_key_label();
         case "purple": return "THE ARROWS CHANGE LANES";
     }
     return "";
@@ -871,10 +872,14 @@ function kbr_hud_soulhint_box(xx, yy, _M)
         _cx = round((_g.bbox_left + _g.bbox_right) / 2);
         _y = _g.bbox_bottom + 8;
     }
+    // (DRBR 1.0.2: kept on screen and in the battle's middle band, as Flowery's own lines are - a box that is not where it
+    // usually is, or not measured yet, put it in the top left corner)
+    _cx = clamp(_cx, xx + 160, xx + 480);
+    _y = clamp(_y, yy + 250, yy + 330);
     if (instance_exists(obj_fl_soul) && kfo_view().hints && (!variable_global_exists("kbr_fl_turns") || global.kbr_fl_turns <= 2))
         return 0;
     draw_set_halign(fa_center);
-    var _r = kbr_hud_soulhint(_cx, min(_y, yy + 330), 300, _M);
+    var _r = kbr_hud_soulhint(_cx, _y, 300, _M);
     draw_set_halign(fa_left);
     return _r;
 }

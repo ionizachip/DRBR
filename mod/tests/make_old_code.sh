@@ -9,7 +9,9 @@ rm -rf "$SBX"; mkdir -p "$SBX"
 # 1.0.0's exact build inputs: the 51.10 game package's toolkit.zip (its generator, rules, templates with their events, and
 # the boss pieces) - the package kept from 1.0.0's build (work/pkg51_1010_backup)
 mkdir -p "$SBX/tk"
-python3 -c "import zipfile,sys; zipfile.ZipFile(sys.argv[1]).extractall(sys.argv[2])" /home/claude/work/pkg51_1010_backup/toolkit.zip "$SBX/tk"
+# (OLD_TK: another release's toolkit - 1.0.1's for the 1.0.2 room test: work/pkg51_1011_backup/toolkit.zip)
+TK="${OLD_TK:-/home/claude/work/pkg51_1010_backup/toolkit.zip}"
+python3 -c "import zipfile,sys; zipfile.ZipFile(sys.argv[1]).extractall(sys.argv[2])" "$TK" "$SBX/tk"
 mv "$SBX/tk/toolkit" "$SBX/scripts"
 cp -r /home/claude/work/build/merged "$SBX/merged"
 cp /home/claude/work/build/assets.json "$SBX/assets.json"
@@ -18,5 +20,5 @@ for f in "$SBX"/scripts/*.py; do
 done
 (cd "$SBX/scripts" && python3 gen_hub.py > "$SBX/gen.log" 2>&1 && python3 lint_hub.py > "$SBX/lint.log" 2>&1) || { echo "SANDBOX GEN FAILED"; tail -20 "$SBX/gen.log" "$SBX/lint.log"; exit 1; }
 grep -E "unresolved|collisions|accessors on|raw asset" "$SBX/lint.log" | tr '\n' ' '; echo
-echo "1.0.0 code: start log build $(grep -o '"build", "51.1[0-9]"' "$SBX/merged/gml_GlobalScript_knight_core.gml"), kbr_hj_bot_face $(grep -c 'function kbr_hj_bot_face' "$SBX/merged/gml_GlobalScript_knight_core.gml")"
+echo "old code: start log build $(grep -o '"build", "51.1[0-9]"' "$SBX/merged/gml_GlobalScript_knight_core.gml"), kbr_hj_bot_face $(grep -c 'function kbr_hj_bot_face' "$SBX/merged/gml_GlobalScript_knight_core.gml")"
 echo "$SBX/merged/"

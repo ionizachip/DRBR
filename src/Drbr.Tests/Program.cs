@@ -536,6 +536,17 @@ namespace Drbr
             Ok(Hash.Same(LauncherSwap.Waiting(p), nl.Sha256), "  ... the next launcher start finds it to swap in");
             File.Copy(p.PendingLauncher, p.LauncherExe, true);   // (what DRBR Updater does, tested on Windows programs under Wine)
             Ok(LauncherSwap.Waiting(p) == null && !File.Exists(p.PendingLauncher), "  ... once it is in place, the staged copy is removed and nothing is swapped again");
+            // DRBR 1.0.2: a release put up under another tag than its version (1.0.1 went up as v1.01): its signed address is not
+            // there - the update reads the DRBR.zip the check read instead (its manifest has to be the one checked)
+            c.Settings.UpdateUrlOverride = url + "/wrongtag/DRBR.zip"; c.Settings.Save(p);
+            File.WriteAllText(logf, "");
+            LauncherCore c6 = new LauncherCore(p);
+            UpdateInfo u6 = c6.Check();
+            InstallResult r6 = c6.ApplyUpdate(u6, null);
+            string[] wtLog = File.ReadAllLines(logf);
+            Ok(u6.Available && r6.Ok && new InstallEngine(p).InstalledVersion() == TestVer(6) && new InstallEngine(p).VerifyInstall(true) == null
+               && wtLog.Any(l => l.Contains("v-not-its-tag")) && wtLog.Any(l => l.StartsWith("RANGE wrongtag/DRBR.zip")),
+               "a release under the wrong tag (its own address not found) still updates, from the DRBR.zip the check read (" + r6.Version + ")");
             // no release there (yet): a clear message
             c.Settings.UpdateUrlOverride = url + "/nothing/DRBR.zip"; c.Settings.Save(p);
             string e4 = Throws(() => new LauncherCore(p).Check());

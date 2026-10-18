@@ -266,6 +266,8 @@ function kbr_jv_attack()
     _dc.damage = 100;
     _dc.grazepoints = 3;
     _dc.inv = _d.inv[_ai];
+    // (DRBR 1.0.2: whether his body turns into the Devilsknife now - its own Draw then says "METAMORPHOSIS!")
+    var _morph = false;
     if (instance_exists(body))
     {
         body.dancelv = kbr_jv_dance();
@@ -279,14 +281,19 @@ function kbr_jv_attack()
         {
             body.condition = 5;
             body.timer = 0;
+            _morph = true;
         }
     }
-    kbr_jv_say(_d, _ai);
+    kbr_jv_say(_d, _ai, _morph);
     return 1;
 }
 
-// his line for attack _ai: its own the first time in this match, then one of his repeats; his voice with it (Chapter 1's)
-function kbr_jv_say(_d, _ai)
+// his line for attack _ai: its own the first time in this match, then one of his repeats; his voice with it (Chapter 1's).
+// DRBR 1.0.2: the Devilsknife attacks (his body turns into the scythe: _morph) and the finale have Chapter 1's own clip -
+// "METAMORPHOSIS!" from his body as it turns, "BYE-BYE!" from the finale's bullets - and nothing on top of it (a laugh or
+// "CHAOS, CHAOS!" played over it: your report "uses the wrong voiceline"); a Devilsknife whose body is already the scythe
+// says it here instead
+function kbr_jv_say(_d, _ai, _morph)
 {
     var _first = true;
     for (var _i = 0; _i < array_length(said); _i++)
@@ -303,8 +310,10 @@ function kbr_jv_say(_d, _ai)
         say = _d.again[kbr_irandom(array_length(_d.again) - 1)];
     say_t = 75;
     var _snd = -1;
-    if (_ai == 15)
-        _snd = snd_joker_byebye;
+    if (_ai == 15 || (_d.cond[_ai] == 5 && !is_undefined(_morph) && _morph))
+        _snd = -1;
+    else if (_d.cond[_ai] == 5)
+        _snd = snd_joker_metamorphosis;
     else if (_ai == 0 || string_pos("CHAOS", say) > 0)
         _snd = snd_joker_chaos;
     else if (string_pos("ANYTHING", say) > 0)

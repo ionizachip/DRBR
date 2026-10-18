@@ -2,7 +2,7 @@
 """A tiny HTTP file server with Range support (resumed downloads, a file read in parts) and a request log, for DRBR's
 update tests. Files under norange/ are always sent whole (a server without ranges). A path with no file but a
 "<path>.redirect" file is answered 302 to the address in it (as GitHub's latest -> v<version> -> its file host). Log
-lines: "GET <path>", "RANGE <path> <first>-<last>" or "REDIRECT <path> <address>".
+lines: "GET <path>", "RANGE <path> <first>-<last>", "REDIRECT <path> <address>" or "NOTFOUND <path>".
 Usage: range_server.py <root dir> <port> <log file>"""
 import http.server, os, sys, re, urllib.parse
 
@@ -26,6 +26,9 @@ class H(http.server.BaseHTTPRequestHandler):
             self.end_headers()
             return
         if not full.startswith(os.path.realpath(ROOT)) or not os.path.isfile(full):
+            # (DRBR 1.0.2: logged too - the wrong-tag release's own address is asked first)
+            with open(LOG, 'a') as lg:
+                lg.write('NOTFOUND %s\n' % path)
             self.send_response(404)
             self.end_headers()
             return

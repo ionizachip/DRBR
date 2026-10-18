@@ -611,6 +611,13 @@ function kbr_fl_jarona_say()
     return kbr_enc_say(_r[0], _r[1], _r[2], _r[3], _f.say, min(1, _f.say_t / 10));
 }
 
+// the pieces that live on his board only (not his Jarona copies or his friends' markers: a copy waits at his place for its board)
+function kbr_fl_board_objs()
+{
+    return [obj_fl_soul, obj_fl_ctrl, obj_fl_wall, obj_fl_bullet, obj_fl_word, obj_fl_orbit, obj_fl_pad, obj_fl_thorns, obj_fl_bloom, obj_fl_box,
+        obj_fl_book, obj_fl_pickup, obj_fl_wordflower, obj_fl_beam];
+}
+
 // every one of his pieces' objects (the cut, the bots' view of his board)
 function kbr_fl_pieces()
 {
@@ -634,19 +641,7 @@ function kbr_fl_cut(_all)
         with (_l[_i])
             instance_destroy();
     }
-    with (obj_heart)
-    {
-        visible = true;
-        if (variable_instance_exists(id, "canmove"))
-            canmove = 1;
-        image_alpha = 1;
-    }
-    with (obj_grazebox)
-    {
-        image_angle = 0;
-        if (variable_instance_exists(id, "angle"))
-            angle = 0;
-    }
+    kbr_fl_red_back();
     if (variable_global_exists("kbr_fl_box") && is_struct(global.kbr_fl_box))
     {
         var _B = global.kbr_fl_box;
@@ -670,6 +665,66 @@ function kbr_fl_cut(_all)
         thissprite = idlesprite;
     }
     // his voice and the charge's loop stop with the attack
+    audio_stop_sound(snd_chargeshot_charge);
+    return 1;
+}
+
+// the red SOUL back from under the orange one (the orange SOUL drags it hidden: kbr_fl_attack, kbr_fl_build)
+function kbr_fl_red_back()
+{
+    with (obj_heart)
+    {
+        visible = true;
+        if (variable_instance_exists(id, "canmove"))
+            canmove = 1;
+        image_alpha = 1;
+    }
+    with (obj_grazebox)
+    {
+        image_angle = 0;
+        if (variable_instance_exists(id, "angle"))
+            angle = 0;
+    }
+    return 1;
+}
+
+// ---------- DRBR 1.0.2: the board's two halves ----------
+// His board is its controller (obj_fl_ctrl: the scroll, the course, its spawns) and the orange SOUL on the battle box, and his
+// pieces read them every frame. 1.0.1 could stop with "obj_fl_soul Draw: <unknown_object>.fakecamxspeedadditional not set": the orange SOUL drew
+// with its controller gone. Now, when one half is gone while the rest of the board still runs, the board ends in this game the
+// way the cut ends it (its pieces go; the red SOUL, the box and Flowery come back) instead of a piece reading the half that is
+// not there. make_flowery.py makes kbr_fl_broken() the first line of every Step / Draw that reads them.
+function kbr_fl_whole()
+{
+    // (and the battle box it is on: every piece reads it - scr_get_box - and the board is made only while there is one)
+    return instance_exists(obj_fl_ctrl) && instance_exists(obj_fl_soul) && instance_exists(obj_growtangle);
+}
+
+// true: the board is not whole - it has ended in this game (self is gone with it) and the calling event stops
+function kbr_fl_broken()
+{
+    if (kbr_fl_whole())
+        return false;
+    kbr_fl_unboard();
+    if (instance_exists(id))
+        instance_destroy();
+    return true;
+}
+
+// the board's end in this game: the cut's own (once per attack: the GROUP MERCY note, the tower, the box), else - a board whose
+// attack was already cut - what is left of it goes and the red SOUL comes back
+function kbr_fl_unboard()
+{
+    global.kbr_fl_broke = (variable_global_exists("kbr_fl_broke") ? global.kbr_fl_broke : 0) + 1;
+    if (variable_global_exists("kbr_fl_dirty") && global.kbr_fl_dirty)
+        return kbr_fl_cut(false);
+    var _l = kbr_fl_board_objs();
+    for (var _i = 0; _i < array_length(_l); _i++)
+    {
+        with (_l[_i])
+            instance_destroy();
+    }
+    kbr_fl_red_back();
     audio_stop_sound(snd_chargeshot_charge);
     return 1;
 }

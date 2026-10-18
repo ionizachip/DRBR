@@ -380,6 +380,18 @@ GENERAL > SPECTATORS lets room members watch, WATCH PLACES 0-4 extra places for 
 480 ("Spacewar"): kf_steam.dll, steam_api64.dll and steam_appid.txt stay in chapter3_windows; Steam must be running and
 signed in. The relay: knightfights_server.zip (Node.js 18+, TCP 7777); everyone types its address in MORE OPTIONS > SERVER.
 
+DRBR 1.0.2 (build 51 update 12)
+-------------------------------
+- FLOWERY'S BOARD no longer stops the game when a part of it is gone in the middle of an attack (1.0.1: "ERROR ... Draw Event
+  for object obj_fl_soul ... fakecamxspeedadditional not set"): the board ends in that game as an attack's end ends it (your
+  red SOUL is back in the box) and his next attack builds it again.
+- SKILLS ON THE YELLOW AND ORANGE SOULS: there Z is the SOUL's (Spamton NEO's shots, Flowery's dash), so USE SKILL is on
+  HOLD BREATH's key - S (LT on a controller) unless you changed it. "SKILLS: HOLD S" is beside your skill slots the whole
+  time (it blinks when you hold Z with a skill ready), in the SOUL hint under the box, and on the KEYBINDS page. Everywhere
+  else (and on Gerson's green and Pink's purple SOULs) Z uses skills as always.
+- Jevil's Devilsknife: Chapter 1's "METAMORPHOSIS!" alone as he turns into it; BYE-BYE once; the DEVILSKNIFE skill lands
+  with "METAMORPHOSIS!".
+
 Known issues and limits (DRBR 1.0.1 - build 51 update 11)
 --------------------------------------------------------
 - The bots now PLAY the bosses' SOUL modes: on Gerson's green SOUL each bot turns its own shield toward the spears (a block

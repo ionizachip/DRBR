@@ -180,7 +180,17 @@ namespace Drbr
         /// Every file is checked against the signed manifest either way.</summary>
         void DownloadFromPackage(UpdateInfo u, List<PayloadFile> todo, string dir, long total, Action<string, int> progress)
         {
-            HttpRangeSource src = new HttpRangeSource(u.PackageUrl);
+            HttpRangeSource src;
+            try { src = new HttpRangeSource(u.PackageUrl); }
+            catch (DrbrException e) when (e.Code == "no_release" && !string.IsNullOrEmpty(u.Url) && u.Url != u.PackageUrl)
+            {
+                // DRBR 1.0.2: the release's own address (its tag, named in the signed manifest) is not there - a release put up
+                // under another tag than its version (v1.01 for 1.0.1 did that): the DRBR.zip the check read is used instead. Its
+                // manifest has to be the one that was checked (just below), so nothing else can come in this way.
+                Log.Warn("The release's own address " + u.PackageUrl + " was not found (its tag is not v" + u.Manifest.Version + "?) - reading the DRBR.zip the check read: " + u.Url);
+                u.PackageUrl = u.Url;
+                src = new HttpRangeSource(u.PackageUrl);
+            }
             Dictionary<string, PackagedFile> where = null;
             if (src.Ranges)
             {

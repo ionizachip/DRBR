@@ -230,6 +230,17 @@ function kbr_hud_skills(xx, yy, _M)
             draw_rectangle(_nx, _ny + 14, _nx + round(100 * _f), _ny + 15, false);
         }
     }
+    // DRBR 1.0.2: while the orange / yellow SOUL has Z (its dash, its shots), USE SKILL is on HOLD BREATH's key - said right
+    // of the slots all the while (it blinks as it comes and when the usual key is held: kbr_skills_tick)
+    if (kbr_orange_on() && _M.me && !_M.out)
+    {
+        var _lx = _fx + _r + (_n * 27) + 16 + _r + 8;
+        var _ly = _cy0 - 12;
+        scr_84_set_draw_font("main");
+        var _hot = variable_struct_exists(_S, "mv_t") && _S.mv_t > 0 && ((_S.mv_t div 6) mod 2) == 0;
+        kbr_hud_text(_lx, _ly, "SKILLS:", c_ltgray);
+        kbr_hud_text(_lx, _ly + 14, "HOLD " + kbr_use_key_label(), _hot ? c_white : c_yellow);
+    }
     // build 52: what is on you right now, with its seconds (SLOW, CONFUSE, DARKNESS, REGENERATION, REFLECTION, LIFESTEAL,
     // DETERMINATION)
     kbr_hud_status(_fx + 66, _cy0 + 76, _M);

@@ -887,10 +887,12 @@ function kbr_sa_step(_G)
             _G.end_t = 210;
             break;
         case 30:
-            // DEVILSKNIFE: four Devilsknives swing round the box's middle (the first makes the other three)
+            // DEVILSKNIFE: four Devilsknives swing round the box's middle (the first makes the other three). DRBR 1.0.2: with
+            // Jevil's own "METAMORPHOSIS!" (Chapter 1's clip as he becomes the Devilsknife) - it came in silently
             if (_t == 0)
             {
                 kbr_sa_mk(_G, _B[0], _B[1], obj_jv_cscythe);
+                kbr_sa_sfx(snd_joker_metamorphosis, 1);
                 kbr_sa_sfx(snd_spearappear, 1);
             }
             _G.end_t = 200;

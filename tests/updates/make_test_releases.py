@@ -8,6 +8,8 @@
   corrupt/DRBR.zip  +4, correctly signed, but the changed file inside it is damaged (must be refused)
   inuse/DRBR.zip    +5, a new DRBR Launcher.exe too: the running launcher cannot be replaced (Windows), so it waits for
                     DRBR Updater
+  wrongtag/DRBR.zip +6, its signed manifest names another address (a release put up under another tag than its version):
+                    the update reads the DRBR.zip the check read
   json/             +1 in DRBR 1.0.0's layout (update-manifest.json + .sig + every file): still understood
 (+n: the payload's own version with n added to its last number - DRBR 1.0.1: they were fixed 1.0.1-1.0.5, so a 1.0.1
 payload's "updates" were not newer than it; drbr-tests.dll counts the same way, TestVer)
@@ -74,13 +76,15 @@ def setup_with(d):
     return p
 
 
-def make(kind, ver, doc_text, sign_key, damage=False, rezip=False, folder=None, launcher=False):
+def make(kind, ver, doc_text, sign_key, damage=False, rezip=False, folder=None, launcher=False, tag_folder=None):
     d, m = release_files(kind, ver, doc_text, damage, launcher)
     setup = setup_with(d)
     od = os.path.join(out, folder or kind)
     os.makedirs(od, exist_ok=True)
     zp = os.path.join(od, 'DRBR.zip')
-    m['base_url'] = base.rstrip('/') + '/' + (folder or kind) + '/'
+    # (tag_folder: the release's own address as its signed manifest names it - another folder than where it is served: a release
+    # put up under the wrong tag)
+    m['base_url'] = base.rstrip('/') + '/' + (tag_folder or folder or kind) + '/'
     m['package'] = 'DRBR.zip'
     mb = json.dumps(m, indent=2).encode()
     sig = rt.sign_bytes(mb, sign_key).encode()
@@ -123,6 +127,8 @@ make('norange', V(3), ('# DRBR %s (no HTTP ranges on this server)\n' % V(3)) * 6
 make('badsig', V(4), ('# DRBR %s (bad signature)\n' % V(4)) * 60, other)
 make('corrupt', V(4), ('# DRBR %s (damaged on the server)\n' % V(4)) * 60, key, damage=True)
 make('inuse', V(5), ('# DRBR %s (a new launcher)\n' % V(5)) * 60, key, launcher=True)
+# DRBR 1.0.2: put up under another tag than its version - its signed address (v-not-its-tag/) is not there
+make('wrongtag', V(6), ('# DRBR %s (under the wrong tag)\n' % V(6)) * 60, key, tag_folder='v-not-its-tag')
 make_json('json', V(1), ('# DRBR %s\n\nThis README changed in the test release.\n' % V(1)) * 60, key)
 shutil.rmtree(work)
 print('test releases in', out)

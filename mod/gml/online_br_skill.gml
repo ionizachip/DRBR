@@ -416,13 +416,31 @@ function kbr_skills_tick()
     var _orn = kbr_orange_on();
     if (!variable_struct_exists(_S, "orw"))
         _S.orw = _orn;
+    // DRBR 1.0.2: the label beside the slots ("SKILLS: HOLD S") blinks when it comes, and again when you hold the usual USE
+    // key (Z: the SOUL's now) with a skill ready - your report: "you can't use skills with other SOUL types" (Z did not)
+    if (!variable_struct_exists(_S, "mv_t"))
+    {
+        _S.mv_t = 0;
+        _S.zmv = 0;
+    }
+    if (_S.mv_t > 0)
+        _S.mv_t--;
     if (_orn != _S.orw)
     {
         _S.orw = _orn;
         _S.zlock = true;
         _S.zh = 0;
         _S.zdone = false;
+        _S.mv_t = _orn ? 75 : 0;
     }
+    if (_orn && array_length(_S.slots) > 0 && kfo_key("use") > 0 && keyboard_check(kfo_key("use")) && !kfo_chat_typing())
+    {
+        _S.zmv++;
+        if (_S.zmv == 12 && _S.mv_t <= 0)
+            _S.mv_t = 60;
+    }
+    else
+        _S.zmv = 0;
     if (_S.zlock)
     {
         if (!kbr_key_held("use"))

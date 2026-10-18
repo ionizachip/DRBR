@@ -1,5 +1,31 @@
 # Changelog
 
+## 1.0.2
+
+### In the game
+
+- **Fixed a crash on Flowery's board** ("ERROR in action number 1 of Draw Event for object obj_fl_soul ...
+  fakecamxspeedadditional not set before reading it"): the orange SOUL was drawn after the board's controller was gone. Now,
+  if a part of Flowery's board (its controller, the orange SOUL or the battle box) is gone in the middle of an attack, the
+  board ends in that game the way an attack's end ends it - its pieces go and your red SOUL is back in the box - and the
+  game goes on. His next attack builds the board again as usual.
+- **Skills on the yellow and orange SOULs.** On Spamton NEO's yellow SOUL and Flowery's orange board, Z belongs to the
+  SOUL (it shoots or dashes), so USE SKILL is on **S** (HOLD BREATH's key, LT on a controller) while they are up. The game
+  now says so all the while: **SKILLS: HOLD S** beside your skill slots, in the SOUL hint under the box, and on the
+  KEYBINDS page. The label blinks when you hold Z with a skill ready. Before, only Flowery's first attacks said it, so it
+  looked as if skills did not work there.
+- **Jevil's Devilsknife has his own voice again.** When he turns into the Devilsknife you hear Chapter 1's "METAMORPHOSIS!"
+  alone (DRBR used to play a laugh or "CHAOS, CHAOS!" over it). BYE-BYE says "BYE-BYE!" once instead of twice. The
+  DEVILSKNIFE skill lands with "METAMORPHOSIS!" too (it came in silently).
+- The SOUL hint stays under the battle box and on screen.
+
+### Installing and updating
+
+- **A release under the wrong tag still updates** (from this launcher on). If a release is put up under another tag than
+  its version (1.0.1 went up as `v1.01`), the 1.0.2 launcher downloads the changed files from the DRBR.zip it just checked
+  (it is still checked against the signed manifest). Before, the update stopped with "There is no DRBR release to update
+  from yet". Launchers 1.0.0 and 1.0.1 still need the exact tag (`v1.0.2` for this release).
+
 ## 1.0.1
 
 ### In the game

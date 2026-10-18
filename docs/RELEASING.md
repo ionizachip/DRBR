@@ -130,9 +130,14 @@ and that nothing in it is compressed.
 Upload **`DRBR.zip` exactly as it was made**: do not unpack it and zip it again. (A re-zipped `DRBR.zip` still works,
 but every launcher then has to download all of it for an update.)
 
-By hand on GitHub: Releases > Draft a new release > tag `v1.1.0` (exactly the version: the signed manifest points at
-`releases/download/v1.1.0/DRBR.zip`) > title `DRBR 1.1.0` > the text of `RELEASE_NOTES.md` > attach `DRBR.zip` >
-"Set as the latest release" > Publish.
+By hand on GitHub: Releases > Draft a new release > tag `v1.1.0` (exactly the version, every dot included - `v1.1.0`,
+not `v1.10`: the signed manifest points at `releases/download/v1.1.0/DRBR.zip`) > title `DRBR 1.1.0` > the text of
+`RELEASE_NOTES.md` > attach `DRBR.zip` > "Set as the latest release" > Publish.
+
+A release under another tag still updates from launcher 1.0.2 on (it falls back to the `DRBR.zip` it checked, still
+verified against the signed manifest), but launchers 1.0.0 and 1.0.1 can only download from the exact tag. 1.0.1 went
+up as `v1.01`: renaming that tag to `v1.0.1` (Edit release > tag) fixes it for them; once a later release is the latest,
+they update to that one instead. After publishing, check it the launcher's way: `drbr-tests.dll live`.
 
 Or with the GitHub CLI:
 

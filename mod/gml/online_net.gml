@@ -296,7 +296,7 @@ function kfo_ini_save()
 // ---------- the match keys (build 46: MORE OPTIONS > KEYBINDS, kept in knightfights_online.ini [keys]) ----------
 // [id, the KEYBINDS page's label, the default key]. The arrows move the SOUL and X is the game's own slow walk: those stay
 // the game's and cannot be taken here (nor ENTER / ESC / F4). A controller: its confirm button uses (tap: next skill), its
-// menu button charges, LB holds breath, RB is the hold slot, BACK the player list.
+// menu button charges, LT holds breath, RT is the hold slot, LB / RB change the TARGETING mode, BACK the player list.
 function kfo_key_list()
 {
     // build 48: TARGETING takes Q / E (the mode) and A (the next target): HOLD SLOT moves to D, QUICK SETTINGS to F
@@ -567,6 +567,27 @@ function kfo_key_label(_id)
     return (_k > 0) ? kfo_key_name(_k) : "-";
 }
 
+// DRBR 1.0.2: USE SKILL's key right now as the match HUD says it - the keyboard key, and the controller button too while one
+// is in use ("S / LT" on the orange / yellow SOUL)
+function kbr_use_key_label()
+{
+    var _l = kfo_key_label("use");
+    if (knight_pad_on())
+    {
+        // (gp_shoulderlb / rb are the triggers - LT and RT, as KEYBINDS names them - gp_shoulderl / r the bumpers)
+        var _b = kbr_pad_now("use");
+        if (_b == gp_shoulderlb)
+            _l += " / LT";
+        else if (_b == gp_shoulderrb)
+            _l += " / RT";
+        else if (_b == gp_shoulderl)
+            _l += " / LB";
+        else if (_b == gp_shoulderr)
+            _l += " / RB";
+    }
+    return _l;
+}
+
 // the KEYBINDS page's name of an action
 function kfo_key_title(_id)
 {
@@ -604,7 +625,8 @@ function kfo_key_desc(_id)
     switch (_id)
     {
         case "breath": return "HOLD BREATH: press once to hold your#breath (SOUL faster), again to let go.";
-        case "use": return "USE SKILL: tap it to pick the next skill,#hold it to use the picked one. Z: change it.";
+        // (DRBR 1.0.2: and where it goes while the SOUL itself uses Z)
+        case "use": return "USE SKILL: tap: next skill, hold: use it.#Yellow / orange SOUL: on " + kfo_key_name(kfo_key("breath")) + ". Z: change it.";
         case "charge": return "CHARGE: hold it to charge the gauge, let go#to draw a skill. Z: change the key.";
         case "hold": return "HOLD SLOT: the picked skill into the hold#slot, and back. Z: change the key.";
         case "list": return "PLAYER LIST: hold it to see every player.#Z: change the key.";

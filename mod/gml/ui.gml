@@ -1892,6 +1892,16 @@ function knight_pad_pressed(_b)
     return gamepad_button_check_pressed(_g.gamepad_id, _b);
 }
 
+// DRBR 1.0.2: a controller is connected - Chapter 3's obj_gamecontroller sets gamepad_active when one is found (and clears it
+// when it goes); its gamepad_id is 0 even with no controller at all
+function knight_pad_on()
+{
+    if (!instance_exists(obj_gamecontroller))
+        return false;
+    var _g = instance_find(obj_gamecontroller, 0);
+    return variable_instance_exists(_g, "gamepad_active") && _g.gamepad_active == 1 && variable_instance_exists(_g, "gamepad_id") && _g.gamepad_id >= 0;
+}
+
 // a controller button is down (the online match keys: LB / RB / BACK)
 function knight_pad_held(_b)
 {

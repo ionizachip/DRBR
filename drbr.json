@@ -1,10 +1,10 @@
 {
   "product": "DRBR",
   "title": "DRBR - DELTARUNE BATTLE ROYALE",
-  "version": "1.0.1",
-  "mod_build": "51.11",
+  "version": "1.0.2",
+  "mod_build": "51.12",
   "protocol": 51,
-  "launcher_version": "1.0.1",
+  "launcher_version": "1.0.2",
   "min_launcher_version": "1.0.0",
   "github": {
     "owner": "ionizachip",

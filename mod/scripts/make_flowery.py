@@ -18,7 +18,9 @@ Changed where Chapter 3 / the shared timeline differ (section 7.2):
   - Flowery's battle object (obj_flowery_enemy) -> obj_fl_flowery (the hub's, online_flowery53.gml), read through kbr_fl_gv()
     so a send can use the pieces while a knight is on stage;
   - the SOUL's clean-up no longer destroys every obj_marker / obj_afterimage in the room (only the board's);
-  - a Jarona copy made at cameray() + 500 (Chapter 5's camera is at 0, 0) -> camerax() + 500.
+  - a Jarona copy made at cameray() + 500 (Chapter 5's camera is at 0, 0) -> camerax() + 500;
+  - 1.0.2: every Step / Draw that reads the board's controller, the orange SOUL or the box starts with kbr_fl_broken(): with one
+    of them gone, the board ends in that game as the cut ends it (1.0.1 could stop in the orange SOUL's Draw).
 Usage: python3 make_flowery.py"""
 import os, re, sys
 sys.path.insert(0, '/home/claude/scripts')
@@ -322,6 +324,32 @@ def main():
     sn = B.sendable(skip=('obj_fl_towery', 'obj_fl_pillars', 'obj_fl_towerdeco', 'obj_fl_tparticle'),
                     keep_soul=('obj_fl_soul', 'obj_fl_ctrl', 'obj_fl_box', 'obj_fl_jarona', 'obj_fl_wall', 'obj_fl_pad', 'obj_fl_thorns', 'obj_fl_bullet'))
     print('flowery sendable: %d Creates, %d events, %d turn-timer reads, %d guarded writes' % sn)
+    # ---- 1.0.2: the board's two halves (its controller, the orange SOUL) and the box it is on. Every Step / Draw that reads one
+    # of them starts with kbr_fl_broken() (online_flowery53.gml): if one is gone while the event still runs, the board ends in
+    # this game the way the cut ends it and the event stops. 1.0.1 could stop with "obj_fl_soul Draw: <unknown_object>.fakecamxspeedadditional
+    # not set before reading it" - the orange SOUL drew with its controller gone.
+    BROKEN = ['obj_fl_soul_Step_0', 'obj_fl_soul_Draw_0', 'obj_fl_ctrl_Step_0', 'obj_fl_ctrl_Step_2', 'obj_fl_ctrl_Draw_0', 'obj_fl_wall_Step_0',
+              'obj_fl_thorns_Step_0', 'obj_fl_thorns_Step_2', 'obj_fl_pad_Step_0', 'obj_fl_box_Step_0', 'obj_fl_bullet_Step_0', 'obj_fl_bullet_Step_2',
+              'obj_fl_book_Draw_0', 'obj_fl_word_Draw_0', 'obj_fl_jarona_Step_0']
+    G = 'if (kbr_fl_broken())\n    exit;\n'
+    for b in BROKEN:
+        n = 'gml_Object_%s.gml' % b
+        t = F[n]
+        if b == 'obj_fl_jarona_Step_0':
+            # (a Jarona copy is made before its board - at his place, as the attack is armed: it waits for the board first)
+            t = sub1(t, 'kbr_ev_in();\nif (!i_ex(obj_fl_ctrl))\n{\n    exit;\n}\n', 'kbr_ev_in();\nif (!i_ex(obj_fl_ctrl))\n{\n    exit;\n}\n' + G, fname=n)
+        else:
+            assert t.startswith('kbr_ev_in();\n'), n
+            t = 'kbr_ev_in();\n' + G + t[len('kbr_ev_in();\n'):]
+        F[n] = t
+    # every other event that runs on its own and reads one of them is the tower's (it checks for the SOUL itself); the Creates and
+    # the pieces' methods (do_hit_event ...) read them only when the board's own guarded events make or call them
+    for n, t in F.items():
+        m = re.match(r'gml_Object_(obj_fl_\w+?_(?:Step|Draw|Alarm|Other)_\d+)\.gml$', n)
+        if not m or m.group(1) in BROKEN or m.group(1).startswith('obj_fl_towery_'):
+            continue
+        body = re.sub(r'//[^\n]*', '', t)
+        assert not re.search(r'\b(obj_fl_ctrl|obj_fl_soul|controller|obj_growtangle)\.\w+|\bscr_get_box\(', body), ('a board read with no kbr_fl_broken()', n)
     # ---- Flowery's battle object and his friends: the hub's own code (online_flowery53.gml)
     F['gml_Object_obj_fl_flowery_Create_0.gml'] = 'kbr_fl_create();\n'
     F['gml_Object_obj_fl_flowery_Step_0.gml'] = 'kbr_fl_step();\n'

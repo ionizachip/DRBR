@@ -1,7 +1,9 @@
 KNIGHT HUB v2 - WHAT WAS TESTED AND WHAT WAS NOT
 ================================================
-THE NEWEST UPDATE IS AT THE END: "BUILD 51 UPDATE 11" (DRBR 1.0.1: the bots play the bosses' SOUL modes, DELTARUNE-size
-menus, your music over the bosses, one-file releases, the launcher's self-update fixed; 1.0.0 and 1.0.1 share rooms).
+THE NEWEST UPDATE IS AT THE END: "BUILD 51 UPDATE 12" (DRBR 1.0.2: Flowery's board no longer stops the game, the skills'
+key shown on the yellow and orange SOULs, Jevil's Devilsknife voice, a release under the wrong tag still updates).
+Before it: "BUILD 51 UPDATE 11" (DRBR 1.0.1: the bots play the bosses' SOUL modes, DELTARUNE-size menus, your music over the
+bosses, one-file releases, the launcher's self-update fixed; 1.0.0 and 1.0.1 share rooms).
 Before it: "BUILD 51 UPDATE 10" (DRBR as its own installation: DRBR-Setup.exe, DRBR Launcher, signed updates, every start
 from the provided save in front of the Roaring Knight).
 Before it: "BUILD 51 UPDATE 9" (DRBR: five bosses, their SOULs and sends, new skins, the polish pass).
@@ -2921,3 +2923,131 @@ TESTS (on the final 1.0.1 code and the real DRBR.zip)
                     - the real update from GitHub: it needs 1.0.1 published (by you). Then drbr-tests.dll live
                       (DRBR_TEST_LIVE_URL) checks it from the internet the launcher's way
                     - Spamton NEO's walls for bots are still a roll by skill (a bot's SOUL cannot shoot)
+================================================================================================================
+BUILD 51 UPDATE 12 - DRBR 1.0.2: FLOWERY'S BOARD NO LONGER STOPS THE GAME, SKILLS ON THE YELLOW AND ORANGE SOULS SHOWN,
+JEVIL'S DEVILSKNIFE VOICE, A RELEASE UNDER THE WRONG TAG STILL UPDATES
+Game build 51.12 (the multiplayer build is still 51: 1.0.1 and 1.0.2 players can share a room). From the three reports on
+1.0.1: "you cant use skills with other soul types", "devils knife bug, uses wrong voiceline and doesnt play", and the crash
+"ERROR in action number 1 of Draw Event for object obj_fl_soul: Variable <unknown_object>.fakecamxspeedadditional ...".
+Statuses as in update 11: EMULATED = the real merged GML in the emulator (NOT the real game); EMULATED WINDOWS = the real
+Windows programs under Wine + wine-mono (NOT real Windows); CORE = the C# code on .NET / Linux with the real vanilla
+data.win, patch, provided save and signing key; STATIC = checked in the built data.win; NOT RUN / BLOCKED = not tested.
+
+WHAT CHANGED (GAME)
+1. THE CRASH ON FLOWERY'S BOARD. The orange SOUL's Draw finds the board's controller (obj_fl_ctrl) with a with() loop and
+   keeps -1 when there is none, then reads its fakecamxspeedadditional: with the controller gone and the SOUL still there,
+   the game stopped. Now every Step / Draw of his pieces that reads the controller, the orange SOUL or the battle box (15
+   events, make_flowery.py) first checks that all three are there; if one is gone in the middle of an attack, the board
+   ends in that game as an attack's end ends it (kbr_fl_cut: its pieces go, the red SOUL is visible and moves again, the
+   box goes back to its size, Flowery is back on stage) and the event stops. The attack then runs to its own end, and his
+   next attack builds a whole board again. WHAT REMOVED THE CONTROLLER IN THE REPORTED GAME WAS NOT FOUND (see TESTS): the
+   fix does not depend on it.
+2. SKILLS ON THE YELLOW AND ORANGE SOULS. They worked, on the wrong-looking key: on Spamton NEO's yellow SOUL and Flowery's
+   orange board Z belongs to the SOUL, so USE SKILL is on HOLD BREATH's key (S; the left trigger, LT, on a controller), and
+   only Flowery's first two attacks said so. Now "SKILLS: HOLD S" is beside the skill slots all the while (it blinks when
+   Z is held with a skill ready - Z itself never uses a skill there), the SOUL hint under the box says it (and stays under
+   the box, on screen), and KEYBINDS > USE SKILL says it. With a controller connected the label is "S / LT". (Found while
+   testing: the label first said LB - GameMaker's gp_shoulderlb is the left TRIGGER - and it took "a controller in use"
+   from gamepad_id, which Chapter 3 sets to 0 with no controller at all: now gamepad_active, set when one is connected.)
+3. JEVIL'S DEVILSKNIFE. As his body turns into the Devilsknife (attacks Devilsknife and Devilsknife Swing) only Chapter 1's
+   "METAMORPHOSIS!" plays (DRBR added a laugh / "HA" / "CHAOS, CHAOS!" over it). BYE-BYE says "BYE-BYE!" once (it was
+   played twice). The DEVILSKNIFE skill lands with "METAMORPHOSIS!" (it came in silently).
+4. drbr_profile\last_start.ini gives build 51.12.
+
+WHAT CHANGED (INSTALLING AND UPDATING)
+5. A RELEASE UNDER THE WRONG TAG STILL UPDATES. 1.0.1 was published under the tag v1.01: the signed manifest names
+   .../download/v1.0.1/, which does not exist, so a 1.0.0 launcher's update stopped with "There is no DRBR release to update
+   from yet". The 1.0.2 launcher, when the signed manifest's address is missing, downloads the changed files from the
+   DRBR.zip it has just checked (still checked against the same signed manifest). 1.0.0 and 1.0.1 launchers do not have
+   this: 1.0.2 must be published under exactly v1.0.2. (The v1.01 release is still up as it was; once 1.0.2 is the latest
+   release, every launcher updates to 1.0.2 from it.)
+
+FOUND IN THIS UPDATE'S TESTING
+- THE CRASH, REPRODUCED: t_flboard102 takes the board's controller away after the SOUL's Step and before its Draw (an End
+  Step does it). On 1.0.1's Flowery code the emulator stops with the reported error at the reported place - "Variable
+  obj_fl_soul.fakecamxspeedadditional not set before reading it [at gml_Object_obj_fl_soul_Draw_0 line 124]" (the
+  emulator names the SOUL where the game says <unknown_object>: the controller variable is -1 there). Taking the SOUL
+  away instead stopped 1.0.1 in a bamboo wall's Step, taking the box away in the controller's Draw: all three now end the
+  board cleanly.
+- WHAT TOOK THE CONTROLLER AWAY IN THE REPORTED GAME IS NOT KNOWN. Looked for: every place DRBR destroys or switches off
+  instances (the cut, a send's end and its off-screen clean-up, the bosses' line-up swaps, prompts that freeze the game,
+  OUT and the match's end), Chapter 3's own (its turn end, its pause - console only), and a soak of practice matches
+  against Flowery alone and against every boss (3 bots, skills on, random keys, the player sometimes going OUT and
+  watching): about 25,000 frames on 1.0.1's code with every frame drawn - no SOUL without its controller, no error. The
+  game's own log (knightfights_debug.log) notes only how a player went OUT, so the crash left nothing there. The fix does
+  not depend on the cause: whatever takes a part of the board away, the game goes on.
+- THE CONTROLLER LABEL (item 2): first written as "S / LB" and shown whenever obj_gamecontroller existed; GameMaker's
+  gp_shoulderlb is the left trigger (KEYBINDS calls HOLD BREATH's button LT) and Chapter 3's obj_gamecontroller sets
+  gamepad_id = 0 in its Create with or without a controller. Now "S / LT", only while gamepad_active says one is connected.
+
+TESTS (on the final 1.0.2 code and the real DRBR.zip)
+   PASS (EMULATED)  FLOWERY'S BOARD WITH A PART GONE (t_flboard102, new, 83/83): a practice match against Flowery, his
+                    attack forced, every frame stepped and drawn, the camera away from the room's corner; one part taken
+                    away by an End Step (after the SOUL's Step, before its Draw - where the reported crash was):
+                    - the CONTROLLER destroyed in Bamboo Run, Jarona!, Thorn Chase, Seth's Book, Aqua's Knives and Justice
+                      Chase; SWITCHED OFF in Bamboo Run and switched back on 20 frames later; the orange SOUL destroyed
+                      (Bamboo Run, Thorn Chase); the BATTLE BOX destroyed (Bamboo Run, Thorn Chase)
+                    - each: no error in that frame (its Draw included); none of the board's pieces left; the red SOUL
+                      visible and moving again and Flowery back on stage; the check that ended it counted; the attack
+                      ran to its end with no error; the next attack built a whole board again; a controller switched
+                      back on with no SOUL left went too
+                    - seven of his attacks (Bamboo Run, Jarona!, Thorn Chase, Seth's Book, Aqua's Knives, Justice Chase,
+                      THE FINAL JARONA) with nothing taken away: run to their cut, the board never ended early
+                    Three of its cases run on 1.0.1's Flowery code (Bamboo Run: controller, SOUL, box) - 7 of their 11
+                    checks fail: the controller case stops with the reported error in the SOUL's Draw (line 124), the
+                    SOUL case in a bamboo wall's Step, the box case in the controller's Draw.
+   PASS (EMULATED)  SKILLS IN EVERY SOUL MODE (t_soulskills102, new, 39/39): a practice match against each boss, one attack
+                    forced so its SOUL mode is on (Jevil: red, Gerson: green, Flowery: orange, Pink: lanes and tunnel,
+                    Spamton NEO: yellow), the real keys: the TP charge fills during the attack, C charges and draws a skill,
+                    holding USE uses it - Z on the red, green and purple SOULs, S on the orange and yellow ones (where Z
+                    is the SOUL's); "SKILLS: HOLD S" beside the slots and in the SOUL hint only on the orange and yellow
+                    SOULs; with a controller connected the label is "S / LT" (with none, "S"); holding Z there with a
+                    skill ready uses none and blinks the label; KEYBINDS > USE SKILL says it.
+   PASS (EMULATED)  JEVIL'S DEVILSKNIFE (t_jevil102, new, 20/20; 6 of its checks fail on 1.0.1): Devilsknife and Devilsknife
+                    Swing, twice each: "METAMORPHOSIS!" alone as his body turns; his four Devilsknives come, fade in, swing
+                    round the box and hurt, with their sounds; BYE-BYE once; Ring-Around keeps one voice of his; the
+                    DEVILSKNIFE skill sent at you lands with "METAMORPHOSIS!" and swings its four Devilsknives.
+                    Also looked at (jv_mixed_knife.py, not a suite): a match of every boss in RANDOM order at HYPER SPEED
+                    with bots - his Devilsknife in all three of his attacks: the same.
+   PASS (EMULATED)  1.0.1 AND 1.0.2 IN ONE ROOM (t_mixver102, new, 52/52): each emulated game runs its own version's code
+                    (1.0.1's from its own 51.11 package toolkit by its own generator, make_old_code.sh with OLD_TK):
+                    - a 1.0.2 host, a 1.0.1 game and a 1.0.2 game: a knights match and one each against Gerson, Flowery
+                      and Pink - every cycle the same knight / attack, seed and start tick (5 + 4 + 3 + 3 cycles), the
+                      same arena, the same bullets (13 + 12 + 9 + 9 moments, 0 different), no error in any game
+                    - watching the PERFECT bot both ways round in Gerson's, Flowery's and Pink's modes: no error, the
+                      watcher follows and sees it move, gets its shield direction, its orange SOUL dashes with it (64 of
+                      64 frames)
+   PASS (EMULATED)  t_flowery53_multi (Flowery in a room of three games, sends between them) 15/15
+   SOAK (EMULATED)  practice matches with every frame drawn, random keys (the SOUL's and the match's), 3 bots, skills on,
+                    the player kept alive most of the time and sometimes going OUT: on 1.0.1's code Flowery alone (3
+                    matches to their end), every boss (2 x 6000 frames) and the reporter's own room settings (every knight
+                    and boss, RANDOM order, 4 slots, 250 HP: 8000 frames, and 6964 frames until the emulator met Chapter 3's
+                    screen shatter calling random() with two arguments, which the game's runner accepts and the emulator
+                    does not) - no SOUL without its controller, no error of the game; on 1.0.2's code the reporter's settings
+                    again (8000 frames, and 6183 to the match's end): no error.
+   PASS (EMULATED)  the full emulator regression on the final code (logs102), 50 of its 51 suites finished, all passing:
+                    t_ui 83/83, t_uilayout 17281/17281, t_kmenu 17/17, t_qol41 133/133, t_presets 23/23, t_loadouts
+                    1911/1911, t_botmodes101 19/19, t_bossbots53 32/32, t_gerson53 244/244, t_gerson53 mixed 244/244,
+                    t_pink53 456/456, t_flowery53 156/156, t_spamton53 375/375, t_jevil52 112/112, t_jevil52 mixed 10/10,
+                    t_spec52 13/13, t_rematch52 17/17, t_mixed53 83/83, t_online 65/65, t_steam_gml 52/52, t_drbr_save54
+                    58/58, t_online_ui47 63367/63367, t_invite49 477/477, t_pages50 23/23, t_realpath49 21/21, t_songs47
+                    136/136, t_kfsong50 30/30, t_music50 16/16, t_mus41 136/136, t_rushsong50 10/10, t_lyrics50 16/16,
+                    t_view47 88/88, t_room47 35/35, t_keys47 150/150, t_chat48 42/42, t_tut51 74/74, t_hud50 117/117,
+                    t_hud51 38/38, t_feed51 21/21, t_bots49 37/37, the sends (t_jevil52_send 38/38, t_gerson53_send 44/44,
+                    t_pink53_send 47/47, t_flowery53_send 46/46, t_spamton53_send 45/45), and the new / 1.0.2 suites above.
+   NOT RUN          t_lineup (Tag Team / Remix): still running when the release was handed over; its result is not part
+                    of this report.
+   PASS (STATIC)    the built data.win (game build 51.12): runner check 5178 functions / 91 variables, 0 missing; round
+                    trip 1524/1524; unresolved names 0, name collisions 0, accessors on expressions 0, raw asset numbers 0;
+                    the patch applied to the vanilla data.win gives the DRBR data.win (227,563,748 bytes); t_validate53 on
+                    its fresh decompile 319/319 (10 warnings, the same kinds as 1.0.1's); the fixes are in the built code
+                    (the guard first in the orange SOUL's Draw and in 15 Flowery events, the LT label, gamepad_active).
+   PASS (CORE)      109/109 core tests on the final 1.0.2 payload (108 as in 1.0.1, and the new "wrongtag": a release whose
+                    own tag address is missing updates from the DRBR.zip the check read, still against its signed
+                    manifest). Run again after the release notes were made clearer (a re-package): 109/109.
+   NOT RUN          the Windows programs under Wine this time (wine_e2e, the real update 1.0.1 -> 1.0.2 and 1.0.0 -> 1.0.2):
+                    queued after the regression; stopped when the release was handed over to be published. The launcher's
+                    only change is the wrong-tag fallback, covered by the core test above; update 11's Wine runs (51/51,
+                    18/18) were on 1.0.1's programs.
+   The release: DRBR.zip 247,903,610 bytes, SHA-256 deecc0ca3de57a6c04c44a8adfb9a8dd5952b8a95011f7287c8d3a06262cba61; an
+   update from 1.0.1 or 1.0.0 downloads about 100 MB (the game patch, DRBR Launcher, DRBR Updater - the music is kept).
