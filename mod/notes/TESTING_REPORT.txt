@@ -2873,10 +2873,10 @@ TESTS (on the final 1.0.1 code and the real DRBR.zip)
                     - t_spamton53 375/375
                     - t_jevil52_send 38/38
                     - t_gerson53_send 44/44
-                    - t_pink53_send: STILL RUNNING when this was written (its result follows in the next update of this report)
-                    - t_flowery53_send: STILL RUNNING when this was written (its result follows in the next update of this report)
-                    - t_spamton53_send: STILL RUNNING when this was written (its result follows in the next update of this report)
-                    - t_lineup (Tag Team / Remix): STILL RUNNING when this was written (its result follows in the next update of this report)
+                    - t_pink53_send 47/47
+                    - t_flowery53_send 46/46
+                    - t_spamton53_send 45/45
+                    - t_lineup (Tag Team / Remix) 1634/1634
    PASS (STATIC)    the built data.win (game build 51.11):
                     - runner check: 5171 functions / 91 variables, 0 missing
                     - round trip: 1524/1524 code entries
