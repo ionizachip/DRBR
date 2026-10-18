@@ -384,7 +384,8 @@ function kbr_send_state(_force)
         // game - build 48 sent room positions and the host cut them at 1000, so nobody's SOUL was where it was drawn)
         // DRBR: on Flowery's board also its dash (d) and the board's dash speed (fa, tenths): a watcher's board follows it
         var _fo = kbr_fl_pos_extra();
-        kfo_up_fast({ k: "p", mid: _M.mid, x: round((_h.x - kbr_ox()) * 10), y: round((_h.y - kbr_oy()) * 10), c: _M.R.k, h: _M.hold ? 1 : 0, d: _fo[0], fa: _fo[1] });
+        kfo_up_fast({ k: "p", mid: _M.mid, x: round((_h.x - kbr_ox()) * 10), y: round((_h.y - kbr_oy()) * 10), c: _M.R.k, h: _M.hold ? 1 : 0, d: _fo[0], fa: _fo[1],
+            gs: kbr_hj_my_dir() });
     }
     if (_force || _now - _M.t_st >= 500)
     {
@@ -442,6 +443,8 @@ function kbr_on_ps(_m)
         // DRBR: Flowery's board (their dash, their board's dash speed in tenths)
         _p.fd = (array_length(_e) > 4 && is_numeric(_e[4])) ? _e[4] : 0;
         _p.ffa = (array_length(_e) > 5 && is_numeric(_e[5])) ? (_e[5] / 10) : 0;
+        // DRBR 1.0.1: Gerson's green shield (its direction, -1: none)
+        _p.gd = (array_length(_e) > 6) ? kbr_hj_dir_ok(_e[6]) : -1;
     }
     return 1;
 }

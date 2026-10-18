@@ -70,6 +70,8 @@ function kbr_spec_place(_M, _wp)
         kbr_fl_puppet(_q, _ty);
         // DRBR: Pink's lanes - the watcher's purple SOUL on the followed one's lane
         kbr_pk_puppet(_tx, _ty);
+        // DRBR 1.0.1: Gerson's green shield - the watcher's turns as the followed one's (a bot's too)
+        kbr_hj_puppet(_q);
     }
     return 1;
 }

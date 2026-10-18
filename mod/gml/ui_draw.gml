@@ -29,30 +29,116 @@ function knight_txt_small(_x, _y, _s)
     draw_text(_x, _y, _s);
 }
 
+// DRBR 1.0.1: the small print that stays small - not in the menus (those are all in the game's own menu size now): the
+// lines over an offline fight, the Tag Team / Remix side labels, the cold place's tags and notes
+function knight_txt_tiny(_x, _y, _s)
+{
+    scr_84_set_draw_font("main");
+    draw_text(_x, _y, _s);
+}
+
+function knight_fit_tiny(_s, _w)
+{
+    scr_84_set_draw_font("main");
+    return knight_scroll_fit(_s, _w);
+}
+
+// the part of _s that fits _w in the menu's font. DRBR 1.0.1: a text too long for its place scrolls by itself (it was cut with
+// ".."): it waits 1.5 seconds at its start, moves on a letter at a time (5 a second) until its end shows, waits 1.5 seconds
+// there and starts over. Where each text can start is kept (knight_fit_last).
 function knight_fit(_s, _w)
 {
     scr_84_set_draw_font("mainbig");
+    return knight_scroll_fit(_s, _w);
+}
+
+// the same in the font that is set (every text that is cut to its place: the menus', the match's)
+function knight_scroll_fit(_s, _w)
+{
+    _s = string(_s);
     if (string_width(_s) <= _w)
         return _s;
-    while (string_length(_s) > 1 && string_width(_s + "..") > _w)
-        _s = string_copy(_s, 1, string_length(_s) - 1);
-    return _s + "..";
+    var _n = string_length(_s);
+    var _last = knight_fit_last(_s, _w, draw_get_font());
+    var _hold = 45;
+    var _step = 6;
+    var _t = (current_time div 33) mod (_hold + ((_last - 1) * _step) + _hold);
+    var _i = (_t < _hold) ? 1 : min(_last, 1 + ((_t - _hold) div _step));
+    var _o = string_copy(_s, _i, (_n - _i) + 1);
+    while (string_length(_o) > 1 && string_width(_o) > _w)
+        _o = string_copy(_o, 1, string_length(_o) - 1);
+    return _o;
+}
+
+// the last letter a scrolling text starts from (from there the rest fits _w); kept for each text and width (up to 300, then the
+// list starts over)
+global.knight_fit_c = {};
+global.knight_fit_n = 0;
+function knight_fit_last(_s, _w, _f)
+{
+    if (!variable_global_exists("knight_fit_c") || !is_struct(global.knight_fit_c))
+    {
+        global.knight_fit_c = {};
+        global.knight_fit_n = 0;
+    }
+    var _key = string(_w) + "|" + (variable_global_exists("lang") ? string(global.lang) : "") + "|" + string(_f) + "|" + _s;
+    if (variable_struct_exists(global.knight_fit_c, _key))
+        return variable_struct_get(global.knight_fit_c, _key);
+    var _n = string_length(_s);
+    var _last = 1;
+    while (_last < _n && string_width(string_copy(_s, _last, (_n - _last) + 1)) > _w)
+        _last++;
+    if (global.knight_fit_n >= 300)
+    {
+        global.knight_fit_c = {};
+        global.knight_fit_n = 0;
+    }
+    variable_struct_set(global.knight_fit_c, _key, _last);
+    global.knight_fit_n++;
+    return _last;
 }
 
 function knight_fit_small(_s, _w)
 {
     scr_84_set_draw_font("main");
-    if (string_width(_s) <= _w)
-        return _s;
-    while (string_length(_s) > 1 && string_width(_s + "..") > _w)
-        _s = string_copy(_s, 1, string_length(_s) - 1);
-    return _s + "..";
+    return knight_scroll_fit(_s, _w);
 }
 
 // word-wrap in the current font. "#" and "\n" force a break; runs of spaces inside a line are kept
+// DRBR 1.0.1: the lines of each text are kept (the menus wrapped the same texts every frame: a walk over every letter, a width
+// measured for every word). A copy is handed back each time (a caller may cut it). Up to 300 texts are kept, then the list
+// starts over; the key has the font, the width and the language (another language has other fonts).
+global.knight_wrap_c = {};
+global.knight_wrap_n = 0;
 function knight_wrap_font(_s, _w, _font)
 {
     scr_84_set_draw_font(_font);
+    if (!variable_global_exists("knight_wrap_c") || !is_struct(global.knight_wrap_c))
+    {
+        global.knight_wrap_c = {};
+        global.knight_wrap_n = 0;
+    }
+    var _key = string(_font) + "|" + string(_w) + "|" + (variable_global_exists("lang") ? string(global.lang) : "") + "|" + string(_s);
+    var _c = variable_struct_exists(global.knight_wrap_c, _key) ? variable_struct_get(global.knight_wrap_c, _key) : undefined;
+    if (!is_array(_c))
+    {
+        _c = knight_wrap_font_now(_s, _w);
+        if (global.knight_wrap_n >= 300)
+        {
+            global.knight_wrap_c = {};
+            global.knight_wrap_n = 0;
+        }
+        variable_struct_set(global.knight_wrap_c, _key, _c);
+        global.knight_wrap_n++;
+    }
+    var _o = array_create(array_length(_c));
+    array_copy(_o, 0, _c, 0, array_length(_c));
+    return _o;
+}
+
+// the wrapping itself (the font already set)
+function knight_wrap_font_now(_s, _w)
+{
     _s = string_replace_all(_s, "#", "\n");
     var _lines = [];
     var _cur = "";
@@ -107,6 +193,32 @@ function knight_para(_x, _y, _s, _w, _max)
     return _n * knight_lh();
 }
 
+// DRBR 1.0.1: knight_para with "..." on its last line when the text goes on (the menu's size; returns the height used)
+function knight_para_fit(_x, _y, _s, _w, _max)
+{
+    return knight_para_fit_p(_x, _y, _s, _w, _max, knight_lh());
+}
+
+// the same with its rows _p apart (a full box packs its rows closer, knight_modal_draw)
+function knight_para_fit_p(_x, _y, _s, _w, _max, _p)
+{
+    var _l = knight_wrap(_s, _w);
+    var _n = min(array_length(_l), _max);
+    for (var _i = 0; _i < _n; _i++)
+    {
+        var _t = _l[_i];
+        // (cut short: the last line has the rest, as much of it as fits - it scrolls by itself, knight_fit)
+        if (_i == _n - 1 && array_length(_l) > _max)
+        {
+            for (var _j = _i + 1; _j < array_length(_l); _j++)
+                _t += " " + _l[_j];
+            _t = knight_fit(_t, _w);
+        }
+        knight_txt(_x, _y + (_i * _p), _t);
+    }
+    return _n * _p;
+}
+
 function knight_para_small(_x, _y, _s, _w, _max)
 {
     var _l = knight_wrap_font(_s, _w, "main");
@@ -114,9 +226,14 @@ function knight_para_small(_x, _y, _s, _w, _max)
     for (var _i = 0; _i < _n; _i++)
     {
         var _t = _l[_i];
-        // cut short: the last line shows that more follows
+        // cut short: the last line shows that more follows (cut, not scrolled: the "..." says it)
         if (_i == _n - 1 && array_length(_l) > _max)
-            _t = knight_fit_small(_t + " ...", _w);
+        {
+            scr_84_set_draw_font("main");
+            _t += " ...";
+            while (string_length(_t) > 4 && string_width(_t) > _w)
+                _t = string_copy(_t, 1, string_length(_t) - 5) + " ...";
+        }
         knight_txt_small(_x, _y + (_i * 16), _t);
     }
     return _n * 16;
@@ -323,6 +440,7 @@ function knight_ui_draw()
             {
                 switch (_u.tab)
                 {
+                    case 5: kfo_ui_draw_tab(xx, yy); break;
                     case 0: knight_ui_draw_knight(xx, yy); break;
                     case 1: knight_ui_draw_party(xx, yy); break;
                     case 2: knight_ui_draw_power(xx, yy); break;
@@ -332,15 +450,8 @@ function knight_ui_draw()
             }
         }
     }
-    // build 49: the build stamp (which data.win this is), bottom right under the page
-    if (_a >= 1)
-    {
-        draw_set_font(fnt_small);
-        draw_set_halign(fa_right);
-        draw_set_color(c_ltgray);
-        draw_text(xx + 636, yy + 466, knight_build_stamp());
-        draw_set_halign(fa_left);
-    }
+    // build 49: the build stamp (which data.win this is) - DRBR 1.0.1: on the CREDITS page's last entry, in the menu's size (it was
+    // small print under the party panel)
     if (is_struct(_u.modal))
         knight_ui_draw_modal(xx, yy);
     else if (_u.notice != "" && _a >= 1)
@@ -378,16 +489,19 @@ function knight_ui_draw_topbar(xx, yy, _u)
         knight_para(xx + 20, _by - 10, knight_ui_desc(), 600, 2);
         return 0;
     }
-    var _btn = [spr_khub_bt_knight, spr_khub_bt_party, spr_darktechbt, spr_khub_bt_rules, spr_darkconfigbt];
-    for (var _i = 0; _i < 5; _i++)
+    // (DRBR 1.0.1: six buttons - ONLINE first - 88 apart, where the game's five are 100 apart)
+    var _btn = [spr_khub_bt_knight, spr_khub_bt_party, spr_darktechbt, spr_khub_bt_rules, spr_darkconfigbt, spr_khub_bt_online];
+    var _ord = knight_ui_tab_order();
+    for (var _i = 0; _i < array_length(_ord); _i++)
     {
+        var _t = _ord[_i];
         var _f = 1;
-        if (_i == _u.tab)
+        if (_t == _u.tab)
             _f = is_struct(_u.modal) ? 2 : 0;
-        draw_sprite_ext(_btn[_i], _f, xx + 120 + (_i * 100), _by, 2, 2, 0, c_white, 1);
+        draw_sprite_ext(_btn[_t], _f, xx + 110 + (_i * 88), _by, 2, 2, 0, c_white, 1);
     }
     var _cs = (_u.tab == 2 || _u.tab == 4) ? spr_darkmenudesc : spr_khub_menudesc;
-    var _cf = [0, 1, 3, 2, 4];
+    var _cf = [0, 1, 3, 2, 4, 3];
     draw_sprite_ext(_cs, _cf[_u.tab], xx + 20, _by + 4, 2, 2, 0, c_white, 1);
 }
 
@@ -474,7 +588,8 @@ function knight_ui_portrait(_k)
 }
 
 // build 52: the KNIGHT page as a carousel - one knight at a time in the middle (< > to turn), its card under its name;
-// the MODE strip under it (KNIGHT RUSH, RANDOM, TAG TEAM, ATTACK REMIX - ways to fight, not knights) and ONLINE, apart
+// the MODE strip under it (KNIGHT RUSH, RANDOM, TAG TEAM, ATTACK REMIX - ways to fight, not knights). DRBR 1.0.1: every line in
+// the game's own menu size (the strip's names short: RUSH, RANDOM, TAG TEAM, REMIX); the keys are in the top bar's text.
 function knight_ui_draw_knight(xx, yy)
 {
     var _u = global.knight_ui;
@@ -493,9 +608,9 @@ function knight_ui_draw_knight(xx, yy)
         }
     }
     var _onk = (_sf.kind == "k" || _sf.kind == "soon");
-    // the card, centred in the whole box
+    // the card, centred in the whole box (above the strip: yy + 96 to yy + 336)
     knight_ui_draw_card(xx - 123, yy - 6, _sf);
-    // < > beside the name while the carousel has the cursor; where it is among the knights
+    // < > beside the name while the carousel has the cursor; where it is among the knights (dots over the strip)
     if (_u.focus == 1 && _onk && _nk > 1)
     {
         knight_ui_side_arrows(xx, yy + 98, _u.siner);
@@ -509,45 +624,52 @@ function knight_ui_draw_knight(xx, yy)
         {
             var _px = xx + 320 - ((_nk - 1) * 7) + (_i * 14);
             draw_set_color((_i == _ki) ? c_yellow : c_dkgray);
-            draw_rectangle(_px - 2, yy + 348, _px + 2, yy + 352, false);
+            draw_rectangle(_px - 2, yy + 338, _px + 2, yy + 342, false);
         }
     }
-    // the MODE strip
-    var _y = yy + 366;
+    // the MODE strip: its names centred on one line
+    var _y = yy + 356;
     draw_set_color(c_white);
-    draw_rectangle(xx + 70, _y - 6, xx + 570, _y - 5, false);
-    var _cx = xx + 76;
-    scr_84_set_draw_font("main");
+    draw_rectangle(xx + 70, yy + 348, xx + 570, yy + 349, false);
+    scr_84_set_draw_font("mainbig");
+    var _gap = 40;
+    var _tw = 0;
+    for (var _i = _nk; _i < _n; _i++)
+        _tw += string_width(knight_ui_mode_short(_f[_i])) + ((_i > _nk) ? _gap : 0);
+    var _cx = xx + 320 - floor(_tw / 2);
     for (var _i = _nk; _i < _n; _i++)
     {
-        var _lab = knight_ui_fight_label(_f[_i]);
+        var _lab = knight_ui_mode_short(_f[_i]);
         var _w = string_width(_lab);
         var _hot = (_u.focus == 1 && _sel == _i);
         var _cur = knight_ui_fight_is_current(_f[_i]);
-        if (_f[_i].kind == "online")
-            _cx = max(_cx + 10, xx + 564 - _w - (_hot ? 18 : 0));
         if (_hot)
-            knight_heart(_cx - 2, _y + 6);
-        var _tx = _cx + (_hot ? 18 : 0);
-        draw_set_color(_hot ? c_yellow : ((_f[_i].kind == "online") ? make_color_rgb(120, 200, 255) : (_cur ? c_orange : c_white)));
-        draw_text(_tx, _y, _lab);
-        _cx = _tx + _w + 16;
-    }
-    draw_set_font(fnt_small);
-    if (_u.focus == 1)
-    {
-        draw_set_halign(fa_center);
-        draw_set_color(c_gray);
-        knight_txt_small(xx + 320, yy + 392, _onk ? "< >: KNIGHT   DOWN: MODES   Z: FIGHT   C: START" : "< >: MODE   UP: KNIGHTS   Z: OPEN");
-        draw_set_halign(fa_left);
+            knight_heart(_cx - 24, _y + 8);
+        draw_set_color(_hot ? c_yellow : (_cur ? c_orange : c_white));
+        knight_txt(_cx, _y, _lab);
+        _cx += _w + _gap;
     }
 }
 
+// DRBR 1.0.1: a mode's name on the KNIGHT page's strip (its card and the top bar have the whole name)
+function knight_ui_mode_short(_f)
+{
+    switch (_f.kind)
+    {
+        case "rush": return "RUSH";
+        case "random": return "RANDOM";
+        case "tag": return "TAG TEAM";
+        case "remix": return "REMIX";
+    }
+    return knight_ui_fight_label(_f);
+}
+
+// the card of fight _f, centred on xx + 443 (the page draws it at xx - 123: the box's middle); from yy + 100 to about yy + 340
 function knight_ui_draw_card(xx, yy, _f)
 {
     var _cx = xx + 443;
     var _x = xx + 320;
-    var _w = 250;
+    var _w = 440;
     if (_f.kind == "online")
     {
         kfo_ui_card(xx, yy);
@@ -559,11 +681,11 @@ function knight_ui_draw_card(xx, yy, _f)
         var _pl = global.knight_planned[_f.p];
         draw_set_halign(fa_center);
         draw_set_color(c_gray);
-        knight_txt(_cx, yy + 110, string_upper(_pl.name));
+        knight_txt(_cx, yy + 106, knight_fit(string_upper(_pl.name), _w));
         draw_set_color(c_yellow);
-        knight_txt(_cx, yy + 160, "COMING SOON");
+        knight_txt(_cx, yy + 150, "COMING SOON");
         draw_set_color(c_gray);
-        knight_para_small(_cx, yy + 210, "Planned for the hub: not in it yet.#It will be on this page, in RANDOM#and KNIGHT RUSH" + (_pl.online ? ", and online." : "."), 240, 2);
+        knight_para(_cx, yy + 200, "Planned for the hub: not in it yet. It will be on this page, in RANDOM and KNIGHT RUSH" + (_pl.online ? ", and online." : "."), _w, 4);
         draw_set_halign(fa_left);
         return 0;
     }
@@ -571,29 +693,38 @@ function knight_ui_draw_card(xx, yy, _f)
     if (_f.kind == "rush")
     {
         draw_set_color(c_yellow);
-        knight_txt(_cx, yy + 110, "KNIGHT RUSH");
+        knight_txt(_cx, yy + 106, "KNIGHT RUSH");
         var _l = knight_rush_list();
         var _c = global.knight_cfg;
         draw_set_color(c_white);
+        // (two to a line when there are more than 4)
+        var _two = (array_length(_l) > 4);
         for (var _i = 0; _i < array_length(_l); _i++)
-            knight_txt(_cx, yy + 150 + (_i * 30), _c.rush_shuffle ? "???" : knight_reg(_l[_i]).short);
+        {
+            var _nm = _c.rush_shuffle ? "???" : knight_reg(_l[_i]).short;
+            if (_two)
+                knight_txt(_cx + (((_i mod 2) == 0) ? -110 : 110), yy + 146 + ((_i div 2) * 30), _nm);
+            else
+                knight_txt(_cx, yy + 146 + (_i * 30), _nm);
+        }
+        var _ny = yy + 146 + ((_two ? ceil(array_length(_l) / 2) : array_length(_l)) * 30) + 8;
         draw_set_color(c_gray);
         var _hv = "FULL";
         if (_c.rush_heal == 1)
             _hv = string(_c.rush_pct) + "%";
         if (_c.rush_heal == 2)
             _hv = "NONE";
-        knight_txt(_cx, yy + 304, "HEALING: " + _hv);
+        knight_txt(_cx, _ny, "HEALING: " + _hv);
         var _rec = knight_rec_get("rush", "rush");
         if (!is_undefined(_rec) && _rec.win > 0)
         {
             draw_set_color(c_yellow);
-            knight_txt(_cx, yy + 340, "BEST " + knight_time_text(_rec.best));
+            knight_txt(_cx, _ny + 32, "BEST " + knight_time_text(_rec.best));
         }
         else if (!is_undefined(_rec) && _rec.far > 0)
         {
             draw_set_color(c_ltgray);
-            knight_txt(_cx, yy + 340, "FURTHEST " + string(_rec.far) + "/" + string(array_length(_l)));
+            knight_txt(_cx, _ny + 32, "FURTHEST " + string(_rec.far) + "/" + string(array_length(_l)));
         }
         draw_set_halign(fa_left);
         return 0;
@@ -602,69 +733,62 @@ function knight_ui_draw_card(xx, yy, _f)
     {
         var _c2 = global.knight_cfg;
         draw_set_color(c_yellow);
-        knight_txt(_cx, yy + 110, "TAG TEAM");
-        knight_ui_tag_pair(_cx, yy + 150, _c2.knight, _c2.knight2, global.knight_ui.siner);
+        knight_txt(_cx, yy + 106, "TAG TEAM");
+        knight_ui_tag_pair(_cx, yy + 150, _c2.knight, _c2.knight2, global.knight_ui.siner, false);
         draw_set_color(c_gray);
-        knight_txt(_cx, yy + 304, "TAKING TURNS,");
-        knight_txt(_cx, yy + 334, "BEAT BOTH");
-        knight_ui_mode_best("tag", _cx, yy + 362);
+        knight_txt(_cx, yy + 272, "TAKING TURNS, BEAT BOTH");
+        knight_ui_mode_best("tag", _cx, yy + 304);
         draw_set_halign(fa_left);
         return 0;
     }
     if (_f.kind == "remix")
     {
         draw_set_color(c_yellow);
-        knight_txt(_cx, yy + 110, "ATTACK REMIX");
+        knight_txt(_cx, yy + 106, "ATTACK REMIX");
+        // the knights in it, two to a line
         var _rl = knight_ui_remix_rows();
         for (var _i = 0; _i < array_length(_rl); _i++)
         {
             var _on = knight_remix_on(global.knight_cfg, _rl[_i]);
             draw_set_color(_on ? knight_reg(_rl[_i]).color : c_dkgray);
-            knight_txt_small(_cx, yy + 148 + (_i * 20), knight_reg(_rl[_i]).short + (_on ? "" : " (OFF)"));
+            knight_txt(_cx + (((_i mod 2) == 0) ? -110 : 110), yy + 146 + ((_i div 2) * 30), knight_reg(_rl[_i]).short);
         }
+        var _ry = yy + 146 + (ceil(array_length(_rl) / 2) * 30) + 8;
         draw_set_color(c_gray);
-        knight_txt(_cx, yy + 280, "A RANDOM ATTACK");
-        knight_txt(_cx, yy + 310, "EVERY TURN");
-        knight_ui_mode_best("remix", _cx, yy + 350);
+        knight_txt(_cx, _ry, "A RANDOM ATTACK EVERY TURN");
+        knight_ui_mode_best("remix", _cx, _ry + 32);
         draw_set_halign(fa_left);
         return 0;
     }
     if (_f.kind == "random")
     {
         draw_set_color(c_yellow);
-        knight_txt(_cx, yy + 110, "RANDOM KNIGHT");
+        knight_txt(_cx, yy + 106, "RANDOM KNIGHT");
         draw_set_color(c_white);
         scr_84_set_draw_font("mainbig");
-        draw_text_transformed(_cx, yy + 160, "?", 4, 4, 0);
+        draw_text_transformed(_cx, yy + 150, "?", 4, 4, 0);
         draw_set_color(c_gray);
-        knight_txt(_cx, yy + 296, "ANY KNIGHT THAT");
-        knight_txt(_cx, yy + 326, "FITS YOUR SETUP");
+        knight_txt(_cx, yy + 282, "ANY KNIGHT THAT FITS");
+        knight_txt(_cx, yy + 312, "YOUR SETUP");
         draw_set_halign(fa_left);
         return 0;
     }
     var _k = _f.k;
     var _r = knight_reg(_k);
     draw_set_color(_r.color);
-    var _tl = knight_wrap(_r.title, _w);
-    var _ty = yy + 106;
-    for (var _i = 0; _i < min(2, array_length(_tl)); _i++)
-        knight_txt(_cx, _ty + (_i * 28), _tl[_i]);
-    var _py = _ty + (min(2, array_length(_tl)) * 28) + 8;
+    knight_txt(_cx, yy + 106, knight_fit(_r.title, _w));
+    var _py = yy + 142;
     var _spr = knight_ui_portrait(_k);
     if (_spr >= 0)
     {
         // the knight battle sprites are drawn at 2x; their art sits in the box (24, 31)-(92, 96) of the frame
         var _fr = (global.knight_ui.siner / 8) mod max(1, sprite_get_number(_spr));
         draw_sprite_ext(_spr, _fr, _cx - (58 * 2) + (sprite_get_xoffset(_spr) * 2), _py - (31 * 2) + (sprite_get_yoffset(_spr) * 2), 2, 2, 0, _r.tint ? _r.color : c_white, 1);
-        _py += 138;
+        _py += 136;
     }
     draw_set_color(c_ltgray);
-    var _al = knight_wrap("BY " + _r.author, _w);
-    for (var _i = 0; _i < min(2, array_length(_al)); _i++)
-    {
-        knight_txt(_cx, _py, _al[_i]);
-        _py += 28;
-    }
+    knight_txt(_cx, _py, knight_fit("BY " + _r.author, _w));
+    _py += 30;
     if (_r.joke)
     {
         draw_set_color(c_orange);
@@ -815,8 +939,7 @@ function knight_ui_draw_party(xx, yy)
     {
         draw_set_color(c_gray);
         knight_txt(xx + 350, yy + 240, "EMPTY SLOT");
-        knight_txt_small(xx + 350, yy + 276, "UP / DOWN ON THE CHAR ROW");
-        knight_txt_small(xx + 350, yy + 294, "PUTS SOMEONE HERE.");
+        knight_para(xx + 350, yy + 276, "UP / DOWN on the CHAR row puts someone here.", 220, 3);
     }
     knight_ui_draw_stats(xx, yy, _ch, 74, 230, 224, _prev);
 }
@@ -893,9 +1016,8 @@ function knight_ui_draw_power(xx, yy)
         draw_set_color(c_white);
         knight_txt(xx + 320, yy + 105, "SPELLS " + string(_cnt) + "/12");
         draw_set_color(c_gray);
-        knight_txt_small(xx + 320, yy + 141, "Z: EDIT THIS LIST");
-        knight_txt_small(xx + 320, yy + 159, "IN THE LIST  < >: CHANGE A SPELL");
-        knight_txt_small(xx + 320, yy + 177, "IN THE LIST  Z: EMPTY THE SLOT");
+        knight_txt(xx + 320, yy + 138, "Z: EDIT THE LIST");
+        knight_txt(xx + 320, yy + 168, "< > IN IT: CHANGE");
     }
     else
     {
@@ -957,23 +1079,15 @@ function knight_ui_draw_config(xx, yy)
     var _u = global.knight_ui;
     var _ids = knight_ui_cfg_ids();
     knight_caption_center("OPTIONS", xx + 320, yy + 84);
-    // build 49: 14 rows (RESET MOD SETTINGS): 13 shown, the list scrolls with the heart
-    var _shown = min(13, array_length(_ids));
+    // build 49: 14 rows (RESET MOD SETTINGS); DRBR 1.0.1: 10 shown, a line each in the menu's size (30 apart), the list scrolls
+    // with the heart (the game's arrows when there is more)
+    var _shown = min(10, array_length(_ids));
     var _first = (_u.focus == 1) ? clamp(_u.crow - (_shown - 1), 0, array_length(_ids) - _shown) : 0;
-    if (_first > 0)
-    {
-        draw_set_color(c_gray);
-        knight_txt_small(xx + 88, yy + 92, "^");
-    }
-    if (_first + _shown < array_length(_ids))
-    {
-        draw_set_color(c_gray);
-        knight_txt_small(xx + 88, yy + 392, "v");
-    }
+    knight_ui_arrows(xx + 556, yy + 100, yy + 398, _first > 0, _first + _shown < array_length(_ids), _u.siner);
     for (var _i = _first; _i < _first + _shown; _i++)
     {
         var _id = _ids[_i];
-        var _y = yy + ((_shown > 12) ? 100 : 104) + ((_i - _first) * ((_shown > 12) ? 23 : ((_shown > 11) ? 25 : 27)));
+        var _y = yy + 102 + ((_i - _first) * 30);
         var _blk = (knight_ui_block(_id) != "");
         var _hot = (_u.focus == 1 && _u.crow == _i);
         draw_set_color(_blk ? c_dkgray : c_white);
@@ -991,14 +1105,12 @@ function knight_ui_draw_config(xx, yy)
                 _col = c_dkgray;
             if (_id == "song" && !knight_music_exists(knight_ui_song_file()))
                 _col = make_color_rgb(255, 96, 96);
-            draw_set_color(_col);
-            knight_txt(xx + 556, _y, knight_fit(_v, 240));
-            draw_set_halign(fa_left);
+            // (the song playing: its name in yellow - the top bar says it is playing)
             if (_id == "song" && knight_preview_playing())
-            {
-                draw_set_color(c_yellow);
-                knight_txt_small(xx + 300, _y + 8, "PLAYING");
-            }
+                _col = c_yellow;
+            draw_set_color(_col);
+            knight_txt(xx + 530, _y, knight_fit(_v, 220));
+            draw_set_halign(fa_left);
         }
         if (_hot)
             knight_heart(xx + 85, _y + 10);
@@ -1040,7 +1152,7 @@ function knight_ui_draw_presets(xx, yy)
     if (global.knight_save_fail)
     {
         draw_set_color(make_color_rgb(255, 96, 96));
-        knight_txt_small(xx + 320, yy + 384, "THE LAST SAVE FAILED!");
+        knight_txt(xx + 320, yy + 376, "THE LAST SAVE FAILED!");
     }
 }
 
@@ -1068,7 +1180,7 @@ function knight_ui_draw_loadouts(xx, yy)
     if (knight_lo_is_clone(_g))
     {
         draw_set_color(c_gray);
-        knight_txt_small(xx + 180, yy + 144, knight_lo_is_triple(_g) ? "THREE OF ONE MEMBER" : "TWO OF ONE MEMBER");
+        knight_txt(xx + 180, yy + 140, knight_lo_is_triple(_g) ? "THREE OF ONE" : "TWO OF ONE");
     }
     else
     {
@@ -1091,44 +1203,56 @@ function knight_ui_draw_loadouts(xx, yy)
             knight_heart(xx + 75, _y + 10);
     }
     draw_set_color(c_gray);
-    knight_txt_small(xx + 80, yy + 388, "< > PARTY     Z LOAD");
-    // details: each member's gear and spells
+    knight_txt(xx + 80, yy + 376, "Z: LOAD");
+    // details: each member's gear and spells (DRBR 1.0.1: in the menu's size - each member gets its share of the lines:
+    // 3 members a line of gear and a line of spells each, fewer members more lines; the Z box shows them whole)
     var _lo = _l[clamp(_u.lo_i, 0, array_length(_l) - 1)];
     var _party = knight_lo_party(_g, _lo);
-    var _yy = yy + 108;
+    var _yy = yy + 104;
     var _seen = [0, 0, 0, 0, 0, 0];
+    var _mem = [];
     for (var _i = 0; _i < 3; _i++)
     {
         var _c = _party[_i];
         if (_c < 1 || (_c > 4 && !knight_cc_ok(_c)) || _c >= array_length(_seen) || _seen[_c])
             continue;
         _seen[_c] = 1;
+        array_push(_mem, _c);
+    }
+    var _shared = (_lo.kind == "triple" || _lo.kind == "double");
+    var _per = max(3, floor((_shared ? 9 : 10) / max(1, array_length(_mem))));
+    for (var _i = 0; _i < array_length(_mem); _i++)
+    {
+        var _c = _mem[_i];
         var _gear = knight_lo_gear(_lo.kind, _c, _party);
         draw_set_color(c_white);
-        knight_txt_small(xx + 320, _yy, string_upper(knight_char_proper(_c)));
+        knight_txt(xx + 320, _yy, string_upper(knight_char_proper(_c)));
         if (_gear[1] == 23 || _gear[2] == 23)
         {
             draw_set_color(c_yellow);
-            knight_txt_small(xx + 400, _yy, "SHADOW MANTLE");
+            knight_txt(xx + 452, _yy, "MANTLE");
         }
-        _yy += 16;
+        _yy += 30;
+        var _gl = max(1, floor((_per - 1) / 2));
+        var _sl = max(1, (_per - 1) - _gl);
         draw_set_color(c_ltgray);
-        _yy += knight_para_small(xx + 320, _yy, knight_lo_gear_names(_gear, _c), 252, 2);
+        _yy += knight_para_fit(xx + 320, _yy, knight_lo_gear_names(_gear, _c), 256, _gl);
         draw_set_color(c_gray);
-        _yy += knight_para_small(xx + 320, _yy, knight_lo_spell_names(knight_lo_spells(_lo.kind, _c, _party)), 252, 3);
-        _yy += 4;
+        _yy += knight_para_fit(xx + 320, _yy, knight_lo_spell_names(knight_lo_spells(_lo.kind, _c, _party)), 256, _sl);
     }
-    if (_lo.kind == "triple" || _lo.kind == "double")
+    if (_shared)
     {
         draw_set_color(c_gray);
-        knight_para_small(xx + 320, _yy + 4, ((_lo.kind == "triple") ? "All three" : "Both") + " share one HP bar, one set of gear and one spell list.", 252, 2);
+        knight_txt(xx + 320, _yy + 4, "SHARED HP AND GEAR");
     }
 }
 
 // ---------------- TAG TEAM picker ----------------
 // two knights side by side (portraits as on the KNIGHT page, a little smaller), FIRST and SECOND under them
-function knight_ui_tag_pair(_cx, _y, _k1, _k2, _siner)
+function knight_ui_tag_pair(_cx, _y, _k1, _k2, _siner, _labels)
 {
+    if (is_undefined(_labels))
+        _labels = true;
     var _ks = [_k1, _k2];
     for (var _i = 0; _i < 2; _i++)
     {
@@ -1142,9 +1266,12 @@ function knight_ui_tag_pair(_cx, _y, _k1, _k2, _siner)
         }
         draw_set_halign(fa_center);
         draw_set_color(_r.color);
-        knight_txt_small(_x, _y + 104, _r.short);
-        draw_set_color(c_gray);
-        knight_txt_small(_x, _y + 120, (_i == 0) ? "FIRST" : "SECOND");
+        knight_txt(_x, _y + 92, knight_fit(_r.short, 116));
+        if (_labels)
+        {
+            draw_set_color(c_gray);
+            knight_txt(_x, _y + 122, (_i == 0) ? "FIRST" : "SECOND");
+        }
     }
 }
 
@@ -1171,9 +1298,9 @@ function knight_ui_draw_tag(xx, yy)
     var _u = global.knight_ui;
     var _c = global.knight_cfg;
     draw_set_color(c_white);
-    draw_rectangle(xx + 300, yy + 91, xx + 305, yy + 410, false);
+    draw_rectangle(xx + 330, yy + 91, xx + 335, yy + 410, false);
     knight_caption_hub("KNIGHTS", xx + 112, yy + 84);
-    knight_caption_center("TAG TEAM", xx + 443, yy + 84);
+    knight_caption_center("TAG TEAM", xx + 458, yy + 84);
     var _n = knight_count();
     for (var _i = 0; _i <= _n; _i++)
     {
@@ -1199,22 +1326,22 @@ function knight_ui_draw_tag(xx, yy)
             {
                 draw_set_halign(fa_right);
                 draw_set_color(c_yellow);
-                knight_txt_small(xx + 294, _y + 8, _mk);
+                knight_txt(xx + 322, _y, _mk);
                 draw_set_halign(fa_left);
             }
         }
         if (_hot)
             knight_heart(xx + 75, _y + 10);
     }
-    knight_ui_tag_pair(xx + 443, yy + 162, _c.knight, _c.knight2, _u.siner);
-    // which slot Z fills
+    knight_ui_tag_pair(xx + 458, yy + 150, _c.knight, _c.knight2, _u.siner, true);
+    // which slot Z fills (DRBR 1.0.1: the menu's size; C: START is in the top bar's text)
     draw_set_halign(fa_center);
     draw_set_color(c_yellow);
-    knight_txt_small(xx + 443 + ((_u.tag_slot == 0) ? -60 : 60), yy + 302, (_u.tag_row < _n) ? "< Z PUTS IT HERE >" : "");
+    if (_u.tag_row < _n)
+        knight_txt(xx + 458 + ((_u.tag_slot == 0) ? -60 : 60), yy + 302, "Z HERE");
     draw_set_color(c_gray);
-    var _note = (knight_reg(_c.knight).joke || knight_reg(_c.knight2).joke) ? "A JOKE FIGHT IN THE TEAM: NOT RECORDED" : "EACH KEEPS ITS OWN HP AND ROARING";
-    knight_para_small(xx + 443, yy + 332, _note, 240, 2);
-    knight_txt_small(xx + 443, yy + 384, "C: START");
+    var _note = (knight_reg(_c.knight).joke || knight_reg(_c.knight2).joke) ? "A JOKE FIGHT: NOT RECORDED" : "EACH KEEPS ITS OWN HP AND ROARING";
+    knight_para(xx + 458, yy + 340, _note, 236, 2);
     draw_set_halign(fa_left);
 }
 
@@ -1224,9 +1351,9 @@ function knight_ui_draw_remix(xx, yy)
     var _u = global.knight_ui;
     var _c = global.knight_cfg;
     draw_set_color(c_white);
-    draw_rectangle(xx + 300, yy + 91, xx + 305, yy + 410, false);
+    draw_rectangle(xx + 330, yy + 91, xx + 335, yy + 410, false);
     knight_caption_hub("KNIGHTS", xx + 112, yy + 84);
-    knight_caption_center("REMIX", xx + 443, yy + 84);
+    knight_caption_center("REMIX", xx + 458, yy + 84);
     var _rows = knight_ui_remix_rows();
     var _n = array_length(_rows);
     for (var _i = 0; _i <= _n; _i++)
@@ -1247,7 +1374,7 @@ function knight_ui_draw_remix(xx, yy)
             knight_txt(xx + 100, _y, knight_reg(_k).short);
             draw_set_halign(fa_right);
             draw_set_color(_on ? c_yellow : c_gray);
-            knight_txt_small(xx + 294, _y + 8, _on ? "ON" : "OFF");
+            knight_txt(xx + 322, _y, _on ? "ON" : "OFF");
             draw_set_halign(fa_left);
         }
         if (_hot)
@@ -1256,14 +1383,13 @@ function knight_ui_draw_remix(xx, yy)
     // the knights in the battle, the finale knight marked
     draw_set_halign(fa_center);
     var _p = knight_remix_pool(_c);
-    for (var _i = 0; _i < array_length(_p); _i++)
+    for (var _i = 0; _i < array_length(_p) && _i < 7; _i++)
     {
         draw_set_color(knight_reg(_p[_i]).color);
-        knight_txt_small(xx + 443, yy + 120 + (_i * 22), knight_reg(_p[_i]).name);
+        knight_txt(xx + 458, yy + 102 + (_i * 30), knight_fit(knight_reg(_p[_i]).short, 236));
     }
     draw_set_color(c_gray);
-    knight_para_small(xx + 443, yy + 252, "EVERY TURN ONE OF THEM WITH A RANDOM ATTACK. THE NORMAL KNIGHT OPENS THE BATTLE AND TAKES THE FINALE" + (knight_remix_on(_c, 0) ? "." : " (OFF FOR THE TURNS)."), 250, 4);
-    knight_txt_small(xx + 443, yy + 384, "C: START");
+    knight_para(xx + 458, yy + 320, "THE NORMAL KNIGHT OPENS AND ENDS IT" + (knight_remix_on(_c, 0) ? "" : " (OFF FOR THE TURNS)"), 236, 3);
     draw_set_halign(fa_left);
 }
 
@@ -1280,29 +1406,29 @@ function knight_ui_draw_attacks(xx, yy)
     draw_set_color(_r.color);
     knight_txt(xx + 320, yy + 102, _r.title);
     draw_set_color(c_yellow);
-    knight_txt_small(xx + 320, yy + 132, knight_fit_small(knight_ui_practice_value(_c), 480));
+    knight_txt(xx + 320, yy + 132, knight_fit(knight_ui_practice_value(_c), 480));
     draw_set_halign(fa_left);
-    for (var _v = 0; _v < 9; _v++)
+    for (var _v = 0; _v < 7; _v++)
     {
         var _i = _u.at_scroll + _v;
         if (_i >= _n)
             break;
-        var _y = yy + 152 + (_v * 28);
+        var _y = yy + 168 + (_v * 30);
         var _hot = (_u.at_row == _i);
         var _sel = (_c.p_atk == _i && knight_ui_practice_index(_c) >= 2);
         var _unused = (_l[_i][3] & 1);
         draw_set_color(_hot ? c_yellow : (_sel ? c_white : (_unused ? c_dkgray : c_ltgray)));
-        knight_txt_small(xx + 110, _y + 6, (_l[_i][3] & 2) ? "FINALE" : ("PHASE " + string(_l[_i][0])));
-        knight_txt(xx + 200, _y, knight_fit(_l[_i][2], 330));
+        knight_txt(xx + 110, _y, (_l[_i][3] & 2) ? "FINAL" : ("P" + string(_l[_i][0])));
+        knight_txt(xx + 186, _y, knight_fit(_l[_i][2], 340));
         if (_sel)
         {
             draw_set_color(c_yellow);
-            knight_txt_small(xx + 536, _y + 6, "<");
+            knight_txt(xx + 534, _y, "<");
         }
         if (_hot)
             knight_heart(xx + 85, _y + 10);
     }
-    knight_ui_arrows(xx + 556, yy + 150, yy + 400, _u.at_scroll > 0, _u.at_scroll + 9 < _n, _u.siner);
+    knight_ui_arrows(xx + 556, yy + 166, yy + 384, _u.at_scroll > 0, _u.at_scroll + 7 < _n, _u.siner);
 }
 
 // ---------------- RECORDS ----------------
@@ -1335,29 +1461,34 @@ function knight_ui_draw_records(xx, yy)
             else
             {
                 draw_set_color(c_gray);
-                knight_para_small(xx + 80, _y + 10, _d[_i][1], 480, 3);
+                knight_para(xx + 80, _y + 4, _d[_i][1], 480, 3);
             }
         }
         return 0;
     }
-    var _cx = [290, 410, 490, 560];
-    var _hd = ["WINS", "BEST", "LOW DMG", "STREAK"];
+    // (DRBR 1.0.1: the headings in the menu's size - LOW DMG is DMG, as on the page that says what they mean)
+    var _cx = [270, 380, 460, 572];
+    var _hd = ["WINS", "BEST", "DMG", "STREAK"];
     draw_set_color(c_gray);
     draw_set_halign(fa_right);
     for (var _i = 0; _i < 4; _i++)
-        knight_txt_small(xx + _cx[_i], yy + 146, _hd[_i]);
+        knight_txt(xx + _cx[_i], yy + 138, _hd[_i]);
     draw_set_halign(fa_left);
     var _cats = knight_rec_cats(_key);
     var _lab = (_key == "rush") ? ["RUSH", "NO-HIT"] : ["NORMAL", "RULES", "NO-HIT", "PRACTICE"];
     for (var _r = 0; _r < array_length(_cats); _r++)
     {
         var _rec = knight_rec_get(_key, _cats[_r]);
-        var _y = yy + 166 + (_r * 56);
+        var _y = yy + 170 + (_r * 54);
         draw_set_color(c_white);
         knight_txt(xx + 80, _y, _lab[_r]);
         var _vals = [string(_rec.win) + "/" + string(_rec.att), (_rec.best > 0) ? knight_time_text(_rec.best) : "--", (_rec.lowdmg >= 0) ? string(_rec.lowdmg) : "--", string(_rec.streak)];
         if (_cats[_r] == "pr")
-            _vals = [string(_rec.att) + " TRIES", "", "", ""];
+        {
+            _vals = ["", "", "", ""];
+            draw_set_color(c_white);
+            knight_txt(xx + 230, _y, string(_rec.att) + " TRIES");
+        }
         draw_set_halign(fa_right);
         for (var _i = 0; _i < 4; _i++)
         {
@@ -1373,17 +1504,17 @@ function knight_ui_draw_records(xx, yy)
         if (_key == "rush" && _rec.far > 0)
             _sub += ((_sub == "") ? "" : "   ") + "FURTHEST " + string(_rec.far) + "/" + string(array_length(knight_rush_list()));
         draw_set_color(c_gray);
-        knight_txt_small(xx + 80, _y + 28, knight_fit_small(string_upper(_sub), 480));
+        knight_txt(xx + 80, _y + 26, knight_fit(string_upper(_sub), 490));
     }
     if (global.knight_save_fail)
     {
         draw_set_color(make_color_rgb(255, 96, 96));
-        knight_txt_small(xx + 80, yy + 392, "RECORDS COULD NOT BE SAVED ON THE LAST WRITE.");
+        knight_txt(xx + 80, yy + 384, "THE LAST SAVE FAILED.");
     }
     else if (global.knight_store_status != "ok" && global.knight_store_status != "new")
     {
         draw_set_color(c_orange);
-        knight_txt_small(xx + 80, yy + 392, knight_fit_small(string_upper(global.knight_store_status), 480));
+        knight_txt(xx + 80, yy + 384, knight_fit(string_upper(global.knight_store_status), 490));
     }
 }
 
@@ -1399,7 +1530,7 @@ function knight_ui_draw_credits(xx, yy)
     knight_txt(xx + 320, yy + 106, _e.title);
     draw_set_color(c_white);
     knight_ui_side_arrows(xx, yy + 106, _u.siner);
-    var _l = knight_credit_lines(_i);
+    var _l = knight_credit_rows(_i);
     var _per = knight_credit_per_page();
     var _p0 = _u.cr_page * _per;
     var _gray = make_color_rgb(148, 148, 148);
@@ -1408,37 +1539,42 @@ function knight_ui_draw_credits(xx, yy)
         var _k = _p0 + _j;
         if (_k >= array_length(_l))
             break;
-        var _y = yy + 146 + (_j * 19);
+        var _y = yy + 144 + (_j * 28);
         var _ln = _l[_k];
         if (_ln[0] == "h")
         {
             draw_set_color(_gray);
-            knight_txt_small(xx + 320, _y, string_upper(_ln[1]));
+            knight_txt(xx + 320, _y, string_upper(_ln[1]));
+        }
+        else if (_ln[0] == "r")
+        {
+            draw_set_color(_gray);
+            knight_txt(xx + 320, _y, _ln[1]);
+        }
+        else if (_ln[0] == "c")
+        {
+            // (a long name's next line)
+            draw_set_color(c_white);
+            knight_txt(xx + 320, _y, _ln[1]);
         }
         else
         {
-            scr_84_set_draw_font("main");
+            scr_84_set_draw_font("mainbig");
             var _nm = _ln[1];
             var _role = (_ln[2] != "") ? ("  -  " + _ln[2]) : "";
-            var _tw = string_width(_nm + _role);
-            if (_tw > 500)
-            {
-                _role = knight_fit_small(_role, 500 - string_width(_nm));
-                _tw = string_width(_nm + _role);
-            }
-            var _x0 = xx + 320 - (_tw / 2);
+            var _x0 = xx + 320 - (string_width(_nm + _role) / 2);
             draw_set_halign(fa_left);
             draw_set_color(c_white);
-            knight_txt_small(_x0, _y, _nm);
+            knight_txt(_x0, _y, _nm);
             draw_set_color(_gray);
-            knight_txt_small(_x0 + string_width(_nm), _y, _role);
+            knight_txt(_x0 + string_width(_nm), _y, _role);
             draw_set_halign(fa_center);
         }
     }
     var _pg = knight_credit_pages(_i);
     draw_set_color(c_gray);
     if (_pg > 1)
-        knight_txt_small(xx + 320, yy + 392, "PAGE " + string(_u.cr_page + 1) + "/" + string(_pg));
+        knight_txt(xx + 320, yy + 376, "PAGE " + string(_u.cr_page + 1) + "/" + string(_pg));
     draw_set_halign(fa_left);
 }
 
@@ -1548,19 +1684,25 @@ function knight_modal_opts_h(xx, _y, _opts, _sel)
 }
 
 // one centred box. lines: strings (a leading "!" is a warning), ["@", text] typed text, ["^", text, colour] a centred
-// sub-title, ["~", text] small grey print, ["s", label, value, extra, highlight] a small-print table row (fight stats),
+// sub-title, ["~", text] grey print, ["s", label, value, extra, highlight] a table row (fight stats) - DRBR 1.0.1: all of them in
+// the menu's size,
 // or [label, value, extra, highlight] result rows. opts: [{t, a}]
-function knight_modal_line_h(_ln, _iw)
+// the rows a line takes (a "~" print up to 3, a plain string as many as it wraps to, the others 1)
+function knight_modal_line_rows(_ln, _iw)
 {
     if (is_array(_ln))
     {
         if (_ln[0] == "~")
-            return array_length(knight_wrap_font(_ln[1], _iw, "main")) * 16 + 6;
-        if (_ln[0] == "s")
-            return 19;
-        return 30;
+            return min(3, array_length(knight_wrap(_ln[1], _iw)));
+        return 1;
     }
-    return array_length(knight_wrap(_ln, _iw)) * 30;
+    return array_length(knight_wrap(_ln, _iw));
+}
+
+// its height with rows 30 px apart (a "~" print has 6 more around it)
+function knight_modal_line_h(_ln, _iw)
+{
+    return (knight_modal_line_rows(_ln, _iw) * 30) + ((is_array(_ln) && _ln[0] == "~") ? 6 : 0);
 }
 
 function knight_modal_draw(_title, _lines, _opts, _sel, _footer)
@@ -1570,13 +1712,33 @@ function knight_modal_draw(_title, _lines, _opts, _sel, _footer)
     var _w = 520;
     var _iw = 440;
     var _x0 = xx + 60;
-    var _bh = 0;
+    var _rows = 0;
+    var _fix = 0;
     for (var _i = 0; _i < array_length(_lines); _i++)
-        _bh += knight_modal_line_h(_lines[_i], _iw);
+    {
+        _rows += knight_modal_line_rows(_lines[_i], _iw);
+        if (is_array(_lines[_i]) && _lines[_i][0] == "~")
+            _fix += 6;
+    }
     var _horiz = (array_length(_opts) == 2);
-    var _oh = _horiz ? 44 : (array_length(_opts) * 32 + 12);
-    var _h = 26 + 34 + _bh + 10 + _oh + ((_footer != "") ? 24 : 0) + 20;
-    _h = min(_h, 456);
+    var _nv = _horiz ? 0 : array_length(_opts);
+    var _ft = (_footer != "") ? 32 : 0;
+    // DRBR 1.0.1: a box with more in it than the screen's 456 px hold packs its rows closer - down to 26 px apart, the menu
+    // font's own height - and then its options (down to 28 px); a line that still does not fit is left out (a grey print
+    // keeps the rows that fit, its last one scrolling through the rest): text never runs into the options any more
+    var _lp = 30;
+    var _op = 32;
+    var _fixed = 26 + 34 + _fix + 10 + (_horiz ? 44 : 12) + _ft + 20;
+    var _over = (_fixed + (_rows * _lp) + (_nv * _op)) - 456;
+    if (_over > 0 && _rows > 0)
+    {
+        _lp = max(26, 30 - ceil(_over / _rows));
+        _over = (_fixed + (_rows * _lp) + (_nv * _op)) - 456;
+    }
+    if (_over > 0 && _nv > 1)
+        _op = max(28, 32 - ceil(_over / _nv));
+    var _oh = (_horiz ? 44 : 12) + (_nv * _op);
+    var _h = min(_fixed + (_rows * _lp) + (_nv * _op), 456);
     var _y0 = yy + 240 - (_h / 2);
     draw_set_alpha(0.6);
     draw_set_color(c_black);
@@ -1588,10 +1750,11 @@ function knight_modal_draw(_title, _lines, _opts, _sel, _footer)
     knight_txt(xx + 320, _y0 + 24, _title);
     draw_set_halign(fa_left);
     var _y = _y0 + 62;
-    var _oy = _y0 + _h - 20 - _oh - ((_footer != "") ? 24 : 0) + (_horiz ? 6 : 0);
+    var _oy = _y0 + _h - 20 - _oh - _ft + (_horiz ? 6 : 0);
     for (var _i = 0; _i < array_length(_lines); _i++)
     {
-        if (_y + 14 > _oy)
+        // (a row is 26 px tall: it has to end above the options)
+        if (_y + 26 > _oy)
             break;
         var _ln2 = _lines[_i];
         if (is_array(_ln2))
@@ -1600,7 +1763,7 @@ function knight_modal_draw(_title, _lines, _opts, _sel, _footer)
             {
                 draw_set_color(c_yellow);
                 knight_txt(_x0 + 40, _y, _ln2[1]);
-                _y += 30;
+                _y += _lp;
             }
             else if (_ln2[0] == "^")
             {
@@ -1608,26 +1771,30 @@ function knight_modal_draw(_title, _lines, _opts, _sel, _footer)
                 draw_set_color((array_length(_ln2) > 2) ? _ln2[2] : c_yellow);
                 knight_txt(xx + 320, _y, knight_fit(_ln2[1], _iw));
                 draw_set_halign(fa_left);
-                _y += 30;
+                _y += _lp;
             }
             else if (_ln2[0] == "~")
             {
+                // (the rows of it that end above the options, up to 3)
+                var _fn = min(3, floor((_oy - _y - 30) / _lp) + 1);
+                if (_fn < 1)
+                    break;
                 draw_set_color(c_gray);
                 _y += 4;
-                _y += knight_para_small(_x0 + 40, _y, _ln2[1], _iw, 3);
+                _y += knight_para_fit_p(_x0 + 40, _y, _ln2[1], _iw, _fn, _lp);
                 _y += 2;
             }
             else if (_ln2[0] == "s")
             {
                 draw_set_color(c_white);
-                knight_txt_small(_x0 + 40, _y, knight_fit_small(_ln2[1], 300));
+                knight_txt(_x0 + 40, _y, knight_fit(_ln2[1], 250));
                 draw_set_halign(fa_right);
                 draw_set_color((array_length(_ln2) > 4 && _ln2[4]) ? c_yellow : c_white);
-                knight_txt_small(_x0 + _w - 130, _y, _ln2[2]);
+                knight_txt(_x0 + _w - 130, _y, _ln2[2]);
                 draw_set_color(c_ltgray);
-                knight_txt_small(_x0 + _w - 40, _y, _ln2[3]);
+                knight_txt(_x0 + _w - 40, _y, _ln2[3]);
                 draw_set_halign(fa_left);
-                _y += 19;
+                _y += _lp;
             }
             else
             {
@@ -1646,7 +1813,7 @@ function knight_modal_draw(_title, _lines, _opts, _sel, _footer)
                     knight_txt(_x0 + _w - 40, _y, _ln2[2]);
                 }
                 draw_set_halign(fa_left);
-                _y += 30;
+                _y += _lp;
             }
         }
         else
@@ -1658,7 +1825,7 @@ function knight_modal_draw(_title, _lines, _opts, _sel, _footer)
                 if (_y + 26 > _oy)
                     break;
                 knight_txt(_x0 + 40, _y, _wl[_j]);
-                _y += 30;
+                _y += _lp;
             }
         }
     }
@@ -1670,16 +1837,16 @@ function knight_modal_draw(_title, _lines, _opts, _sel, _footer)
         {
             var _hot = (_i == _sel);
             draw_set_color(_hot ? c_yellow : c_white);
-            knight_txt(_x0 + 110, _oy + (_i * 32), _opts[_i].t);
+            knight_txt(_x0 + 110, _oy + (_i * _op), _opts[_i].t);
             if (_hot)
-                knight_heart(_x0 + 82, _oy + (_i * 32) + 10);
+                knight_heart(_x0 + 82, _oy + (_i * _op) + 10);
         }
     }
     if (_footer != "")
     {
         draw_set_color(c_gray);
         draw_set_halign(fa_center);
-        knight_txt_small(xx + 320, _y0 + _h - 40, _footer);
+        knight_txt(xx + 320, _y0 + _h - 48, _footer);
         draw_set_halign(fa_left);
     }
     draw_set_color(c_white);
@@ -1807,9 +1974,9 @@ function knight_hud_draw()
     for (var _i = 0; _i < array_length(_l); _i++)
     {
         draw_set_color(c_black);
-        knight_txt_small(xx + 9, yy + 5 + (_i * 16), _l[_i]);
+        knight_txt_tiny(xx + 9, yy + 5 + (_i * 16), _l[_i]);
         draw_set_color(knight_hud_line_color(_l[_i]));
-        knight_txt_small(xx + 8, yy + 4 + (_i * 16), _l[_i]);
+        knight_txt_tiny(xx + 8, yy + 4 + (_i * 16), _l[_i]);
     }
     // build 50: the fight song's lyrics (online in the strip at the bottom, offline under these lines)
     knight_lyr_hud(xx, yy, array_length(_l));
@@ -1825,9 +1992,9 @@ function knight_hud_draw()
             draw_set_halign(fa_right);
             draw_set_alpha(min(1, (180 - _r.song_t) / 30));
             draw_set_color(c_black);
-            knight_txt_small(xx + 633, yy + 5, knight_fit_small("MUSIC: " + _sc, 400));
+            knight_txt_tiny(xx + 633, yy + 5, knight_fit_tiny("MUSIC: " + _sc, 400));
             draw_set_color(c_ltgray);
-            knight_txt_small(xx + 632, yy + 4, knight_fit_small("MUSIC: " + _sc, 400));
+            knight_txt_tiny(xx + 632, yy + 4, knight_fit_tiny("MUSIC: " + _sc, 400));
             draw_set_alpha(1);
             draw_set_halign(fa_left);
         }

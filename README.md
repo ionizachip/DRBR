@@ -9,8 +9,8 @@ your own copy of DELTARUNE from Steam.
 ## Play
 
 1. Have **DELTARUNE (Steam)** with Chapter 3 installed.
-2. Download **`DRBR-Setup.exe`** from [Releases](../../releases/latest).
-3. Run it, then click **INSTALL DRBR**, then **PLAY DRBR**.
+2. Download **`DRBR.zip`** from [Releases](../../releases/latest) and open it.
+3. Run **`DRBR-Setup.exe`** from it, then click **INSTALL DRBR**, then **PLAY DRBR**.
 4. The game opens in the cold place, right before the Roaring Knight. Walk right to the sign and press **Z**:
    **ONLINE** is in its menu.
 

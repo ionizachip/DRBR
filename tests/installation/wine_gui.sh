@@ -49,7 +49,7 @@ if [ $# -ge 4 ]; then
   python3 "$HERE/tests/updates/make_test_releases.py" "$PAYLOAD" "$W/releases-gui" "$KEY" "http://127.0.0.1:$PORT" > /dev/null
   : > "$W/http-gui.log"
   python3 "$HERE/tests/updates/range_server.py" "$W/releases-gui" "$PORT" "$W/http-gui.log" & SRV=$!
-  python3 - "$D/drbr-settings.json" "http://127.0.0.1:$PORT/good/update-manifest.json" <<'PY'
+  python3 - "$D/drbr-settings.json" "http://127.0.0.1:$PORT/good/DRBR.zip" <<'PY'
 import json, sys
 d = json.load(open(sys.argv[1], encoding='utf-8-sig')); d['update_url_override'] = sys.argv[2]; d['check_updates_on_start'] = True; json.dump(d, open(sys.argv[1], 'w'))
 PY
@@ -59,8 +59,10 @@ PY
   shot 05_update_available
   # UPDATE NOW (the left button of the dialog: 110, 170)
   [ -n "${UW:-}" ] && click_rel "$UW" 110 170
-  for i in $(seq 1 300); do grep -q '"version": "1.0.1"' "$D/drbr-install.json" 2>/dev/null && break; sleep 1; done
-  # the "DRBR 1.0.1 is installed." box comes once the update has finished; OK, then the refreshed window
+  # (the test release is the payload's version with 1 added to its last number - make_test_releases.py)
+  V1=$(python3 -c "import json,sys; v=json.load(open(sys.argv[1]))['version'].split('.'); v[-1]=str(int(v[-1])+1); print('.'.join(v))" "$PAYLOAD/payload.json")
+  for i in $(seq 1 300); do grep -q "\"version\": \"$V1\"" "$D/drbr-install.json" 2>/dev/null && break; sleep 1; done
+  # the "DRBR <version> is installed." box comes once the update has finished; OK, then the refreshed window
   MB=""; for i in $(seq 1 120); do MB=$(xdotool search --name "^DRBR$" 2>/dev/null | head -1); [ -n "$MB" ] && break; sleep 0.5; done
   sleep 2
   shot 06_update_done

@@ -35,7 +35,8 @@ function kfo_view_default()
         help: 1,    // the watching keys box
         zoom: 2,    // ZOOM: 2 or 3 times
         wnames: 1,  // ROOM NAMES: the players' names over their heads in the cold place
-        chat: 1     // CHAT shown (build 48; messages still arrive while it is hidden)
+        chat: 1,    // CHAT shown (build 48; messages still arrive while it is hidden)
+        blines: 0   // BOSS LINES: the bosses' speech balloons (1.0.1: off unless chosen - they were over the battle)
     };
 }
 
@@ -57,7 +58,7 @@ function kfo_view_spec()
     return [["show", 0, 1, 1], ["sop", 0, 100, 5], ["names", 0, 1, 1], ["nop", 0, 100, 5], ["outl", 0, 1, 1], ["cmode", 0, 3, 1], ["hl", 0, 1, 1],
         ["dim", 0, 1, 1], ["skfx", 0, 2, 1], ["dmgfx", 0, 1, 1], ["nums", 0, 1, 1], ["fade", 0, 1, 1], ["spv", 0, 2, 1], ["mark", 0, 1, 1],
         ["shake", 0, 1, 1], ["flash", 0, 1, 1], ["simple", 0, 1, 1], ["hints", 0, 1, 1], ["elim", 0, 1, 1], ["info", 0, 1, 1], ["net", 0, 1, 1],
-        ["shud", 0, 2, 1], ["cam", 0, 3, 1], ["help", 0, 1, 1], ["zoom", 2, 3, 1], ["wnames", 0, 1, 1], ["chat", 0, 1, 1]];
+        ["shud", 0, 2, 1], ["cam", 0, 3, 1], ["help", 0, 1, 1], ["zoom", 2, 3, 1], ["wnames", 0, 1, 1], ["chat", 0, 1, 1], ["blines", 0, 1, 1]];
 }
 
 function kfo_look_spec()

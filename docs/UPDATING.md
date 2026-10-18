@@ -2,9 +2,14 @@
 
 ## Automatic update detection
 
-When DRBR Launcher opens, and when you click **Check for Updates**, it downloads the release information
+When DRBR Launcher opens, and when you click **Check for Updates**, it reads the release information
 (`update-manifest.json` and its signature) from the latest DRBR release on GitHub. You can turn off the check at
 opening in Settings.
+
+A DRBR release is **one file, `DRBR.zip`**. It holds `DRBR-Setup.exe` (with the whole DRBR package inside it), a
+`README.txt`, and `update/update-manifest.json` with its signature as its last entries. The launcher does not download
+`DRBR.zip` to check: it reads only its end (about 64 KB: the zip's directory, the manifest and the signature) with HTTP
+range requests.
 
 - The release information is **accepted only when its signature is DRBR's**. It is signed with the DRBR release key, and
   the launcher checks it with the public key built into it. A release that is not signed by DRBR is refused, and
@@ -34,8 +39,13 @@ DRBR stays playable.
 
 1. It checks that DRBR's game is not running and that there is enough disk space.
 2. It downloads only what changed. Each file is listed in the signed release information with its size and SHA-256. A
-   file DRBR already has with that checksum is reused, not downloaded. Downloads go to
-   `%LOCALAPPDATA%\DRBR\staging\download-<version>\`.
+   file DRBR already has with that checksum is reused, not downloaded. The others are read **from inside `DRBR.zip`**:
+   the files lie uncompressed in the package appended to `DRBR-Setup.exe`, which lies uncompressed in `DRBR.zip`, so
+   the launcher asks the server for just their bytes. Downloads go to `%LOCALAPPDATA%\DRBR\staging\download-<version>\`.
+   - The files come from that version's own `DRBR.zip` (`releases/download/v<version>/DRBR.zip`), not from "latest",
+     so a release published meanwhile cannot mix in.
+   - A `DRBR.zip` that was compressed again by hand, or a server that does not answer range requests, still works: then
+     `DRBR.zip` is downloaded whole and the files are taken out of it here.
 3. It checks every file by SHA-256. A damaged download is deleted and downloaded once more. If it is damaged again, the
    update is refused and nothing changes.
 4. It installs with the same transaction as a fresh install:
@@ -53,7 +63,8 @@ launcher does not use them yet.
 ## Interrupted downloads and failed updates
 
 - A download that stops (connection lost, launcher closed) **resumes** from where it stopped the next time, using an
-  HTTP Range request on the kept `.part` file.
+  HTTP Range request on the kept `.part` file. (GitHub hands out short-lived download addresses: an expired one is
+  asked for again.)
 - An update that fails or is interrupted while installing, whether it crashed, lost power or was closed, is undone the
   next time DRBR Launcher or DRBR-Setup starts. The previous DRBR is put back
   (`%LOCALAPPDATA%\DRBR\drbr-transaction.json` records the transaction).
@@ -63,12 +74,15 @@ launcher does not use them yet.
 
 A running program cannot replace itself. When a release has a newer launcher:
 
-1. Its file is downloaded and checked like any other file.
+1. Its file is downloaded and checked like any other file. Windows refuses to delete or overwrite the running
+   launcher, so the new one waits in `%LOCALAPPDATA%\DRBR\staging\pending\`; the rest of the update goes in as usual.
 2. The launcher starts **DRBR Updater** and closes.
 3. The updater waits for the launcher to close, checks the new file's SHA-256, swaps the files (the old one is kept
    until the new one is checked), and starts the launcher again.
 
-If anything fails, the old launcher is put back and keeps working. There is no background service.
+If anything fails, the old launcher is put back and keeps working. A new launcher still waiting (for example after
+DRBR-Setup.exe ran while the launcher was open) goes in the next time the launcher starts. There is no background
+service.
 
 ## Save migrations
 

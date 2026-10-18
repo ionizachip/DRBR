@@ -233,6 +233,9 @@ def main():
     left = [(n, x) for n, tt in F.items() for x in re.findall(r'\b(obj_pink_enemy|obj_dbulletcontroller|obj_purplecontrols|obj_fusebomb\w*|obj_pink\w+|e__VW|obj_date_\w+)',
                                                               re.sub(r'"[^"\n]*"', '""', tt))]
     assert not left, left[:6]
+    # ---- 1.0.1: her line while she is in the battle herself (her own object is hidden then; obj_pk_move shows her)
+    mv = 'gml_Object_obj_pk_move_Draw_0.gml'
+    F[mv] = F[mv].rstrip('\n') + '\nkbr_pk_move_say();\n'
     for s in EXTRA_SPR:
         assert s in B.S['spr'], s
         B.sprites.add(s)

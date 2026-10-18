@@ -677,10 +677,21 @@ function kfo_mus_situ_file(_kind)
 
 function kfo_mus_situ(_kind)
 {
+    // (DRBR 1.0.1: a song of your own plays on - kbr_mus_own)
+    if (kbr_mus_own())
+        return 0;
     var _M = (variable_global_exists("kfo") && is_struct(global.kfo) && variable_struct_exists(global.kfo, "M") && is_struct(global.kfo.M)) ? global.kfo.M : undefined;
     var _now = (is_struct(_M) && variable_struct_exists(_M, "situ")) ? _M.situ : "";
     if (_now == _kind || (_now == "lms" && _kind == "nm"))
         return 0;
+    // DRBR 1.0.1: a boss on stage keeps its own music; the moment's song comes when the knights are back (kbr_enc_music)
+    var _en = kbr_enc_now();
+    if (is_struct(_en) && variable_struct_exists(_en, "music") && knight_music_exists(_en.music))
+    {
+        if (is_struct(_M))
+            _M.situ = _kind;
+        return 0;
+    }
     var _f = kfo_mus_situ_file(_kind);
     if (!knight_music_exists(_f) || !knight_mus_ok())
         return 0;

@@ -105,7 +105,7 @@ function kfo_ui_bots_desc(_pg, _id)
     switch (_id)
     {
         case "done": return "Z: back.";
-        case "badd": return "Z: one more bot in the room (up to 7; not#while a match runs).";
+        case "badd": return "Z: one more bot (up to 7). Bots play by the#players' rules: same SOUL, damage and skills.";
         case "bdel": return "Z: the last bot leaves the room (not while a#match runs).";
         case "ball": return "< >: the skill of every bot you did not set#one by one (DUMMY ... PERFECT).";
         case "bdef": return "Z: this bot plays at the room's BOT SKILL#again.";
@@ -188,45 +188,4 @@ function kfo_ui_bots_change(_pg, _id, _d, _ok)
         }
     }
     return false;
-}
-
-// the right side: the bot (or every bot) and what the numbers mean
-function kfo_ui_prev_bots(_pg, xx, yy)
-{
-    var _bx = xx + 330;
-    var _by = yy + 104;
-    draw_set_color(c_black);
-    draw_rectangle(_bx, _by, _bx + 236, _by + 200, false);
-    var _l = kfo_ui_bots_list();
-    draw_set_color(c_white);
-    if (_pg == "onl_bots")
-    {
-        knight_txt_small(_bx + 8, _by + 6, "BOTS PLAY BY THE PLAYERS' RULES:");
-        var _t = ["THE SAME SOUL, HITBOX AND SPEED", "THE SAME DAMAGE, GAUGE AND SKILLS", "HEALS, SHIELDS AND TARGETING", "DODGING FROM THE REAL BULLETS",
-            "", "PRACTICE AND ONLINE ROOMS", "SHOWN WITH A BOT TAG"];
-        for (var _i = 0; _i < array_length(_t); _i++)
-        {
-            draw_set_color(c_ltgray);
-            knight_txt_small(_bx + 8, _by + 28 + (_i * 18), _t[_i]);
-        }
-        return 1;
-    }
-    var _bi = kfo_ui_bot_i();
-    if (_bi < array_length(_l))
-    {
-        var _b = _l[_bi];
-        kfo_skin_head_draw(kfo_skin_ok(_b.s), _bx + 10, _by + 10);
-        draw_set_color(c_white);
-        knight_txt_small(_bx + 52, _by + 14, _b.n + "  (BOT)");
-        var _c = kfo_host_botcfg(_bi);
-        draw_set_color(c_yellow);
-        knight_txt_small(_bx + 52, _by + 32, kfo_bot_pre_name(_c.pre) + (_c.own ? "" : "  - THE ROOM'S"));
-    }
-    draw_set_color(c_ltgray);
-    var _t2 = ["PERFECT: NO DELAY, FULL LOOK-AHEAD,", "NO MISTAKES, EXACT MOVES - IT DODGES", "EVERYTHING THAT CAN BE DODGED.",
-        "DUMMY: BARELY MOVES."];
-    for (var _i = 0; _i < array_length(_t2); _i++)
-        knight_txt_small(_bx + 8, _by + 70 + (_i * 18), _t2[_i]);
-    draw_set_color(c_white);
-    return 1;
 }

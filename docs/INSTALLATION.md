@@ -13,8 +13,9 @@ your saves.
 
 ## Download
 
-Get `DRBR-Setup.exe` from the latest release on the DRBR GitHub page (**Releases**, then **Latest**, then
-**DRBR-Setup.exe**). `SHA256SUMS.txt` in the same release lists its checksum.
+Get **`DRBR.zip`** from the latest release on the DRBR GitHub page (**Releases**, then **Latest**, then **DRBR.zip** -
+it is the release's one file). Open it (or extract it) and run **`DRBR-Setup.exe`** from it. Its `README.txt` says the
+same; the `update` folder in it is what the launcher reads for updates.
 
 Windows may say "Windows protected your PC" because the program is not code-signed. Click **More info**, then
 **Run anyway**.

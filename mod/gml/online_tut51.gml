@@ -25,12 +25,17 @@ function kfo_tut_count()
 }
 
 // finished once (the ONLINE page says so)
+// (DRBR 1.0.1: read from the file once and kept - the ONLINE page asked for it every frame, opening the file each time)
+global.kfo_tut_done_c = undefined;
 function kfo_tut_done()
 {
+    if (variable_global_exists("kfo_tut_done_c") && !is_undefined(global.kfo_tut_done_c))
+        return global.kfo_tut_done_c;
     ossafe_ini_open(kfo_ini_file());
     var _d = ini_read_real("player", "tut_done", 0);
     ossafe_ini_close();
-    return _d == 1;
+    global.kfo_tut_done_c = (_d == 1);
+    return global.kfo_tut_done_c;
 }
 
 // the ONLINE page's HOW TO PLAY: a practice room set up for the lesson, started at once
@@ -444,6 +449,7 @@ function kfo_tut_finish(_done)
         ossafe_ini_open(kfo_ini_file());
         ini_write_real("player", "tut_done", 1);
         ossafe_ini_close();
+        global.kfo_tut_done_c = true;
         snd_play(snd_won);
     }
     kfo_back_to_lobby();

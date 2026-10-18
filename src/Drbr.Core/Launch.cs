@@ -18,6 +18,49 @@ namespace Drbr
         public Process Game;
     }
 
+    /// <summary>A new DRBR Launcher.exe that could not go in while the launcher ran (Windows does not let a running program be
+    /// deleted or overwritten) waits in staging\pending; DRBR Updater swaps it in once the launcher has closed.</summary>
+    public static class LauncherSwap
+    {
+        /// <summary>The staged launcher's checksum when one is waiting and is the installed release's launcher; a stale or
+        /// damaged one is removed. null: nothing to swap.</summary>
+        public static string Waiting(DrbrPaths p)
+        {
+            try
+            {
+                if (!File.Exists(p.PendingLauncher)) return null;
+                string mf = Path.Combine(p.PayloadDir, "payload.json");
+                PayloadFile want = File.Exists(mf) ? Manifest.Load(mf).Files.Find(f => f.Kind == "app" && string.Equals(f.Dest, "DRBR Launcher.exe", StringComparison.OrdinalIgnoreCase)) : null;
+                string sha = Hash.Sha256File(p.PendingLauncher);
+                bool current = File.Exists(p.LauncherExe) && Hash.Same(Hash.Sha256File(p.LauncherExe), sha);
+                if (want == null || !Hash.Same(sha, want.Sha256) || current)
+                {
+                    Log.Info("A staged launcher that is not needed was removed (" + (want == null ? "no installed release" : current ? "already in place" : "not this release's") + ").");
+                    File.Delete(p.PendingLauncher);
+                    return null;
+                }
+                return sha;
+            }
+            catch (Exception e) { Log.Warn("The staged launcher could not be checked: " + e.Message); return null; }
+        }
+
+        /// <summary>Starts DRBR Updater: it waits for process waitPid to end, checks the staged launcher, swaps it in (the old
+        /// one is put back if anything fails) and, with restart, starts the new launcher.</summary>
+        public static bool Start(DrbrPaths p, string sha, int waitPid, bool restart)
+        {
+            if (!File.Exists(p.UpdaterExe) || !File.Exists(p.PendingLauncher)) return false;
+            try
+            {
+                Log.Info("Handing over to DRBR Updater for the new launcher.");
+                Process.Start(new ProcessStartInfo(p.UpdaterExe, "--swap \"" + p.PendingLauncher + "\" --target \"" + p.LauncherExe + "\" --sha256 " + sha +
+                                                   " --wait-pid " + waitPid + (restart ? " --restart" : "") + " --root \"" + p.Root + "\"")
+                { UseShellExecute = false, WorkingDirectory = p.Root });
+                return true;
+            }
+            catch (Exception e) { Log.Error("DRBR Updater could not be started: " + e.Message); return false; }
+        }
+    }
+
     public sealed class LauncherCore
     {
         public readonly DrbrPaths P;

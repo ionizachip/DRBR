@@ -27,11 +27,11 @@ function kbr_enc_def_flowery()
         type: [623, 620, 624, 634, 630, 641, 631, 636, 638, 632, 635, 622, 639],
         tt: [420, 360, 330, 360, 330, 330, 330, 360, 360, 330, 330, 360, 640],
         // his opening lines (Chapter 5's, by phase) and his repeats
-        line: ["Hah! You think&you can&match&my style!?", "Kris... isn't&your mother&calling you?", "If everyone&could just&be friends...",
+        line: ["Hah! You think&you can match&my style!?", "Kris... isn't&your mother&calling you?", "If everyone&could just&be friends...",
                "Is that really&just what \"HEROES\"&can do!?", "I won't lose...&My friends are&behind me!", "Seth, remember&the patterns&I taught you!?",
-               "Heh, I improved&them! Watch!", "Orange! Be brave,&it's your turn!", "Green! How&about&a $999 tip!?", "Don't cry, Orange.&Tears are for a&wedding's day...",
+               "Heh, I improved&them! Watch!", "Orange! Be brave,&it's your turn!", "Green! How about&a $999 tip!?", "Don't cry, Orange.&Tears are for a&wedding's day...",
                "Yellow! Tonight...&justice rides&together!", "Feel it!&Smell it!&The power&of flowers!", "Enough, Kris!&I don't need a trial&to expose the truth!"],
-        again: ["You might&turn over&a new leaf.", "Imagine that...&a branch&where we didn't&have to fight.", "I'll never let you&get to the Dark&Fountain...!",
+        again: ["You might&turn over&a new leaf.", "Imagine that...&a branch where&we didn't have&to fight.", "I'll never let you&get to the Dark&Fountain...!",
                 "But, I see your&hearts are set&in stone."],
         flavor: ["* Flowery emits the fragrance of hope!", "* Flowery holds onto his dream.", "* Flowery blooms in bravery.",
                  "* Flowery shows Aqua how to safely hold a knife!", "* Orange rides on Flowery's fist as they punch together!",
@@ -595,8 +595,20 @@ function kbr_fl_draw()
     var _fy = sin(float_siner * 0.33) * 5;
     draw_sprite_ext(thissprite, siner, x, y + _fy, image_xscale, image_yscale, 0, image_blend, image_alpha);
     if (say_t > 0)
-        kbr_enc_balloon(x - 8, y + 40, say, min(1, say_t / 10));
+        kbr_enc_say(x, y, x + 106, y + 120, say, min(1, say_t / 10));
     return 1;
+}
+
+// his line while his Jarona copy stands in for him (obj_fl_jarona's Draw; he hides for those attacks) - not a SENT copy's
+function kbr_fl_jarona_say()
+{
+    if ((variable_instance_exists(id, "kbrx") && kbrx > 0) || !instance_exists(obj_fl_flowery))
+        return 0;
+    var _f = instance_find(obj_fl_flowery, 0);
+    if (_f.visible || _f.say_t <= 0)
+        return 0;
+    var _r = kbr_bl_spr_rect(x, y);
+    return kbr_enc_say(_r[0], _r[1], _r[2], _r[3], _f.say, min(1, _f.say_t / 10));
 }
 
 // every one of his pieces' objects (the cut, the bots' view of his board)
@@ -963,26 +975,43 @@ function kbr_fl_hud(xx, yy, _M)
 // A bot cannot dash through the host's board (its scroll is the host player's own dashes), so while one of his attacks is
 // on, each bot meets a hazard every so often (a Jarona's lunge every 70 frames, a piece of the chase every 40) and passes it
 // by its PRECISION, MISTAKES and REACTION (a PERFECT bot almost always; a DUMMY almost never): a pass is a break or a parry
-// (its FLOWERY TP for the GROUP MERCY), a miss is a hit by the attack's own damage. Its SOUL sits where the orange SOULs
-// sit (the box's left, moving up and down). Self: nothing (the host's game). True when it played the bot's frame.
+// (its FLOWERY TP for the GROUP MERCY), a miss is a hit by the attack's own damage. Its SOUL is where the orange SOULs are
+// (the box's left) and moves up and down out of the way of his pieces as they come (DRBR 1.0.1: its planning, on the orange
+// SOUL's one axis - before, it wandered), and DASHES when it passes a hazard (the dash goes out with its place, so a watcher's
+// board rushes on as theirs does). Self: nothing (the host's game). True when it played the bot's frame.
 function kbr_fl_bot_tick(_h, _b, _c, _box, _e)
 {
     if (!instance_exists(obj_fl_ctrl) || !variable_global_exists("kbr_fl_k") || global.kbr_fl_k < 0)
+    {
+        _b.fd = 0;
+        _b.ffa = 0;
         return false;
+    }
     var _s = _b.bt;
     if (!variable_struct_exists(_s, "flk") || _s.flk != global.kbr_fl_k)
     {
         _s.flk = global.kbr_fl_k;
         _s.flt = 0;
         _s.flw = 20 + irandom(30);
-        _s.fly = lerp(_box[1], _box[3], 0.5);
+        _s.fld = 0;
+        _s.fla = 0;
     }
-    // where the orange SOULs sit (Chapter 5: 75 px left of the box's middle line... the SOUL's own x)
+    // where the orange SOULs are (Chapter 5: the SOUL's own x); up and down by its planning (only the vertical moves)
     var _sx = instance_exists(obj_fl_soul) ? obj_fl_soul.x : (_box[0] + 40);
     _s.x = clamp(_sx, _box[0], _box[2]);
-    if (abs(_s.y - _s.fly) < 2 || irandom(60) == 0)
-        _s.fly = lerp(_box[1] + 10, _box[3] - 10, random(1));
-    _s.y = clamp(lerp(_s.y, _s.fly, 0.12), _box[1], _box[3]);
+    if (((_s.alive_f mod max(1, _c.every)) == 0 || _s.owe) && _c.pre != -2)
+    {
+        _s.flax = true;
+        kfo_bot_think(_b, _c, _box, _e, get_timer() + 2500);
+        _s.flax = false;
+        _s.owe = false;
+    }
+    _s.y = clamp(_s.y + _s.iy, _box[1], _box[3]);
+    // its dash (a pass): the orange SOUL's dash, and the board's rush for whoever watches it
+    if (_s.fld > 0)
+        _s.fld--;
+    _b.fd = (_s.fld > 0) ? 1 : 0;
+    _b.ffa = (_s.fld > 0) ? _s.fla : 0;
     if (_s.inv > 0)
         _s.inv--;
     // a player's Flowery send at it: more of his pieces, one every 30 frames (the send's damage, its sender's credit)
@@ -997,7 +1026,11 @@ function kbr_fl_bot_tick(_h, _b, _c, _box, _e)
             array_delete(_s.flx, 0, 1);
         var _pass0 = clamp((_c.prec / 100) * (1 - (_c.miss / 100)) * (1 - (_c.react / 90)), 0.02, 0.995);
         if (random(1) < _pass0)
+        {
             _s.flt += 3.75;
+            _s.fld = 6;
+            _s.fla = -160;
+        }
         else if (_s.inv <= 0)
         {
             var _dmg0 = max(1, round(_x0.d * (_e.skdmg / 100) * (_e.dmul / 100)));
@@ -1026,9 +1059,11 @@ function kbr_fl_bot_tick(_h, _b, _c, _box, _e)
         var _pass = clamp((_c.prec / 100) * (1 - (_c.miss / 100)) * (1 - (_c.react / 90)), 0.02, 0.995);
         if (random(1) < _pass)
         {
-            // a break (3.75) or a parry (12, a fast one 22 - the better the bot, the faster)
+            // a break (3.75) or a parry (12, a fast one 22 - the better the bot, the faster): a dash (a fast parry's, faster)
             var _tp = _jarona ? ((random(100) < _c.prec) ? 22 : 12) : 3.75;
             _s.flt += _tp;
+            _s.fld = _jarona ? 10 : 6;
+            _s.fla = (_tp >= 22) ? -240 : -160;
             _b.g = min(100, _b.g + ((_tp / 5) * (_e.grz / 100)));
         }
         else if (_s.inv <= 0)

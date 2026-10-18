@@ -367,6 +367,7 @@ function kbr_skill_icon(_sid, _x, _y, _a, _sc)
     if (is_undefined(_sc))
         _sc = 1;
     var _k = _sc;
+    var _kb = _sc * 0.7;
     var _w = c_white;
     var _gr = make_color_rgb(70, 230, 110);
     var _bl = make_color_rgb(90, 170, 255);
@@ -530,125 +531,126 @@ function kbr_skill_icon(_sid, _x, _y, _a, _sc)
             // FOUNTAIN SPLIT: the Thorn Knight's fountain bullet
             kbr_spr_c(spr_rk_fountain_bullet, _f4, _x, _y + _bob, 0.55 * _k, 0.55 * _k, 0, _w, _a);
             break;
-        // DRBR: the bosses' sends - their own sprites (Chapter 1 Jevil, Chapter 4 Gerson, Chapter 5 Flowery)
+        // DRBR: the bosses' sends - their own sprites (Chapter 1 Jevil, Chapter 4 Gerson, Chapter 5 Flowery). DRBR 1.0.1: at 70% of
+        // the size they had (_kb), as big as the knights' pictures in the slots - they filled the slots past their edges
         case 26:
             // SPADE RING: three spades going round
             for (var _i = 0; _i < 3; _i++)
             {
                 var _ra = (_t / 6) + (_i * 120);
-                kbr_icon_fit(spr_jv_spadebullet, 0, _x + lengthdir_x(6 * _k, _ra), _y + lengthdir_y(6 * _k, _ra), 9 * _k, 0, _w, _a);
+                kbr_icon_fit(spr_jv_spadebullet, 0, _x + lengthdir_x(6 * _kb, _ra), _y + lengthdir_y(6 * _kb, _ra), 9 * _kb, 0, _w, _a);
             }
             break;
         case 27:
             // DIAMOND RAIN: two diamonds rising
             for (var _i = 0; _i < 2; _i++)
-                kbr_icon_fit(spr_jv_diamondbullet_vert, 0, _x + ((_i - 0.5) * 9 * _k), _y + 4 - (((_t / 40) + (_i * 9)) mod 12) * _k, 12 * _k, 0, _w, _a);
+                kbr_icon_fit(spr_jv_diamondbullet_vert, 0, _x + ((_i - 0.5) * 9 * _kb), _y + 4 - (((_t / 40) + (_i * 9)) mod 12) * _kb, 12 * _kb, 0, _w, _a);
             break;
         case 28:
-            kbr_icon_fit(spr_jv_clubsball_b, _f4 mod max(1, sprite_get_number(spr_jv_clubsball_b)), _x, _y + _bob, 18 * _k, 0, _w, _a);
+            kbr_icon_fit(spr_jv_clubsball_b, _f4 mod max(1, sprite_get_number(spr_jv_clubsball_b)), _x, _y + _bob, 18 * _kb, 0, _w, _a);
             break;
         case 29:
-            kbr_icon_fit(spr_jv_carousel, _f4 mod max(1, sprite_get_number(spr_jv_carousel)), _x, _y + _bob, 20 * _k, 0, _w, _a);
+            kbr_icon_fit(spr_jv_carousel, _f4 mod max(1, sprite_get_number(spr_jv_carousel)), _x, _y + _bob, 20 * _kb, 0, _w, _a);
             break;
         case 30:
-            kbr_icon_fit(spr_jv_joker_scythebody, 0, _x, _y, 22 * _k, (_t / 4) mod 360, _w, _a);
+            kbr_icon_fit(spr_jv_joker_scythebody, 0, _x, _y, 22 * _kb, (_t / 4) mod 360, _w, _a);
             break;
         case 31:
-            kbr_icon_fit(spr_jv_suitsbomb, _f4 mod max(1, sprite_get_number(spr_jv_suitsbomb)), _x, _y + _bob, 18 * _k, 0, _w, _a);
+            kbr_icon_fit(spr_jv_suitsbomb, _f4 mod max(1, sprite_get_number(spr_jv_suitsbomb)), _x, _y + _bob, 18 * _kb, 0, _w, _a);
             break;
         case 32:
-            kbr_icon_fit(spr_hj_gerson_hammer_trowable4, 0, _x, _y, 20 * _k, (_t / 3) mod 360, _w, _a);
+            kbr_icon_fit(spr_hj_gerson_hammer_trowable4, 0, _x, _y, 20 * _kb, (_t / 3) mod 360, _w, _a);
             break;
         case 33:
-            kbr_icon_fit(spr_hj_bounce_shell_idle, _f4 mod max(1, sprite_get_number(spr_hj_bounce_shell_idle)), _x, _y + _bob, 20 * _k, 0, _w, _a);
+            kbr_icon_fit(spr_hj_bounce_shell_idle, _f4 mod max(1, sprite_get_number(spr_hj_bounce_shell_idle)), _x, _y + _bob, 20 * _kb, 0, _w, _a);
             break;
         case 34:
-            kbr_icon_fit(spr_hj_gerson_red_hammer, 0, _x, _y, 22 * _k, -30 + (sin(_t / 140) * 40), _w, _a);
+            kbr_icon_fit(spr_hj_gerson_red_hammer, 0, _x, _y, 22 * _kb, -30 + (sin(_t / 140) * 40), _w, _a);
             break;
         case 35:
-            kbr_icon_fit(spr_hj_greenheart, 0, _x, _y, 12 * _k, 0, _w, _a);
-            kbr_icon_fit(spr_hj_spear_arrow, 0, _x + (10 * _k) - (((_t / 50) mod 6) * _k), _y, 12 * _k, 180, _w, _a);
+            kbr_icon_fit(spr_hj_greenheart, 0, _x, _y, 12 * _kb, 0, _w, _a);
+            kbr_icon_fit(spr_hj_spear_arrow, 0, _x + (10 * _kb) - (((_t / 50) mod 6) * _kb), _y, 12 * _kb, 180, _w, _a);
             break;
         case 36:
-            kbr_icon_fit(spr_hj_gerson_bell, 0, _x - (3 * _k), _y + (sin(_t / 120) * 2), 16 * _k, sin(_t / 160) * 15, _w, _a);
-            kbr_icon_fit(spr_hj_gerson_musical_note2, 0, _x + (7 * _k), _y - (5 * _k) + _bob, 9 * _k, 0, _w, _a);
+            kbr_icon_fit(spr_hj_gerson_bell, 0, _x - (3 * _kb), _y + (sin(_t / 120) * 2), 16 * _kb, sin(_t / 160) * 15, _w, _a);
+            kbr_icon_fit(spr_hj_gerson_musical_note2, 0, _x + (7 * _kb), _y - (5 * _kb) + _bob, 9 * _kb, 0, _w, _a);
             break;
         case 37:
-            kbr_icon_fit(spr_hj_gerson_red_hammer, 0, _x, _y + _bob, 26 * _k, 180, make_color_rgb(255, 200, 200), _a);
+            kbr_icon_fit(spr_hj_gerson_red_hammer, 0, _x, _y + _bob, 26 * _kb, 180, make_color_rgb(255, 200, 200), _a);
             break;
         case 38:
             // JARONA: his lunge
-            kbr_icon_fit(spr_fl_flowery_puuunch_left, _f4 mod max(1, sprite_get_number(spr_fl_flowery_puuunch_left)), _x - (((_t / 60) mod 4) * _k), _y, 22 * _k, 0, _w, _a);
+            kbr_icon_fit(spr_fl_flowery_puuunch_left, _f4 mod max(1, sprite_get_number(spr_fl_flowery_puuunch_left)), _x - (((_t / 60) mod 4) * _kb), _y, 22 * _kb, 0, _w, _a);
             break;
         case 39:
             // BAMBOO RUSH: two stalks, blue joints
-            kbr_icon_fit(spr_fl_bamboo_wall, 0, _x - (4 * _k), _y, 20 * _k, 0, _w, _a);
-            kbr_icon_fit(spr_fl_bamboo_wall, 0, _x + (5 * _k), _y + (2 * _k), 18 * _k, 0, make_color_rgb(120, 190, 255), _a);
+            kbr_icon_fit(spr_fl_bamboo_wall, 0, _x - (4 * _kb), _y, 20 * _kb, 0, _w, _a);
+            kbr_icon_fit(spr_fl_bamboo_wall, 0, _x + (5 * _kb), _y + (2 * _kb), 18 * _kb, 0, make_color_rgb(120, 190, 255), _a);
             break;
         case 40:
-            kbr_icon_fit(spr_fl_orangeheart_lillypad, 0, _x, _y + (5 * _k), 16 * _k, 0, _w, _a);
-            kbr_icon_fit(spr_fl_attack_knifechain, _f4 mod max(1, sprite_get_number(spr_fl_attack_knifechain)), _x, _y - (3 * _k), 16 * _k, 90, _w, _a);
+            kbr_icon_fit(spr_fl_orangeheart_lillypad, 0, _x, _y + (5 * _kb), 16 * _kb, 0, _w, _a);
+            kbr_icon_fit(spr_fl_attack_knifechain, _f4 mod max(1, sprite_get_number(spr_fl_attack_knifechain)), _x, _y - (3 * _kb), 16 * _kb, 90, _w, _a);
             break;
         case 41:
-            kbr_icon_fit(spr_fl_omega_book, _f4 mod max(1, sprite_get_number(spr_fl_omega_book)), _x, _y + _bob, 20 * _k, 0, _w, _a);
+            kbr_icon_fit(spr_fl_omega_book, _f4 mod max(1, sprite_get_number(spr_fl_omega_book)), _x, _y + _bob, 20 * _kb, 0, _w, _a);
             break;
         case 42:
-            kbr_icon_fit(spr_fl_orange_animepunch_finished_cent, _f4 mod max(1, sprite_get_number(spr_fl_orange_animepunch_finished_cent)), _x - (3 * _k), _y, 18 * _k, 0, _w, _a);
-            kbr_icon_fit(spr_fl_bullet_green_flame, _f4 mod max(1, sprite_get_number(spr_fl_bullet_green_flame)), _x + (7 * _k), _y + (4 * _k), 10 * _k, 0, _w, _a);
+            kbr_icon_fit(spr_fl_orange_animepunch_finished_cent, _f4 mod max(1, sprite_get_number(spr_fl_orange_animepunch_finished_cent)), _x - (3 * _kb), _y, 18 * _kb, 0, _w, _a);
+            kbr_icon_fit(spr_fl_bullet_green_flame, _f4 mod max(1, sprite_get_number(spr_fl_bullet_green_flame)), _x + (7 * _kb), _y + (4 * _kb), 10 * _kb, 0, _w, _a);
             break;
         case 43:
-            kbr_icon_fit(spr_fl_enemy_yellow_reticle, 0, _x, _y, 20 * _k, (_t / 8) mod 360, _w, _a * 0.8);
-            kbr_icon_fit(spr_fl_enemy_blue_bullet_butterfly, _f4 mod max(1, sprite_get_number(spr_fl_enemy_blue_bullet_butterfly)), _x, _y + _bob, 13 * _k, 0, _w, _a);
+            kbr_icon_fit(spr_fl_enemy_yellow_reticle, 0, _x, _y, 20 * _kb, (_t / 8) mod 360, _w, _a * 0.8);
+            kbr_icon_fit(spr_fl_enemy_blue_bullet_butterfly, _f4 mod max(1, sprite_get_number(spr_fl_enemy_blue_bullet_butterfly)), _x, _y + _bob, 13 * _kb, 0, _w, _a);
             break;
         case 44:
             // LAST JARONA: his lunge, round the rainbow
-            kbr_icon_fit(spr_fl_flowery_puuunch_left, _f4 mod max(1, sprite_get_number(spr_fl_flowery_puuunch_left)), _x, _y, 24 * _k, 0, make_color_hsv((_t / 6) mod 255, 160, 255), _a);
+            kbr_icon_fit(spr_fl_flowery_puuunch_left, _f4 mod max(1, sprite_get_number(spr_fl_flowery_puuunch_left)), _x, _y, 24 * _kb, 0, make_color_hsv((_t / 6) mod 255, 160, 255), _a);
             break;
         // DRBR: Spamton NEO's (his own Chapter 2 sprites)
         case 45:
             // PIPIS: the egg, rocking
-            kbr_icon_fit(spr_pipis_egg, 0, _x, _y + _bob, 18 * _k, sin(_t / 90) * 20, _w, _a);
+            kbr_icon_fit(spr_pipis_egg, 0, _x, _y + _bob, 18 * _kb, sin(_t / 90) * 20, _w, _a);
             break;
         case 46:
             // FLYING HEADS: two of them, one behind the other
-            kbr_icon_fit(spr_sneo_crew, _f4 mod max(1, sprite_get_number(spr_sneo_crew)), _x + (4 * _k), _y - (3 * _k), 14 * _k, 0, _w, _a * 0.7);
-            kbr_icon_fit(spr_sneo_crew, _f4 mod max(1, sprite_get_number(spr_sneo_crew)), _x - (2 * _k), _y + (2 * _k) + _bob, 18 * _k, 0, _w, _a);
+            kbr_icon_fit(spr_sneo_crew, _f4 mod max(1, sprite_get_number(spr_sneo_crew)), _x + (4 * _kb), _y - (3 * _kb), 14 * _kb, 0, _w, _a * 0.7);
+            kbr_icon_fit(spr_sneo_crew, _f4 mod max(1, sprite_get_number(spr_sneo_crew)), _x - (2 * _kb), _y + (2 * _kb) + _bob, 18 * _kb, 0, _w, _a);
             break;
         case 47:
-            kbr_icon_fit(spr_sneo_wireheart_smaller, _f4 mod max(1, sprite_get_number(spr_sneo_wireheart_smaller)), _x, _y + _bob, 20 * _k, 0, _w, _a);
+            kbr_icon_fit(spr_sneo_wireheart_smaller, _f4 mod max(1, sprite_get_number(spr_sneo_wireheart_smaller)), _x, _y + _bob, 20 * _kb, 0, _w, _a);
             break;
         case 48:
             // KROMER RAIN: a bill drifting right
-            kbr_icon_fit(spr_spamton_dollar, 0, _x + ((((_t / 40) mod 6) - 3) * _k), _y, 20 * _k, 0, _w, _a);
+            kbr_icon_fit(spr_spamton_dollar, 0, _x + ((((_t / 40) mod 6) - 3) * _kb), _y, 20 * _kb, 0, _w, _a);
             break;
         case 49:
             // MAIL WALL: a mail cell over a crew head
-            kbr_icon_fit(spr_sneo_mail, 0, _x, _y - (5 * _k), 12 * _k, 0, _w, _a);
-            kbr_icon_fit(spr_sneo_crew, _f4 mod max(1, sprite_get_number(spr_sneo_crew)), _x, _y + (6 * _k), 12 * _k, 0, _w, _a);
+            kbr_icon_fit(spr_sneo_mail, 0, _x, _y - (5 * _kb), 12 * _kb, 0, _w, _a);
+            kbr_icon_fit(spr_sneo_crew, _f4 mod max(1, sprite_get_number(spr_sneo_crew)), _x, _y + (6 * _kb), 12 * _kb, 0, _w, _a);
             break;
         // DRBR: Pink's (her own Chapter 5 sprites)
         case 51:
-            kbr_icon_fit(spr_pk_bullet_catface, _f4 mod max(1, sprite_get_number(spr_pk_bullet_catface)), _x + (((_t / 40) mod 6) - 3) * _k, _y, 18 * _k, 0, _w, _a);
+            kbr_icon_fit(spr_pk_bullet_catface, _f4 mod max(1, sprite_get_number(spr_pk_bullet_catface)), _x + (((_t / 40) mod 6) - 3) * _kb, _y, 18 * _kb, 0, _w, _a);
             break;
         case 52:
-            kbr_icon_fit(spr_pk_bullet_catface, _f4 mod max(1, sprite_get_number(spr_pk_bullet_catface)), _x - (4 * _k), _y - (4 * _k) + _bob, 14 * _k, 0, _w, _a);
-            kbr_icon_fit(spr_pk_bullet_catface, _f4 mod max(1, sprite_get_number(spr_pk_bullet_catface)), _x + (4 * _k), _y + (4 * _k) - _bob, 14 * _k, 0, _w, _a);
+            kbr_icon_fit(spr_pk_bullet_catface, _f4 mod max(1, sprite_get_number(spr_pk_bullet_catface)), _x - (4 * _kb), _y - (4 * _kb) + _bob, 14 * _kb, 0, _w, _a);
+            kbr_icon_fit(spr_pk_bullet_catface, _f4 mod max(1, sprite_get_number(spr_pk_bullet_catface)), _x + (4 * _kb), _y + (4 * _kb) - _bob, 14 * _kb, 0, _w, _a);
             break;
         case 53:
-            kbr_icon_fit(spr_pk_pinklanebullet_animation, _f4 mod max(1, sprite_get_number(spr_pk_pinklanebullet_animation)), _x, _y, 20 * _k, (_t / 3) mod 360, _w, _a);
+            kbr_icon_fit(spr_pk_pinklanebullet_animation, _f4 mod max(1, sprite_get_number(spr_pk_pinklanebullet_animation)), _x, _y, 20 * _kb, (_t / 3) mod 360, _w, _a);
             break;
         case 54:
-            kbr_icon_fit(spr_pk_fusebomb, _f4 mod max(1, sprite_get_number(spr_pk_fusebomb)), _x, _y + _bob, 18 * _k, 0, _w, _a);
+            kbr_icon_fit(spr_pk_fusebomb, _f4 mod max(1, sprite_get_number(spr_pk_fusebomb)), _x, _y + _bob, 18 * _kb, 0, _w, _a);
             break;
         case 55:
-            kbr_icon_fit(spr_pk_fusebomb_big, 0, _x, _y + _bob, 24 * _k, 0, make_color_rgb(255, 210, 230), _a);
+            kbr_icon_fit(spr_pk_fusebomb_big, 0, _x, _y + _bob, 24 * _kb, 0, make_color_rgb(255, 210, 230), _a);
             break;
         case 56:
-            kbr_icon_fit(spr_heartbullet, 0, _x, _y + _bob, 16 * _k, 0, make_color_rgb(255, 120, 200), _a);
+            kbr_icon_fit(spr_heartbullet, 0, _x, _y + _bob, 16 * _kb, 0, make_color_rgb(255, 120, 200), _a);
             break;
         case 50:
             // BIG SHOT: his big shot, flaring
-            kbr_icon_fit(spr_sneo_bigshot_s, _f4 mod max(1, sprite_get_number(spr_sneo_bigshot_s)), _x, _y, 24 * _k, 0, make_color_rgb(255, 255, 140 + (sin(_t / 60) * 100)), _a);
+            kbr_icon_fit(spr_sneo_bigshot_s, _f4 mod max(1, sprite_get_number(spr_sneo_bigshot_s)), _x, _y, 24 * _kb, 0, make_color_rgb(255, 255, 140 + (sin(_t / 60) * 100)), _a);
             break;
         default:
             scr_84_set_draw_font("main");
@@ -801,14 +803,10 @@ function kbr_hud_log(xx, yy, _M)
     return 1;
 }
 
-// a line cut to _w pixels in the font that is set (".." at the end when it was cut)
+// a line in _w pixels in the font that is set (DRBR 1.0.1: too long, it scrolls by itself - knight_scroll_fit; it was cut "..")
 function kbr_fit(_s, _w)
 {
-    if (string_width(_s) <= _w)
-        return _s;
-    while (string_length(_s) > 1 && string_width(_s + "..") > _w)
-        _s = string_copy(_s, 1, string_length(_s) - 1);
-    return _s + "..";
+    return knight_scroll_fit(_s, _w);
 }
 
 // the knight that attacks now, its attack, the stage, the next knight and the clock: between the skills (left) and the

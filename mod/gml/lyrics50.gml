@@ -2,7 +2,17 @@
 //   Flower Man: Chapter 5's obj_flowery_lyrics, as the game has it (Flowerman_Arrangement.ogg, the Flowery fight)
 //   Raise Up Your Bat: Chapter 3's karaoke chart (scr_rhythmgame_notechart, song 0: the lines Tenna's karaoke shows for
 //   ch3_karaoke_full.ogg); its syllables spread evenly over each line (the chart has no vocal notes)
+// (DRBR 1.0.1: built once and kept - the fight asked for it every frame)
+global.knight_lyr_tab = undefined;
 function knight_lyr_songs()
+{
+    if (variable_global_exists("knight_lyr_tab") && is_array(global.knight_lyr_tab))
+        return global.knight_lyr_tab;
+    global.knight_lyr_tab = knight_lyr_songs_make();
+    return global.knight_lyr_tab;
+}
+
+function knight_lyr_songs_make()
 {
     return [
         { file: "Flowerman_Arrangement.ogg", len: 192.024, bpm: 160, flowery: true,

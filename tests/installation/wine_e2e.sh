@@ -78,17 +78,33 @@ print(sorted(k for k in set(a) | set(b) if a.get(k) != b.get(k) and not k.starts
 PY
 chk "only drbr_profile changed in the save folder: $(cat "$W/savediff.txt")" [ "$(cat "$W/savediff.txt")" = "[]" ]
 
+echo "== 2b. DRBR-Setup.exe while DRBR Launcher is open: refused (it cannot replace a running launcher)"
+# (one Wine session on one screen for both: the launcher's window open, then the Setup)
+timeout 60 /usr/lib/wine/wineserver -w 2>/dev/null
+DISP=:$((80 + RANDOM % 20)); Xvfb $DISP -screen 0 1024x768x24 > /dev/null 2>&1 & XV=$!; sleep 2
+DISPLAY=$DISP "$WINE" "C:\\users\\root\\AppData\\Local\\DRBR\\DRBR Launcher.exe" > "$W/open_launcher.out" 2>&1 &
+for i in $(seq 1 120); do DISPLAY=$DISP xdotool search --name "DRBR Launcher" > /dev/null 2>&1 && break; sleep 0.5; done
+sleep 3
+DISPLAY=$DISP timeout 600 "$WINE" 'C:\DRBR-Setup.exe' /S --result 'C:\r_open.json' > "$W/last.out" 2>&1
+chk "a reinstall while the launcher is open is refused with a message: $(j "$C/r_open.json" "d.get('code'), d.get('error','')")" [ "$(j "$C/r_open.json" "d.get('code')")" = "launcher_running" ]
+timeout 30 /usr/lib/wine/wineserver -k 2>/dev/null; sleep 2; kill $XV 2>/dev/null
+rc=$(run "C:\\users\\root\\AppData\\Local\\DRBR\\DRBR Launcher.exe" --verify --result 'C:\r_verify_open.json')
+chk "  ... and DRBR is unchanged (verifies, rc=$rc)" [ "$rc" = 0 ]
+
 echo "== 3. restore starting save"
 rc=$(run "C:\\users\\root\\AppData\\Local\\DRBR\\DRBR Launcher.exe" --restore-save --result 'C:\r_restore.json')
 chk "RESTORE STARTING SAVE moved the DRBR save aside ($(j "$C/r_restore.json" "d.get('moved')"))" [ "$(j "$C/r_restore.json" "d['ok'] and d['moved']>=1")" = "True" -a ! -f "$SA/drbr_profile/filech3_0" ]
 
-echo "== 4. update from a local release server (signed manifest, only changed files downloaded)"
+echo "== 4. update from a local release server (one DRBR.zip per release: the signed manifest at its end, only the changed files' bytes downloaded)"
 PORT=$((20000 + RANDOM % 20000))
 python3 "$HERE/tests/updates/make_test_releases.py" "$PAYLOAD" "$W/releases" "$KEY" "http://127.0.0.1:$PORT" > /dev/null
+# (the test releases' versions: the payload's own with n added to its last number - make_test_releases.py)
+TV() { python3 -c "import json,sys; v=json.load(open(sys.argv[1]))['version'].split('.'); v[-1]=str(int(v[-1])+int(sys.argv[2])); print('.'.join(v))" "$PAYLOAD/payload.json" "$1"; }
+V1=$(TV 1); V2=$(TV 2); V5=$(TV 5)
 : > "$W/http.log"
 python3 "$HERE/tests/updates/range_server.py" "$W/releases" "$PORT" "$W/http.log" & SRV=$!
 sleep 1
-python3 - "$D/drbr-settings.json" "http://127.0.0.1:$PORT/good/update-manifest.json" <<'PY'
+python3 - "$D/drbr-settings.json" "http://127.0.0.1:$PORT/good/DRBR.zip" <<'PY'
 import json, sys
 d = json.load(open(sys.argv[1], encoding='utf-8-sig'))
 d['update_url_override'] = sys.argv[2]
@@ -97,25 +113,50 @@ PY
 rc=$(run "C:\\users\\root\\AppData\\Local\\DRBR\\DRBR Launcher.exe" --check --result 'C:\r_check.json')
 chk "update check: $(j "$C/r_check.json" "d.get('installed'), d.get('available'), d.get('update'), d.get('error','')")" [ "$(j "$C/r_check.json" "d['ok'] and d['update']")" = "True" ]
 rc=$(T=1800 run "C:\\users\\root\\AppData\\Local\\DRBR\\DRBR Launcher.exe" --update --result 'C:\r_update.json')
-chk "update installed: $(j "$C/r_update.json" "d.get('installed_before'), d.get('installed_after'), d.get('error','')")" [ "$(j "$C/r_update.json" "d['ok'] and d['installed_after']=='1.0.1'")" = "True" ]
-chk "only the changed file was downloaded ($(grep -c . "$W/http.log") requests)" bash -c "! grep -q 'drbr-chapter3.xdelta\|drbr-music' '$W/http.log' && grep -q 'doc-README.md' '$W/http.log'"
+chk "update installed: $(j "$C/r_update.json" "d.get('installed_before'), d.get('installed_after'), d.get('error','')")" [ "$(j "$C/r_update.json" "d['ok'] and d['installed_after']=='$V1'")" = "True" ]
+chk "only the changed files' bytes were read from DRBR.zip ($(grep -c . "$W/http.log") requests, $(python3 -c "import sys; print(sum(int(l.split()[-1].split('-')[1]) - int(l.split()[-1].split('-')[0]) + 1 for l in open(sys.argv[1]) if l.startswith('RANGE ')))" "$W/http.log") bytes)" bash -c "! grep -q '^GET ' '$W/http.log' && [ \$(python3 -c \"import sys; print(sum(int(l.split()[-1].split('-')[1]) - int(l.split()[-1].split('-')[0]) + 1 for l in open(sys.argv[1]) if l.startswith('RANGE ')))\" '$W/http.log') -lt 1000000 ]"
 rc=$(run "C:\\users\\root\\AppData\\Local\\DRBR\\DRBR Launcher.exe" --verify --result 'C:\r_verify2.json')
 chk "after the update the install verifies (rc=$rc)" [ "$rc" = 0 ]
 chk "after the update the same starting save is in place" [ "$(sha256sum < "$D/game/chapter3_windows/drbr_data/start_filech3" | cut -d' ' -f1)" = "fa956269ee3ee98e7df04356bb575e3afd5455a538bb5568b2ac931fdb0aa082" ]
-python3 - "$D/drbr-settings.json" "http://127.0.0.1:$PORT/badsig/update-manifest.json" <<'PY'
+python3 - "$D/drbr-settings.json" "http://127.0.0.1:$PORT/rezip/DRBR.zip" <<'PY'
+import json, sys
+d = json.load(open(sys.argv[1], encoding='utf-8-sig')); d['update_url_override'] = sys.argv[2]; json.dump(d, open(sys.argv[1], 'w'))
+PY
+rc=$(T=1800 run "C:\\users\\root\\AppData\\Local\\DRBR\\DRBR Launcher.exe" --update --result 'C:\r_rezip.json')
+chk "a DRBR.zip compressed again by hand still updates (downloaded whole): $(j "$C/r_rezip.json" "d.get('installed_after'), d.get('error','')")" [ "$(j "$C/r_rezip.json" "d['ok'] and d['installed_after']=='$V2'")" = "True" ]
+python3 - "$D/drbr-settings.json" "http://127.0.0.1:$PORT/badsig/DRBR.zip" <<'PY'
 import json, sys
 d = json.load(open(sys.argv[1], encoding='utf-8-sig')); d['update_url_override'] = sys.argv[2]; json.dump(d, open(sys.argv[1], 'w'))
 PY
 rc=$(run "C:\\users\\root\\AppData\\Local\\DRBR\\DRBR Launcher.exe" --update --result 'C:\r_badsig.json')
 chk "a release not signed by DRBR's key is refused: $(j "$C/r_badsig.json" "d.get('code')")" [ "$(j "$C/r_badsig.json" "d.get('code')")" = "bad_signature" ]
-python3 - "$D/drbr-settings.json" "http://127.0.0.1:$PORT/corrupt/update-manifest.json" <<'PY'
+python3 - "$D/drbr-settings.json" "http://127.0.0.1:$PORT/corrupt/DRBR.zip" <<'PY'
 import json, sys
 d = json.load(open(sys.argv[1], encoding='utf-8-sig')); d['update_url_override'] = sys.argv[2]; json.dump(d, open(sys.argv[1], 'w'))
 PY
 rc=$(run "C:\\users\\root\\AppData\\Local\\DRBR\\DRBR Launcher.exe" --update --result 'C:\r_corrupt.json')
 chk "a damaged download is refused: $(j "$C/r_corrupt.json" "d.get('code')")" [ "$(j "$C/r_corrupt.json" "d.get('code')")" = "bad_download" ]
 rc=$(run "C:\\users\\root\\AppData\\Local\\DRBR\\DRBR Launcher.exe" --verify --result 'C:\r_verify3.json')
-chk "after the refused updates DRBR 1.0.1 still verifies" [ "$rc" = 0 ]
+chk "after the refused updates DRBR $V2 still verifies" [ "$rc" = 0 ]
+# a release with a NEW LAUNCHER, updated from that running launcher: Windows (and Wine) refuse to delete or overwrite a running
+# program, so the new launcher waits in staging\pending and DRBR Updater swaps it in once the launcher has ended
+python3 - "$D/drbr-settings.json" "http://127.0.0.1:$PORT/inuse/DRBR.zip" <<'PY'
+import json, sys
+d = json.load(open(sys.argv[1], encoding='utf-8-sig')); d['update_url_override'] = sys.argv[2]; json.dump(d, open(sys.argv[1], 'w'))
+PY
+NEWL=$(python3 -c "
+import json, sys, zipfile
+m = json.loads(zipfile.ZipFile(sys.argv[1]).read('update/update-manifest.json'))
+print([f['sha256'] for f in m['files'] if f.get('dest') == 'DRBR Launcher.exe'][0])" "$W/releases/inuse/DRBR.zip")
+OLDL=$(sha256sum < "$D/DRBR Launcher.exe" | cut -d' ' -f1)
+# (the launcher, then everything it started - DRBR Updater - in one Wine session: wineserver -w waits for them all)
+rc=$(timeout 1800 xvfb-run -a bash -c '"$0" "$@"; r=$?; /usr/lib/wine/wineserver -w; exit $r' "$WINE" "C:\\users\\root\\AppData\\Local\\DRBR\\DRBR Launcher.exe" --update --result 'C:\r_inuse.json' > "$W/last.out" 2>&1; echo $?)
+chk "a release with a new launcher installs from the running launcher: $(j "$C/r_inuse.json" "d.get('installed_after'), d.get('error','')")" [ "$(j "$C/r_inuse.json" "d['ok'] and d['installed_after']=='$V5'")" = "True" ]
+chk "  ... the new launcher waited for DRBR Updater (pending: $(j "$C/r_inuse.json" "d.get('launcher_pending','')"), updater started: $(j "$C/r_inuse.json" "d.get('launcher_swap')"))" [ "$(j "$C/r_inuse.json" "bool(d.get('launcher_pending')) and d.get('launcher_swap') is True")" = "True" ]
+chk "  ... DRBR Updater swapped it in after the launcher ended (it was $OLDL)" [ "$(sha256sum < "$D/DRBR Launcher.exe" | cut -d' ' -f1)" = "$NEWL" ]
+chk "  ... nothing left over (staged copy, .old, .part)" [ ! -f "$D/staging/pending/DRBR Launcher.exe" -a ! -f "$D/DRBR Launcher.exe.old" -a ! -f "$D/DRBR Launcher.exe.part" ]
+rc=$(run "C:\\users\\root\\AppData\\Local\\DRBR\\DRBR Launcher.exe" --verify --result 'C:\r_verify5.json')
+chk "  ... the new launcher runs and DRBR $V5 verifies (rc=$rc)" [ "$rc" = 0 ]
 kill $SRV 2>/dev/null
 
 echo "== 5. repair"

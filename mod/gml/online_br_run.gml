@@ -564,8 +564,14 @@ function kbr_stage_fx(_c)
         _M.stage = _c.st;
         if (_was >= 0 && _c.st > _was)
         {
-            // build 51: the big announcement (no feed line: the band says it)
-            kbr_bn_show("STAGE " + string(_c.st) + ": " + kfo_stage_name(_c.st), kbr_bn_stage(_c.st, _c.k), c_white);
+            // build 51: the big announcement (no feed line: the band says it). DRBR 1.0.1: on a boss's attack the stage is not
+            // the Knight's (no second Knight, no other forms): its number (OVERDRIVE's speed is everyone's) and the boss's own
+            // battle text from its chapter
+            var _en = kbr_ok_enc(_c.ok);
+            if (is_struct(_en))
+                kbr_bn_show("STAGE " + string(_c.st) + ((_c.st >= 4) ? (": " + kfo_stage_name(_c.st)) : ""), kbr_bn_pick(_en.flavor, _c.k), c_white);
+            else
+                kbr_bn_show("STAGE " + string(_c.st) + ": " + kfo_stage_name(_c.st), kbr_bn_stage(_c.st, _c.k), c_white);
         }
         if (_c.st >= 3 && _was < 3 && _M.set.ftmus)
             kfo_mus_situ("nm");
@@ -578,7 +584,7 @@ function kbr_stage_fx(_c)
     if (_c.ft && !_M.ft_on)
     {
         _M.ft_on = true;
-        kbr_final_two_fx();
+        kbr_final_two_fx(_c);
     }
     return 1;
 }

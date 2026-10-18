@@ -200,12 +200,8 @@ namespace Drbr
             Background(() =>
             {
                 InstallResult r = C.ApplyUpdate(latest, Progress);
-                if (r.LauncherPending && File.Exists(P.UpdaterExe))
+                if (r.LauncherPending && LauncherSwap.Start(P, r.PendingLauncherSha ?? Hash.Sha256File(r.PendingLauncher), Process.GetCurrentProcess().Id, true))
                 {
-                    Log.Info("Handing over to DRBR Updater for the new launcher.");
-                    string sha = Hash.Sha256File(r.PendingLauncher);
-                    Process.Start(new ProcessStartInfo(P.UpdaterExe, "--swap \"" + r.PendingLauncher + "\" --target \"" + P.LauncherExe + "\" --sha256 " + sha +
-                                                       " --wait-pid " + Process.GetCurrentProcess().Id + " --restart --root \"" + P.Root + "\"") { UseShellExecute = false });
                     Ui(Close);
                     return;
                 }

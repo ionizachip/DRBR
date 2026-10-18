@@ -282,7 +282,7 @@ function kdr_log_start(_err)
     ini_write_real("start", "template_version", variable_global_exists("kdr_tver") ? global.kdr_tver : 0);
     ini_write_string("start", "profile", kdr_cfg_get("profile", ""));
     ini_write_string("start", "start_mode", kdr_cfg_get("start_mode", "template"));
-    ini_write_string("start", "build", "51.10");
+    ini_write_string("start", "build", "51.11");
     ini_write_string("start", "when", date_datetime_string(date_current_datetime()));
     ini_close();
 }
@@ -342,9 +342,9 @@ function kdr_hint_draw()
     draw_set_alpha(_a);
     draw_set_halign(fa_center);
     draw_set_color(c_yellow);
-    knight_txt_small(_cx, _cy, "DRBR - DELTARUNE BATTLE ROYALE");
+    knight_txt_tiny(_cx, _cy, "DRBR - DELTARUNE BATTLE ROYALE");
     draw_set_color(c_white);
-    knight_txt_small(_cx, _cy + 16, "The sign just ahead opens the hub. ONLINE is in its menu.");
+    knight_txt_tiny(_cx, _cy + 16, "The sign just ahead opens the hub. ONLINE is in its menu.");
     draw_set_halign(fa_left);
     draw_set_alpha(1);
     return 1;

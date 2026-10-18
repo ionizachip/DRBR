@@ -204,19 +204,11 @@ function kfo_ui_draw_skin(xx, yy)
     draw_set_color(c_white);
     draw_rectangle(xx + 306, yy + 91, xx + 309, yy + 410, false);
     knight_caption_hub("SKINS", xx + 112, yy + 84);
-    // the groups: every one's name, the chosen one yellow and underlined
-    var _tx = xx + 78;
-    for (var _i = 0; _i < array_length(_c); _i++)
-    {
-        var _t = _c[_i][1];
-        scr_84_set_draw_font("main");
-        var _tw = string_width(_t);
-        draw_set_color((_i == _ci) ? c_yellow : c_gray);
-        knight_txt_small(_tx, yy + 100, _t);
-        if (_i == _ci)
-            draw_rectangle(_tx, yy + 116, _tx + _tw - 1, yy + 117, false);
-        _tx += _tw + 10;
-    }
+    // the group (DRBR 1.0.1: in the menu's size - the one shown, < > for the others; there are 4)
+    draw_set_halign(fa_center);
+    draw_set_color(c_yellow);
+    knight_txt(xx + 185, yy + 94, "< " + _c[_ci][1] + " >");
+    draw_set_halign(fa_left);
     // its skins: the head, the name, ON for the one you wear
     var _sel = clamp(_u.sk_i, 0, array_length(_l) - 1);
     for (var _i = 0; _i < array_length(_l) && _i < 8; _i++)
@@ -232,7 +224,7 @@ function kfo_ui_draw_skin(xx, yy)
         {
             draw_set_halign(fa_right);
             draw_set_color(c_lime);
-            knight_txt_small(xx + 298, _y + 8, "ON");
+            knight_txt(xx + 298, _y, "ON");
             draw_set_halign(fa_left);
         }
         if (_hot)
@@ -262,13 +254,13 @@ function kfo_ui_skin_preview2(_s, xx, yy)
     draw_set_color(_col);
     knight_txt(_cx, _by + 8, knight_fit(string_upper(_d.name), _bw - 16));
     draw_set_color(c_ltgray);
-    knight_txt_small(_cx, _by + 36, knight_fit_small(kfo_skin_what(_s), _bw - 12));
+    knight_txt_fit_c(_cx, _by + 36, string_replace(kfo_skin_what(_s), "CHAPTER ", "CH "), _bw - 12);
     draw_set_halign(fa_left);
     if (!kfo_skin_ready(_s))
     {
         draw_set_halign(fa_center);
         draw_set_color(make_color_rgb(255, 150, 120));
-        knight_txt_small(_cx, _by + 130, "MISSING ART");
+        knight_txt(_cx, _by + 130, "MISSING ART");
         draw_set_halign(fa_left);
         return 0;
     }
@@ -303,26 +295,19 @@ function kfo_ui_skin_preview2(_s, xx, yy)
     draw_line(_bx + 12, _floor + 2, _bx + _bw - 12, _floor + 2);
     draw_set_color(c_gray);
     draw_set_halign(fa_center);
-    knight_txt_small(_bx + 62, _floor + 6, "WALKING");
-    knight_txt_small(_bx + 172, _floor + 6, "BATTLE");
+    knight_txt(_bx + 62, _floor + 4, "WALKING");
+    knight_txt(_bx + 172, _floor + 4, "BATTLE");
     draw_set_halign(fa_left);
-    // its dialogue face, when it has one (never a stand-in)
+    // its dialogue face, when it has one (never a stand-in), under them; else what it is (a look over Kris, or a hero) - the top
+    // bar says it whole (DRBR 1.0.1: in the menu's size)
     if (!_d.own && variable_struct_exists(_d, "portrait") && kfo_skin_spr(_d.portrait) >= 0)
-        kfo_skin_portrait_draw(_s, _bx + 44, _by + 248, 64, 52);
-    // a look or a character of its own
-    var _nx = (!_d.own && variable_struct_exists(_d, "portrait")) ? (_bx + 84) : (_bx + 12);
-    draw_set_color(_d.own ? c_white : make_color_rgb(150, 210, 255));
-    if (_d.own)
-    {
-        knight_txt_small(_nx, _by + 236, "THE GAME'S OWN");
-        knight_txt_small(_nx, _by + 252, "HERO, IN THEIR");
-        knight_txt_small(_nx, _by + 268, "OWN BATTLE ART.");
-    }
+        kfo_skin_portrait_draw(_s, _cx - 32, _by + 238, 64, 52);
     else
     {
-        knight_txt_small(_nx, _by + 236, "ONLINE ONLY. A");
-        knight_txt_small(_nx, _by + 252, "LOOK OVER KRIS:");
-        knight_txt_small(_nx, _by + 268, "SAME HP, SOUL.");
+        draw_set_halign(fa_center);
+        draw_set_color(_d.own ? c_white : make_color_rgb(150, 210, 255));
+        knight_txt(_cx, _by + 248, _d.own ? "THE GAME'S HERO" : "A LOOK OVER KRIS");
+        draw_set_halign(fa_left);
     }
     draw_set_color(c_white);
     return 1;

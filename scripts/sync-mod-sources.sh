@@ -13,6 +13,17 @@ cp "$S"/*.py "$S"/*.csx "$S"/knights.json "$S"/variant_default_sprites.json "$M/
 cp -r "$S/rules" "$S/extra_entries" "$M/scripts/"
 cp "$S"/gml_templates_v6/*.gml "$M/gml/"
 [ -d "$S/gml_templates_v6/kfsong" ] && cp -r "$S/gml_templates_v6/kfsong" "$M/gml/"
+# (DRBR 1.0.1: the hub objects' own events too - gen_hub.py needs them. Five are the games' own code with a hook added -
+# Chapter 5's flame spell (firespell / firehex) and Chapter 3's SOUL drawing (heart_Draw_0) - and stay out of the public
+# repository, like the bosses' generated code: a local build has them from the toolkit)
+mkdir -p "$M/gml/events"
+for f in "$S"/gml_templates_v6/events/*.gml; do
+  case "$(basename "$f")" in
+    firehex_Create_0.gml|firehex_Step_0.gml|firespell_Create_0.gml|firespell_Draw_0.gml|heart_Draw_0.gml) ;;
+    *) cp "$f" "$M/gml/events/" ;;
+  esac
+done
+printf 'Not here (the games'"'"' own code with a hook added - a local build has them from its toolkit):\nfirehex_Create_0.gml firehex_Step_0.gml firespell_Create_0.gml firespell_Draw_0.gml heart_Draw_0.gml\n' > "$M/gml/events/NOT_INCLUDED.txt"
 cp "$W"/tests/*.py "$W"/tests/*.sh "$M/tests/" 2>/dev/null || true
 mkdir -p "$M/tests/data" && cp "$W/tests/data/ow_dump.tsv" "$M/tests/data/"
 cp "$W"/runbuild51.sh "$W"/runchk51.sh "$W"/runverify51.sh "$W"/runrt51.sh "$W"/verify51.csx "$W"/funcdump51.csx "$W"/vardump51.csx \

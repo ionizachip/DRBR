@@ -1318,9 +1318,10 @@ function kbr_sa_draw()
                     draw_sprite_ext(_T.spr, min(sprite_get_number(_T.spr) - 1, _u div 4), _T.x, _T.y, _T.xs, abs(_T.xs), 0, merge_color(c_white, _G.col, 0.55), _al2);
                     break;
                 case "ph":
-                    // the sender's knight (its real sprite), fading in and out at its side of the box
+                    // the sender's knight (its real sprite), fading in and out at its side of the box - in the sender's own colour
+                    // (1.0.1: a pale one read as a grey creature beside the bosses)
                     var _al = min(1, _u / 6) * min(1, (_T.d - _u) / 6) * 0.75;
-                    draw_sprite_ext(spr_roaringknight_attack_ol, min(5, _u div 3), _T.x, _T.y + (sin(_u * 0.2) * 2), (_T.a == 180) ? 2 : -2, 2, 0, merge_color(c_white, _G.col, 0.55), _al);
+                    draw_sprite_ext(spr_roaringknight_attack_ol, min(5, _u div 3), _T.x, _T.y + (sin(_u * 0.2) * 2), (_T.a == 180) ? 2 : -2, 2, 0, merge_color(c_white, _G.col, 0.85), _al);
                     break;
                 case "seam":
                     // the box splitting along the seam: a white line that thickens, then the break

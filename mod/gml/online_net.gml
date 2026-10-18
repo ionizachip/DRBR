@@ -212,7 +212,7 @@ function kfo_ini_load()
         _osong = -1;
     else if (_osf != "~none")
         _osong = max(-1, knight_song_find_exact(_osf));
-    else if (is_real(_osong) && _osong >= 0 && _osong < array_length(global.knight_songs_v49))
+    else if (is_real(_osong) && _osong == floor(_osong) && _osong >= 0 && _osong < array_length(global.knight_songs_v49))
         _osong = max(-1, knight_song_find_exact(global.knight_songs_v49[_osong]));
     var _kl = kfo_key_list();
     var _kr = {};

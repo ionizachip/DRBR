@@ -242,7 +242,8 @@ function kfo_host_flush(_force)
         {
             var _p = _h.pl[_i];
             if (_p.inm && _p.al && _p.t_p > 0 && current_time - _p.t_p < 1500)
-                array_push(_l, [_p.pid, round(_p.x * 10), round(_p.y * 10), _p.hx, variable_struct_exists(_p, "fd") ? _p.fd : 0, variable_struct_exists(_p, "ffa") ? _p.ffa : 0]);   // tenths of a pixel (build 47)
+                array_push(_l, [_p.pid, round(_p.x * 10), round(_p.y * 10), _p.hx, variable_struct_exists(_p, "fd") ? _p.fd : 0, variable_struct_exists(_p, "ffa") ? _p.ffa : 0,
+                    variable_struct_exists(_p, "gd") ? _p.gd : -1]);   // tenths of a pixel (build 47); DRBR 1.0.1: the green shield's direction
         }
         if (array_length(_l) > 0)
             kfo_down_fast(0, { k: "ps", mid: _h.mid, l: _l });
@@ -802,6 +803,8 @@ function kfo_host_on(_from, _m)
                 // DRBR: Flowery's board: the orange SOUL's dash and the board's dash speed (numbers only, clamped)
                 _p.fd = kfo_jn(_m, "d", 0) ? 1 : 0;
                 _p.ffa = clamp(floor(kfo_jn(_m, "fa", 0)), -400, 400);
+                // DRBR 1.0.1: Gerson's green shield - where it points (one of its 8 directions, -1: none)
+                _p.gd = kbr_hj_dir_ok(kfo_jn(_m, "gs", -1));
                 _p.t_p = current_time;
             }
             break;

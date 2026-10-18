@@ -2557,14 +2557,14 @@ function knight_hub_hint_draw()
     draw_set_alpha(1);
     draw_set_halign(fa_center);
     draw_set_color(c_yellow);
-    knight_txt_small(_cx, _cy, kdr_on() ? "DRBR: no hub sign with this save." : "KNIGHT HUB: no sign with this save.");
+    knight_txt_tiny(_cx, _cy, kdr_on() ? "DRBR: no hub sign with this save." : "KNIGHT HUB: no sign with this save.");
     draw_set_color(c_white);
-    knight_txt_small(_cx, _cy + 16, "It is only here right before the Roaring Knight fight.");
+    knight_txt_tiny(_cx, _cy + 16, "It is only here right before the Roaring Knight fight.");
     // DRBR (update 10): the DRBR install starts in the right save by itself (continue mode can carry a later one)
     if (kdr_on())
-        knight_txt_small(_cx, _cy + 32, "DRBR Launcher > SETTINGS: start from the DRBR starting save.");
+        knight_txt_tiny(_cx, _cy + 32, "DRBR Launcher > SETTINGS: start from the DRBR starting save.");
     else
-        knight_txt_small(_cx, _cy + 32, "Load SAVE SLOT 3 (the tester pack's \"Save file\").");
+        knight_txt_tiny(_cx, _cy + 32, "Load SAVE SLOT 3 (the tester pack's \"Save file\").");
     draw_set_halign(fa_left);
     return 1;
 }

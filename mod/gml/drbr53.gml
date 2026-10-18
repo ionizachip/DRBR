@@ -379,11 +379,21 @@ function kbr_bvars()
     return 1;
 }
 
-// the boss's music while it is on stage, the match's song after (Jevil's way, for every encounter with a "music" file)
+// DRBR 1.0.1: your own music plays over everything. With a song picked (MORE OPTIONS > MUSIC, or the hub's FIGHT SONG left on
+// AS IN THE HUB) the bosses and the match's big moments do not change it; DEFAULT lets each boss bring its own music (as Tag
+// Team's knight_mus_takeover: a chosen song plays on)
+function kbr_mus_own()
+{
+    return is_struct(global.krun) && variable_struct_exists(global.krun, "cfg") && is_struct(global.krun.cfg) && knight_cfg_num(global.krun.cfg, "song") != 0;
+}
+
+// the boss's music while it is on stage, the match's song after - every encounter with a "music" file, Jevil's too (1.0.1: one
+// place decides, so one boss after another never queues two songs at once). Back with the knights: the match's song, or the
+// song of a big moment that came while a boss was on (kfo_mus_situ keeps the boss's music meanwhile)
 function kbr_enc_music()
 {
     var _M = kbr_match();
-    if (is_undefined(_M))
+    if (is_undefined(_M) || kbr_mus_own())
         return 0;
     if (!variable_struct_exists(_M, "encmus"))
     {
@@ -391,7 +401,7 @@ function kbr_enc_music()
         _M.encmus_old = "";
     }
     var _d = kbr_enc_now();
-    var _want = (is_struct(_d) && variable_struct_exists(_d, "music") && _d.key != "jevil") ? _d.music : "";
+    var _want = (is_struct(_d) && variable_struct_exists(_d, "music")) ? _d.music : "";
     if (_want == _M.encmus || !knight_mus_ok())
         return 0;
     if (_want != "")
@@ -412,6 +422,15 @@ function kbr_enc_music()
     {
         _M.encmus = "";
         var _back = _M.encmus_old;
+        if (variable_struct_exists(_M, "situ") && _M.situ != "")
+            _back = kfo_mus_situ_file(_M.situ);
+        // (no song was known when the boss came on: the knight's own, as its fight starts it)
+        if ((_back == "" || !knight_music_exists(_back)) && is_struct(global.knight_lu) && global.knight_lu.ready)
+        {
+            var _k = global.knight_lu.ks[global.knight_lu.act];
+            if (is_numeric(_k) && _k < KBR_ENC_BASE)
+                _back = knight_mus_default_file(_k);
+        }
         if (_back == "" || !knight_music_exists(_back))
             return 0;
         var _old2 = global.batmusic[0];
@@ -446,27 +465,164 @@ function kbr_enc_cut(_all)
     return 1;
 }
 
-// a boss's speech balloon (Jevil's look): the text left of (x, y), "&" breaks lines, faded by _a
-function kbr_enc_balloon(_x, _y, _txt, _a)
+// ---------- a boss's speech balloon (1.0.1) ----------
+// Off unless VIEW > BOSS LINES is on (the balloons were over the battle; the bosses' voices play either way). On: Deltarune's
+// own balloon (spr_battleblcon_long's shape at any size: white, rounded, its curved tail pointing at the speaker; black DotumChe
+// in the battle balloons' 9 x 20 spacing), put beside the speaker where it covers neither the battle box nor the HUD: left of
+// them (the game's own side), else below, right or above them - else wherever it covers the box least.
+// (_l, _t, _r, _b): the speaker's body on the screen; "&" breaks lines; faded by _a.
+function kbr_blines_on()
 {
-    if (_txt == "" || _a <= 0)
+    return (kfo_view().blines == 1);
+}
+
+// the battle box as the balloon keeps away from it (with its frame and a little room), or undefined
+function kbr_bl_box()
+{
+    if (kbr_jv_boxless() || !instance_exists(obj_growtangle))
+        return undefined;
+    var _g = instance_find(obj_growtangle, 0);
+    if (_g.x < -1000 || !_g.visible)
+        return undefined;
+    var _hw = (abs(_g.sprite_width) / 2) + 10;
+    var _hh = (abs(_g.sprite_height) / 2) + 10;
+    return [_g.x - _hw, _g.y - _hh, _g.x + _hw, _g.y + _hh];
+}
+
+// what the instance's sprite covers drawn at (_xx, _yy) with its scale (mirrored: it reaches the other way) - a stand-in that
+// shows a boss during an attack (its balloon points there)
+function kbr_bl_spr_rect(_xx, _yy)
+{
+    var _sw = sprite_get_width(sprite_index);
+    var _sh = sprite_get_height(sprite_index);
+    var _ox = sprite_get_xoffset(sprite_index);
+    var _oy = sprite_get_yoffset(sprite_index);
+    var _l = (image_xscale >= 0) ? (_xx - (_ox * image_xscale)) : (_xx - ((_sw - _ox) * -image_xscale));
+    var _t = (image_yscale >= 0) ? (_yy - (_oy * image_yscale)) : (_yy - ((_sh - _oy) * -image_yscale));
+    return [_l, _t, _l + max(40, _sw * abs(image_xscale)), _t + max(40, _sh * abs(image_yscale))];
+}
+
+// how much two [l, t, r, b] rectangles cover of each other
+function kbr_bl_ov(_p, _q)
+{
+    if (is_undefined(_p) || is_undefined(_q))
         return 0;
-    draw_set_font(fnt_main);
-    var _l = string_split(_txt, "&");
-    var _w = 0;
-    for (var _i = 0; _i < array_length(_l); _i++)
-        _w = max(_w, string_width(_l[_i]));
-    var _h = array_length(_l) * 16;
-    var _x1 = _x - _w - 34;
-    var _y1 = _y - 4;
+    var _w = min(_p[2], _q[2]) - max(_p[0], _q[0]);
+    var _h = min(_p[3], _q[3]) - max(_p[1], _q[1]);
+    return (_w > 0 && _h > 0) ? (_w * _h) : 0;
+}
+
+// a balloon's place: [left, top, kind (0 left of the speaker, the tail pointing right; 1 below, tail up; 2 right, tail left; 3
+// above, tail down), how much it covers (0: nothing)] for a body _bw x _bh; _sl: the body centred on the tail (0) or slid
+// along it as far as the tail allows, to one end (1) or the other (2)
+function kbr_bl_place(_k, _sl, _bw, _bh, _me, _box, _hud, _cx, _cy)
+{
+    var _l = _me[0];
+    var _t = _me[1];
+    var _r = _me[2];
+    var _b = _me[3];
+    var _mx = (_l + _r) / 2;
+    var _my = _t + ((_b - _t) * 0.3);
+    var _L = _mx - ((_sl == 0) ? (_bw / 2) : ((_sl == 1) ? 17 : (_bw - 16)));
+    var _T = _my - ((_sl == 0) ? (_bh / 2) : ((_sl == 1) ? 17 : (_bh - 16)));
+    if (_k == 0)
+        _L = _l - 23 - _bw;
+    else if (_k == 1)
+        _T = _b + 23;
+    else if (_k == 2)
+        _L = _r + 23;
+    else
+        _T = _t - 23 - _bh;
+    // on the screen, above the bottom bar (the tail stays with the body)
+    _L = floor(clamp(_L, _cx + 6 + ((_k == 2) ? 21 : 0), _cx + 634 - _bw - ((_k == 0) ? 21 : 0)));
+    _T = floor(clamp(_T, _cy + 6 + ((_k == 1) ? 21 : 0), _cy + 398 - _bh - ((_k == 3) ? 21 : 0)));
+    var _all = [_L - ((_k == 2) ? 21 : 0), _T - ((_k == 1) ? 21 : 0), _L + _bw + ((_k == 0) ? 21 : 0), _T + _bh + ((_k == 3) ? 21 : 0)];
+    var _s = (kbr_bl_ov(_all, _box) * 100) + (kbr_bl_ov(_all, _me) * 50);
+    for (var _h = 0; _h < array_length(_hud); _h++)
+        _s += kbr_bl_ov(_all, _hud[_h]) * 10;
+    return [_L, _T, _k, _s];
+}
+
+function kbr_enc_say(_l, _t, _r, _b, _txt, _a)
+{
+    if (_txt == "" || _a <= 0 || !kbr_blines_on())
+        return 0;
+    draw_set_font(fnt_dotumche);
+    var _cx = camerax();
+    var _cy = cameray();
+    var _me = [_l, _t, _r, _b];
+    var _box = kbr_bl_box();
+    // the skill slots, the boss's name, the player list (the bottom bar is below the balloon's lowest place)
+    var _hud = [[_cx, _cy, _cx + 215, _cy + 140], [_cx + 240, _cy, _cx + 400, _cy + 34], [_cx + 462, _cy, _cx + 640, _cy + 70]];
+    // the line exactly as the chapter has it (its own "&" breaks). A place found for this line stays while it covers nothing
+    // (no jumping about as the speaker sways)
+    var _keep = variable_instance_exists(id, "kbr_bl_txt") && kbr_bl_txt == _txt;
+    var _best = undefined;
+    var _bl = string_split(_txt, "&");
+    var _tw = 0;
+    for (var _i = 0; _i < array_length(_bl); _i++)
+        _tw = max(_tw, string_width(_bl[_i]));
+    var _bw = max(48, ceil(_tw) + 20);
+    var _bh = (array_length(_bl) * 20) + 15;
+    for (var _k = 0; _k < 4; _k++)
+    {
+        for (var _sl = 0; _sl < 3; _sl++)
+        {
+            if (_keep && (_k != kbr_bl_k || _sl != kbr_bl_sl))
+                continue;
+            var _p = kbr_bl_place(_k, _sl, _bw, _bh, _me, _box, _hud, _cx, _cy);
+            var _sc = _p[3] + _k + (_sl * 0.25);
+            if (is_undefined(_best) || _sc < _best[4])
+                _best = [_p[0], _p[1], _k, _p[3], _sc, _bw, _bh, 0, _sl];
+        }
+    }
+    if (_keep && _best[3] > kbr_bl_ov0)
+    {
+        // the kept place covers more than when it was chosen (the box moved): choose again
+        kbr_bl_txt = "";
+        return kbr_enc_say(_l, _t, _r, _b, _txt, _a);
+    }
+    if (!_keep)
+        kbr_bl_ov0 = _best[3];
+    kbr_bl_txt = _txt;
+    kbr_bl_k = _best[2];
+    kbr_bl_sl = _best[8];
+    var _bL = _best[0];
+    var _bT = _best[1];
+    var _bk = _best[2];
+    var _R = (_bL + _bw) - 1;
+    var _B = (_bT + _bh) - 1;
+    // the body: its rounded corners row by row, the middle in one piece (no piece over another: the fade stays even)
+    var _P = [6, 4, 3, 2, 2, 1, 1];
+    for (var _i = 0; _i < 7; _i++)
+    {
+        draw_sprite_ext(spr_pxwhite, 0, _bL + _P[_i], _bT + _i, _bw - (2 * _P[_i]), 1, 0, c_white, _a);
+        draw_sprite_ext(spr_pxwhite, 0, _bL + _P[_i], _B - _i, _bw - (2 * _P[_i]), 1, 0, c_white, _a);
+    }
+    draw_sprite_ext(spr_pxwhite, 0, _bL, _bT + 7, _bw, _bh - 14, 0, c_white, _a);
+    // the tail: how far each of its 19 rows reaches past the body (21: its tip), at the speaker's height / middle as far as the
+    // straight part of that edge goes
+    var _E = [1, 3, 5, 8, 8, 10, 13, 15, 19, 21, 21, 21, 21, 17, 14, 12, 9, 7, 4];
+    var _ty = floor(clamp(_t + ((_b - _t) * 0.3), _bT + 17, (_bT + _bh) - 16));
+    var _tx = floor(clamp((_l + _r) / 2, _bL + 17, (_bL + _bw) - 16));
+    for (var _j = 0; _j < 19; _j++)
+    {
+        var _e = _E[_j];
+        if (_bk == 0)
+            draw_sprite_ext(spr_pxwhite, 0, _R + 1, (_ty - 10) + _j, _e, 1, 0, c_white, _a);
+        else if (_bk == 1)
+            draw_sprite_ext(spr_pxwhite, 0, (_tx - 10) + _j, _bT - _e, 1, _e, 0, c_white, _a);
+        else if (_bk == 2)
+            draw_sprite_ext(spr_pxwhite, 0, _bL - _e, (_ty - 10) + _j, _e, 1, 0, c_white, _a);
+        else
+            draw_sprite_ext(spr_pxwhite, 0, (_tx - 10) + _j, _B + 1, 1, _e, 0, c_white, _a);
+    }
     draw_set_alpha(_a);
-    draw_set_color(c_white);
-    draw_rectangle(_x1 - 8, _y1 - 6, _x1 + _w + 8, _y1 + _h + 6, false);
-    draw_triangle(_x1 + _w + 8, _y1 + 6, _x1 + _w + 8, _y1 + 18, _x1 + _w + 20, _y1 + 12, false);
     draw_set_color(c_black);
     draw_set_halign(fa_left);
-    for (var _i = 0; _i < array_length(_l); _i++)
-        draw_text(_x1, _y1 + (_i * 16), _l[_i]);
+    draw_set_valign(fa_top);
+    for (var _i = 0; _i < array_length(_bl); _i++)
+        draw_text(_bL + 10, _bT + 10 + (_i * 20), _bl[_i]);
     draw_set_alpha(1);
     draw_set_color(c_white);
     return 1;

@@ -34,6 +34,13 @@ namespace Drbr
                     MessageBox.Show("DRBR Launcher is already open.", "DRBR", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     return 0;
                 }
+                // a new launcher that could not go in while this one ran (an update, or a reinstall with the launcher open):
+                // DRBR Updater swaps it in now and starts it (once per start: not again right after a swap)
+                if (!a.ContainsKey("updated") && !a.ContainsKey("update-failed"))
+                {
+                    string sha = LauncherSwap.Waiting(p);
+                    if (sha != null && LauncherSwap.Start(p, sha, Process.GetCurrentProcess().Id, true)) return 0;
+                }
                 Application.Run(new LauncherForm(p, a));
             }
             return 0;
@@ -117,7 +124,12 @@ namespace Drbr
                             InstallResult ir = c.ApplyUpdate(u2, null);
                             r["installed_after"] = ir.Version;
                             r["notes"] = ir.Notes;
-                            if (ir.LauncherPending) r["launcher_pending"] = ir.PendingLauncher;
+                            if (ir.LauncherPending)
+                            {
+                                // as the window does: DRBR Updater swaps the new launcher in once this process has ended
+                                r["launcher_pending"] = ir.PendingLauncher;
+                                r["launcher_swap"] = LauncherSwap.Start(p, ir.PendingLauncherSha ?? Hash.Sha256File(ir.PendingLauncher), Process.GetCurrentProcess().Id, false);
+                            }
                         }
                         r["ok"] = true;
                         break;

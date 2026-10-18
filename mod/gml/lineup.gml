@@ -979,9 +979,9 @@ function knight_lu_hud_draw(xx, yy)
         var _bx0 = _x1 - 100;
         draw_set_halign(fa_right);
         draw_set_color(c_black);
-        knight_txt_small(_bx0 - 5, _y + 1, _rw.nm);
+        knight_txt_tiny(_bx0 - 5, _y + 1, _rw.nm);
         draw_set_color(_rw.ko ? c_dkgray : (_rw.on ? c_yellow : c_ltgray));
-        knight_txt_small(_bx0 - 6, _y, _rw.nm);
+        knight_txt_tiny(_bx0 - 6, _y, _rw.nm);
         draw_set_halign(fa_left);
         draw_set_color(c_black);
         draw_rectangle(_bx0 - 1, _y + 3, _x1 + 1, _y + 13, false);
@@ -996,7 +996,7 @@ function knight_lu_hud_draw(xx, yy)
         {
             draw_set_color(c_white);
             draw_set_halign(fa_center);
-            knight_txt_small(_bx0 + 50, _y, "DOWN");
+            knight_txt_tiny(_bx0 + 50, _y, "DOWN");
             draw_set_halign(fa_left);
         }
         _y += 17;
@@ -1005,9 +1005,9 @@ function knight_lu_hud_draw(xx, yy)
     {
         draw_set_halign(fa_right);
         draw_set_color(c_black);
-        knight_txt_small(_x1 + 1, _y + 1, knight_reg(_lu.ks[_lu.act]).short + (_lu.finale ? "  FINALE" : ""));
+        knight_txt_tiny(_x1 + 1, _y + 1, knight_reg(_lu.ks[_lu.act]).short + (_lu.finale ? "  FINALE" : ""));
         draw_set_color(knight_reg(_lu.ks[_lu.act]).color);
-        knight_txt_small(_x1, _y, knight_reg(_lu.ks[_lu.act]).short + (_lu.finale ? "  FINALE" : ""));
+        knight_txt_tiny(_x1, _y, knight_reg(_lu.ks[_lu.act]).short + (_lu.finale ? "  FINALE" : ""));
         draw_set_halign(fa_left);
     }
     if (_lu.banner != "" && _lu.banner_t < 120)

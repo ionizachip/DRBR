@@ -24,13 +24,13 @@ function kbr_enc_def_gerson()
               [3, 17, "Shell Medley", 0], [4, 18, "Final Rounds", 2]],
         pat: [0, 1, 2, 3, 4, 72, 70, 6, 7, 12, 9, 47, 13, 14, 53, 55, 56, 220, 19],
         tt: [250, 250, 250, 270, 310, 370, 430, 280, 330, 390, 330, 410, 430, 430, 320, 430, 530, 380, 610],
-        line: ["As long as you're&GREEN, you can't&run away!", "You gotta BLOCK,&you understand?!", "Did you ever hear&that old tale?",
-               "...the prophecy...", "Unless you FACE&DANGER HEAD ON...", "Put some shell into&it, will ya?", "Lord of the Hammer.",
-               "Chapter 1&The March of&the Dark King.", "...What happens&next?", "Geheheh!&Who knows?", "It all stopped.",
-               "That next book,&it never did get&written.", "I see a story lit&up in your eyes...", "Burnin' bright...&Burnin' black.",
-               "So... how do you&think it all ends?", "You choose&eternity.", "And soon, an ocean&of ink shall wash&across the pages.",
-               "There's no prophecy&or legend 'bout&anyone like that.", "The bell's ringin'&now. Seems we've&reached the final&rounds."],
-        again: ["Now, where's my&haircut? Geh ha ha!", "You aren't givin'&up now, are ya?", "Put some shell into&it, will ya?",
+        line: ["As long as you're GREEN,&you can't run away!", "You gotta BLOCK, you&understand?!", "Did you ever hear&that old tale?",
+               "Yes, the old tale,&based upon the&prophecy...", "Unless you FACE DANGER&HEAD ON... These bullets&will do you in!", "Put some shell into&it, will ya?", "Lord of the Hammer.",
+               "Chapter 1&The March of&the Dark King.", "...What happens next?", "Geheheh! Who knows?", "It all stopped.",
+               "That next book, it&never did get written.", "But you, my dear?&I see a story lit&up in your eyes...", "Burnin' bright...&Burnin' black.&Burnin' up&everything.",
+               "So... how do you &think it all ends?", "You choose eternity.", "And soon, an ocean&of ink shall wash&across the pages.",
+               "There's no prophecy&or legend 'bout anyone&like that.", "The bell's ringin' now.&Seems we've reached&the final rounds."],
+        again: ["Now, where's my&haircut? Geh ha ha!", "You aren't givin' up&now, are ya?", "Put some shell into&it, will ya?",
                 "If you've got guts,&c'mon and let your&axe do the talking!"],
         flavor: ["* The air crackles green with freedom.", "* The bells ring in justice...", "* The bell of justice is ringing... it's for you.",
                  "* The white wind howls!", "* Smells like steel and leather.", "* It's one shell of a battle!"],
@@ -340,7 +340,7 @@ function kbr_hj_draw()
         }
     }
     if (say_t > 0)
-        kbr_enc_balloon(x - 6, y + 10, say, min(1, say_t / 10));
+        kbr_enc_say(x, y - 20, x + 134, y + 78, say, min(1, say_t / 10));
     return 1;
 }
 
@@ -750,13 +750,106 @@ function kbr_hj_sa_volley_end(_G)
     return 1;
 }
 
-// the host's bots in his green attacks: each bot's SOUL sits behind its own shield on the box's middle; a spear reaching the
-// SOUL is blocked as well as the bot plays (its preset: reaction, mistakes, precision), else it hurts as a player's hit does
-// (the spears of one game reach every SOUL there at once - the bots' and the host's - so the host's spears are theirs too)
-function kbr_hj_bot_block(_c)
+// the host's bots in his green attacks: each bot's SOUL sits behind its own shield on the box's middle, and the bot turns that
+// shield as a player does (DRBR 1.0.1: kbr_hj_bot_face - before, a block was a roll of the dice and its shield never moved): it
+// faces the spear coming soonest once it has seen it (its REACTION TIME), now and then the wrong way (MISTAKES), a little late
+// when it plays less precisely, and turns AWAY from a red hammer (it breaks the shield). A spear reaching the shields is blocked
+// by the bots facing it (kbr_hj_bots_spear), else it hurts as a player's hit does. (The spears of one game reach every SOUL there
+// at once - the bots' and the host's - so the host's spears are theirs too.) Its shield's direction goes to everyone with its
+// place, so whoever watches the bot sees its shield turn (kbr_hj_puppet).
+function kbr_hj_bot_face(_b, _c, _s)
 {
-    var _p = (1 - (_c.miss / 100) - (_c.react / 120)) * (0.6 + ((0.4 * _c.prec) / 100));
-    return clamp(_p, 0.03, 1);
+    var _sh = kbr_hj_up_shield();
+    if (_sh == noone)
+    {
+        _s.gd = -1;
+        return 0;
+    }
+    if (!variable_struct_exists(_s, "gd") || _s.gd < 0)
+    {
+        _s.gd = _sh.idealdir;
+        _s.gdk = noone;
+        _s.gdw = 0;
+        _s.gdn = _s.gd;
+    }
+    // (frames: the bots' own count - kfo_bot_track)
+    var _F = (variable_global_exists("kfo_bt") && is_struct(global.kfo_bt)) ? global.kfo_bt.f : 0;
+    // the spear coming soonest that it has seen for its reaction time
+    var _bestl = 999999;
+    var _best = noone;
+    var _react = _c.react;
+    with (obj_hj_spear)
+    {
+        if ((variable_instance_exists(id, "kbrx") && kbrx > 0) || variable_instance_exists(id, "kbr_hjb"))
+            continue;
+        // (when the bots first saw it: kept on the spear)
+        if (!variable_instance_exists(id, "kbr_seen"))
+            kbr_seen = _F;
+        if (_F - kbr_seen < _react)
+            continue;
+        if (len < _bestl)
+        {
+            _bestl = len;
+            _best = id;
+        }
+    }
+    if (_best != noone && _best != _s.gdk)
+    {
+        // a new spear to face: where the shield has to point (a red hammer: away), the shield's own directions (4, or 8 when it
+        // takes diagonals); MISTAKES: now and then another one; PRECISION: a frame or two later
+        _s.gdk = _best;
+        var _ang = (_best.bouncespear == 2) ? _best.direction : _best.image_angle;
+        var _want = _best.redhammer ? _ang : (_ang + 180);
+        var _step = _sh.diagonal_enabled ? 45 : 90;
+        _want = ((round(_want / _step) * _step) mod 360 + 360) mod 360;
+        if (_c.miss > 0 && random(100) < _c.miss)
+            _want = (_want + (_step * (1 + irandom((360 / _step) - 2)))) mod 360;
+        _s.gdn = _want;
+        _s.gdw = max(0, round((100 - _c.prec) / 25));
+    }
+    if (_s.gdw > 0)
+        _s.gdw--;
+    else
+        _s.gd = _s.gdn;
+    return 1;
+}
+
+// a shield direction from the network: one of the shield's 8 (0, 45 ... 315) or -1
+function kbr_hj_dir_ok(_v)
+{
+    if (!is_numeric(_v) || _v < 0)
+        return -1;
+    return ((round(_v / 45) * 45) mod 360 + 360) mod 360;
+}
+
+// the shield that is up in this game (his own, not a send's fading one) or noone
+function kbr_hj_up_shield()
+{
+    var _o = noone;
+    with (obj_hj_shield)
+    {
+        if (_o == noone && vanish == 0 && !(variable_instance_exists(id, "kbrx") && kbrx > 0))
+            _o = id;
+    }
+    return _o;
+}
+
+// where this game's player is turning the green shield (-1: no shield up) - sent with the SOUL's place, for whoever watches
+function kbr_hj_my_dir()
+{
+    var _o = kbr_hj_up_shield();
+    return (_o == noone) ? -1 : _o.idealdir;
+}
+
+// a watcher's shield turns as the followed one's does (their direction from the host's positions; -1: none)
+function kbr_hj_puppet(_q)
+{
+    if (!variable_struct_exists(_q, "gd") || !is_numeric(_q.gd) || _q.gd < 0)
+        return 0;
+    var _o = kbr_hj_up_shield();
+    if (_o != noone)
+        _o.idealdir = _q.gd;
+    return 1;
 }
 
 function kbr_hj_bots_spear(_red)
@@ -782,9 +875,11 @@ function kbr_hj_bots_spear(_red)
         var _s = _b.bt;
         if (_s.inv > 0)
             continue;
-        var _c = kfo_host_botcfg(_bi);
-        // a red hammer is blocked by turning AWAY from it (it breaks the shield): the same read
-        if (random(1) < kbr_hj_bot_block(_c))
+        // blocked by the bot's own shield (kbr_hj_bot_face): facing the spear - a red hammer: facing anywhere else
+        var _ang = (bouncespear == 2) ? direction : image_angle;
+        var _sl = (instance_exists(obj_hj_shield) && obj_hj_shield.diagonal_enabled) ? 30 : 50;
+        var _faces = variable_struct_exists(_s, "gd") && _s.gd >= 0 && abs(angle_difference(_ang, _s.gd + 180)) < _sl;
+        if (_red ? !_faces : _faces)
             continue;
         var _t = kbr_hit_dmg(_red ? 1 : 2, false);
         var _dmg = max(1, round(_t[0] * (_e.dmul / 100)));

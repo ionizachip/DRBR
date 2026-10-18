@@ -108,44 +108,48 @@ This makes `dist/1.1.0/`:
 |---|---|
 | `payload/` | everything a DRBR install is made of, plus `payload.json` with every size and SHA-256 |
 | `DRBR-Setup.exe` | the installer with the payload appended |
-| `release/` | the release assets |
+| `release/DRBR.zip` | **the release: its one file** |
+| `release/RELEASE_NOTES.md` | the text for the release's description |
 
-The `release/` folder contains:
+`DRBR.zip` is a zip **without compression** ("stored"), in this order:
 
-- every payload file, each as its own asset (so updates download only what changed)
-- `update-manifest.json` and `update-manifest.json.sig` (signed with your key)
-- `DRBR-Setup.exe`
-- `RELEASE_NOTES.md`
-- `SHA256SUMS.txt`
+1. `DRBR-Setup.exe` (the whole package appended to it)
+2. `README.txt` (how to install)
+3. `update/update-manifest.json` and `update/update-manifest.json.sig` (signed with your key) - **last**, so the
+   launcher finds them by reading only the end of the file
 
-(`release_tools.py release --full` also adds `DRBR-Setup-1.1.0.exe` and `DRBR-FullPatch-1.1.0.zip`, copies of the same
-files, if you want them.)
+Players download `DRBR.zip`, open it and run `DRBR-Setup.exe`. Launchers read the manifest from its end and then only
+the bytes of the files that changed (see [UPDATING.md](UPDATING.md)).
 
-At the end the script runs `release_tools.py check`, which checks the signature against `drbr.json`'s public key, every
-checksum, the Setup's appended payload and `SHA256SUMS.txt`.
+At the end the script runs `release_tools.py check release/DRBR.zip`: it reads the zip the way the launcher does
+(its end, then each file at its place), checks the signature against `drbr.json`'s public key and every file's SHA-256,
+and that nothing in it is compressed.
 
 ### 5. Publish
+
+Upload **`DRBR.zip` exactly as it was made**: do not unpack it and zip it again. (A re-zipped `DRBR.zip` still works,
+but every launcher then has to download all of it for an update.)
+
+By hand on GitHub: Releases > Draft a new release > tag `v1.1.0` (exactly the version: the signed manifest points at
+`releases/download/v1.1.0/DRBR.zip`) > title `DRBR 1.1.0` > the text of `RELEASE_NOTES.md` > attach `DRBR.zip` >
+"Set as the latest release" > Publish.
+
+Or with the GitHub CLI:
 
 ```
 scripts/release-drbr.sh 1.1.0
 ```
 
-This tags `v1.1.0`, pushes the tag, and creates a **draft** GitHub release with every asset. It uses your `gh` login.
-
-Next, run the **release** workflow on GitHub: Actions > release > Run workflow, with version `1.1.0`.
-
-1. It builds the programs from source and runs the tests that need no game files.
-2. It downloads the draft and checks every asset again: the signature, every checksum, and the Setup.
-3. It waits for your approval (the `release` environment), then publishes the release.
-
-Without the workflow, you can publish by hand:
-
-```
-gh release edit v1.1.0 --draft=false
-```
+This tags `v1.1.0`, pushes the tag, and creates a **draft** GitHub release with `DRBR.zip`. It uses your `gh` login.
+Then run the **release** workflow on GitHub (Actions > release > Run workflow, version `1.1.0`): it builds the programs,
+runs the tests that need no game files, downloads the draft's `DRBR.zip` and checks it completely, and publishes after
+your approval (the `release` environment). Without the workflow: `gh release edit v1.1.0 --draft=false`.
 
 Once published, every DRBR Launcher finds the release at
-`https://github.com/<you>/DRBR/releases/latest/download/update-manifest.json`.
+`https://github.com/<you>/DRBR/releases/latest/download/DRBR.zip`.
+
+(`release_tools.py release` still makes DRBR 1.0.0's layout - every file as its own asset with `update-manifest.json`
+- and launchers still read it, but releases are `DRBR.zip` from 1.0.1 on.)
 
 ## Real-PC check (recommended before publishing)
 

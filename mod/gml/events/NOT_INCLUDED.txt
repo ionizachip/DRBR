@@ -1,0 +1,2 @@
+Not here (the games' own code with a hook added - a local build has them from its toolkit):
+firehex_Create_0.gml firehex_Step_0.gml firespell_Create_0.gml firespell_Draw_0.gml heart_Draw_0.gml

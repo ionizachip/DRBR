@@ -88,7 +88,8 @@ def run(key):
         shutil.copy(PACK + f, d)
     for f in ('inst.ogg', 'vocals.ogg'):
         open(os.path.join(d, f), 'wb').write(b'OggS')
-    ok_, err = auto(sim, lambda: sim.run('global.E1 = [knight_music_exists("@kf:it_doesnt_end_here"), knight_kf_inst("it_doesnt_end_here"), knight_song_credit()];'))
+    # (1.0.1: the game looks again at most every 3 seconds - knight_cache_get; here the files are new at once)
+    ok_, err = auto(sim, lambda: sim.run('knight_music_cache_clear(); global.E1 = [knight_music_exists("@kf:it_doesnt_end_here"), knight_kf_inst("it_doesnt_end_here"), knight_song_credit()];'))
     if not ok_:
         return ('folder', err)
     res['folder'] = sim.py(sim.eval('global.E1'))

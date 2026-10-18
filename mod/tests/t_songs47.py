@@ -152,6 +152,11 @@ def part_offline():
         f = J(sim, 'knight_song_file("knight.ogg")')
         want = J(sim, 'global.knight_songs[%d].file' % i) or None
         cr = J(sim, 'knight_song_credit()')
+        if want is not None and want.startswith('@kf:'):
+            # (a KF Song Pack song: its own test, t_kfsong50 - here the pack is not installed: the knight's own music, no credit)
+            if f == 'knight.ogg' and cr == '':
+                good += 1
+            continue
         if want == '@random':
             # build 48: RANDOM - one of the real songs, kept for the run, credited
             f2 = J(sim, 'knight_song_file("knight.ogg")')
@@ -191,7 +196,8 @@ def part_online():
     sim.run('global.kfo.song = 4; kfo_ini_save(); global.kfo = undefined; kfo_get();')
     ok(J(sim, 'global.kfo.song') == 4, 'online: the choice is kept (4 after a restart)')
     for bad in (99, -5, 2.5):
-        sim.run('ossafe_ini_open(kfo_ini_file()); ini_write_real("player", "song", %r); ossafe_ini_close(); global.kfo = undefined; kfo_get();' % bad)
+        # (build 50 keeps the song as its file, "songf": a bad number alone is what an older file would have)
+        sim.run('ossafe_ini_open(kfo_ini_file()); ini_write_real("player", "song", %r); ini_key_delete("player", "songf"); ossafe_ini_close(); global.kfo = undefined; kfo_get();' % bad)
         ok(J(sim, 'global.kfo.song') == -1, 'online: a bad saved song (%r) - AS IN THE HUB' % bad)
     # the match plays it: kfo_launch puts it in the run (needs a match: the launch code's own lines)
     src = open(M + 'gml_GlobalScript_knight_core.gml', encoding='utf8').read()

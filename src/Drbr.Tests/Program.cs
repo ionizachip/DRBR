@@ -1,11 +1,12 @@
 // DRBR core tests - the same code the Windows programs run, on .NET (here: Linux). Real inputs: the real vanilla Chapter 3
 // data.win, the real release payload (the real game patch), the provided starting save, a real signing key.
 // Env: DRBR_TEST_VANILLA (vanilla data.win), DRBR_TEST_PAYLOAD (payload dir), DRBR_TEST_KEY (private key .pem),
-//      DRBR_TEST_WORK (scratch dir), DRBR_TEST_RELEASE2 (a newer release dir served over HTTP) + DRBR_TEST_HTTP (its URL)
+//      DRBR_TEST_WORK (scratch dir), DRBR_TEST_RELEASES (the test releases served over HTTP: make_test_releases.py) + DRBR_TEST_HTTP (its URL)
 // Usage: drbr-tests [group ...]   groups: basics signature manifest save game install repair failures interrupt update join uninstall
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -57,12 +58,24 @@ namespace Drbr
             G("update", UpdateTests);
             G("join", JoinTests);
             G("uninstall", UninstallTests);
+            // not in the default run: a real release on the internet (DRBR_TEST_LIVE_URL), read the launcher's way
+            if (want.Contains("live")) { Console.WriteLine("== live"); try { LiveTests(); } catch (Exception e) { Ok(false, "live crashed: " + e); } }
             Console.WriteLine("drbr core tests: " + (pass + fail) + " checks, " + fail + " failed");
             foreach (string f in Fails) Console.WriteLine("FAILED: " + f);
             return fail == 0 ? 0 : 1;
         }
 
         static string Env(string k, string d) { string v = Environment.GetEnvironmentVariable(k); return string.IsNullOrEmpty(v) ? d : v; }
+
+        // the test releases' versions (make_test_releases.py): the payload's own version with n added to its last number
+        // (DRBR 1.0.1: they were fixed 1.0.1-1.0.5, so testing a 1.0.1 payload, its "updates" were not newer than it)
+        static string TestVer(int n)
+        {
+            string b = Json.ParseObject(File.ReadAllText(Path.Combine(PayloadDir, "payload.json"))).Str("version", "1.0.0");
+            string[] parts = b.Split('.');
+            parts[parts.Length - 1] = (int.Parse(parts[parts.Length - 1], CultureInfo.InvariantCulture) + n).ToString(CultureInfo.InvariantCulture);
+            return string.Join(".", parts);
+        }
 
         // ------------------------------------------------------------------------------------------------ helpers
         static string Sh(string cmd)
@@ -416,42 +429,167 @@ namespace Drbr
         {
             string url = Env("DRBR_TEST_HTTP", null);
             if (url == null) { Ok(false, "DRBR_TEST_HTTP is not set (the update tests need a local release server)"); return; }
+            string rel = Env("DRBR_TEST_RELEASES", "");
+            string logf = Env("DRBR_TEST_HTTP_LOG", "");
             DrbrPaths p = installed;
             LauncherCore c = new LauncherCore(p);
-            c.Settings.UpdateUrlOverride = url + "/good/update-manifest.json";
+            // DRBR 1.0.0's layout (update-manifest.json and its .sig on their own) is still understood
+            c.Settings.UpdateUrlOverride = url + "/json/update-manifest.json";
+            c.Settings.Save(p);
+            UpdateInfo uj = new LauncherCore(p).Check();
+            Ok(uj.Available && uj.PackageUrl == null && uj.Manifest.Version == TestVer(1), "a release in the old layout (update-manifest.json) is still read: " + uj.Manifest.Version);
+            // the release is one file, DRBR.zip
+            c.Settings.UpdateUrlOverride = url + "/good/DRBR.zip";
             c.Settings.Save(p);
             c = new LauncherCore(p);
+            File.WriteAllText(logf, "");
             UpdateInfo u = c.Check();
-            Ok(u.Available && Ver.IsNewer(u.Manifest.Version, u.Installed), "the newer release is found: " + u.Installed + " -> " + u.Manifest.Version);
+            Ok(u.Available && Ver.IsNewer(u.Manifest.Version, u.Installed) && u.PackageUrl == url + "/good/DRBR.zip", "the newer release is found in DRBR.zip: " + u.Installed + " -> " + u.Manifest.Version);
+            string[] checkLog = File.ReadAllLines(logf);
+            long zipLen = new FileInfo(Path.Combine(rel, "good", "DRBR.zip")).Length;
+            Ok(checkLog.Length > 0 && checkLog.All(l => l.StartsWith("RANGE good/DRBR.zip")) && checkLog.Sum(l => RangeLen(l)) < 200000,
+               "the check read only the end of DRBR.zip (" + checkLog.Length + " requests, " + checkLog.Sum(l => RangeLen(l)) + " of " + zipLen + " bytes)");
+            // where the files are inside it (read here from the file itself)
+            Dictionary<string, PackagedFile> at;
+            using (FileSource fs = new FileSource(Path.Combine(rel, "good", "DRBR.zip")))
+                at = DrbrPackage.Open(fs).PayloadFiles(u.Manifest.Files.Select(f => f.File));
             // an interrupted download resumes: a .part file with the first bytes is there
             PayloadFile changed = u.Manifest.Files.First(f => f.Kind == "doc");
             string dl = Path.Combine(p.StagingDir, "download-" + u.Manifest.Version);
             Directory.CreateDirectory(dl);
-            byte[] full = File.ReadAllBytes(Path.Combine(Env("DRBR_TEST_RELEASE2", ""), changed.File));
+            byte[] full;
+            using (FileStream z = File.OpenRead(Path.Combine(rel, "good", "DRBR.zip")))
+            {
+                full = new byte[changed.Size];
+                z.Seek(at[changed.File].Offset, SeekOrigin.Begin);
+                z.Read(full, 0, full.Length);
+            }
+            Ok(Hash.Same(Hash.Sha256Bytes(full), changed.Sha256), "the changed file is where the package says (" + changed.File + " at " + at[changed.File].Offset + ")");
             File.WriteAllBytes(Path.Combine(dl, changed.File + ".part"), full.Take(full.Length / 2).ToArray());
+            File.WriteAllText(logf, "");
             InstallResult r = c.ApplyUpdate(u, null);
             Ok(r.Ok && new InstallEngine(p).InstalledVersion() == u.Manifest.Version && new InstallEngine(p).VerifyInstall(true) == null, "the update is downloaded, installed and verifies (" + r.Version + ")");
-            string log = File.Exists(Env("DRBR_TEST_HTTP_LOG", "")) ? File.ReadAllText(Env("DRBR_TEST_HTTP_LOG", "")) : "";
-            Ok(log.Contains("RANGE " + changed.File), "the interrupted download was resumed (HTTP Range)");
-            Ok(!log.Contains("GET drbr-chapter3.xdelta") && !log.Contains("GET drbr-music-1.zip"), "unchanged files were not downloaded again (the game patch, the music)");
+            string[] dlLog = File.ReadAllLines(logf);
+            long resumeAt = at[changed.File].Offset + full.Length / 2;
+            Ok(dlLog.Any(l => l == "RANGE good/DRBR.zip " + resumeAt + "-" + (at[changed.File].Offset + full.Length - 1)), "the interrupted download was resumed (only the rest of " + changed.File + " was asked for)");
+            Ok(!dlLog.Any(l => l.StartsWith("GET ")), "DRBR.zip was never downloaded whole");
+            // (the zips' directories are read from their ends: up to 64 KB of whatever file lies just before them)
+            string touched = "";
+            foreach (PayloadFile f in u.Manifest.Files)
+            {
+                if (f.Kind == "doc") continue;
+                long a0 = at[f.File].Offset, a1 = a0 + f.Size - 1, over = 0;
+                foreach (string l in dlLog)
+                {
+                    long s0, s1;
+                    if (RangeOf(l, out s0, out s1) && s0 <= a1 && s1 >= a0) over += Math.Min(a1, s1) - Math.Max(a0, s0) + 1;
+                }
+                if (over > 70000) touched += f.File + " (" + over + " bytes) ";
+            }
+            long docs = u.Manifest.Files.Where(f => f.Kind == "doc").Sum(f => f.Size);
+            Ok(touched == "" && dlLog.Sum(l => RangeLen(l)) < docs + 300000, "unchanged files were not downloaded again (the game patch, the music): " + dlLog.Sum(l => RangeLen(l)) + " bytes read in all, " + docs + " of them the changed files " + touched);
             Ok(Hash.Sha256File(p.BundleTemplate) == u.Manifest.SaveProfile.TemplateSha256 && File.ReadAllText(p.BundleProfileCfg).Contains("start_mode=continue"), "after the update: the same starting save, the player's start mode kept");
             Ok(new LauncherCore(p).Check().Available == false, "after the update: up to date");
+            // a DRBR.zip compressed again by hand: downloaded whole and unpacked here, still checked
+            c.Settings.UpdateUrlOverride = url + "/rezip/DRBR.zip"; c.Settings.Save(p);
+            File.WriteAllText(logf, "");
+            LauncherCore c2 = new LauncherCore(p);
+            UpdateInfo u2 = c2.Check();
+            InstallResult r2 = c2.ApplyUpdate(u2, null);
+            Ok(u2.Manifest.Version == TestVer(2) && r2.Ok && new InstallEngine(p).InstalledVersion() == TestVer(2) && new InstallEngine(p).VerifyInstall(true) == null && File.ReadAllText(logf).Contains("GET rezip/DRBR.zip"),
+               "a DRBR.zip compressed again by hand still updates (downloaded whole): " + u2.Manifest.Version);
+            // a server without HTTP ranges: the same, check and update
+            c.Settings.UpdateUrlOverride = url + "/norange/DRBR.zip"; c.Settings.Save(p);
+            LauncherCore c4 = new LauncherCore(p);
+            UpdateInfo u4 = c4.Check();
+            InstallResult r4 = c4.ApplyUpdate(u4, null);
+            Ok(u4.Manifest.Version == TestVer(3) && r4.Ok && new InstallEngine(p).InstalledVersion() == TestVer(3) && new InstallEngine(p).VerifyInstall(true) == null, "a server without HTTP ranges: the check and the update still work (" + u4.Manifest.Version + ")");
+            string[] left = Directory.Exists(p.StagingDir) ? Directory.GetFiles(p.StagingDir, "*", SearchOption.AllDirectories).Where(x => x.Contains(".whole") || Path.GetFileName(x).StartsWith("check-") || x.EndsWith(".unpacked")).ToArray() : new string[0];
+            Ok(left.Length == 0, "no whole download or unpacked copy left behind (" + string.Join(", ", left.Select(Path.GetFileName)) + ")");
             // a release whose manifest is not signed by DRBR's key
-            c.Settings.UpdateUrlOverride = url + "/badsig/update-manifest.json"; c.Settings.Save(p);
+            c.Settings.UpdateUrlOverride = url + "/badsig/DRBR.zip"; c.Settings.Save(p);
             string e1 = Throws(() => new LauncherCore(p).Check());
             Ok(e1 != null && e1.StartsWith("bad_signature"), "an unauthorized release (bad signature) is refused: " + e1);
             // a release whose file is damaged on the server
-            c.Settings.UpdateUrlOverride = url + "/corrupt/update-manifest.json"; c.Settings.Save(p);
+            c.Settings.UpdateUrlOverride = url + "/corrupt/DRBR.zip"; c.Settings.Save(p);
             LauncherCore c3 = new LauncherCore(p);
             UpdateInfo u3 = c3.Check();
             string ver = new InstallEngine(p).InstalledVersion();
             string e2 = Throws(() => c3.ApplyUpdate(u3, null));
             Ok(e2 != null && e2.StartsWith("bad_download") && new InstallEngine(p).InstalledVersion() == ver && new InstallEngine(p).VerifyInstall(true) == null, "a damaged download is refused; nothing changes: " + e2);
+            // a release with a new launcher while the launcher runs: Windows does not let a running program be deleted ("access
+            // denied") or overwritten, so its new copy waits in staging\pending for DRBR Updater - the update itself goes through
+            c.Settings.UpdateUrlOverride = url + "/inuse/DRBR.zip"; c.Settings.Save(p);
+            LauncherCore c5 = new LauncherCore(p);
+            UpdateInfo u5 = c5.Check();
+            PayloadFile nl = u5.Manifest.Files.First(f => f.Kind == "app" && f.Dest == "DRBR Launcher.exe");
+            string oldLauncher = Hash.Sha256File(p.LauncherExe);
+            InstallResult r5;
+            Environment.SetEnvironmentVariable("DRBR_TEST_LAUNCHER_IN_USE", "1");
+            try { r5 = c5.ApplyUpdate(u5, null); }
+            finally { Environment.SetEnvironmentVariable("DRBR_TEST_LAUNCHER_IN_USE", null); }
+            Ok(r5.Ok && new InstallEngine(p).InstalledVersion() == TestVer(5) && new InstallEngine(p).VerifyInstall(true) == null,
+               "a release with a new launcher installs while the launcher runs (" + r5.Version + ")");
+            Ok(r5.LauncherPending && r5.PendingLauncher == p.PendingLauncher && Hash.Same(Hash.Sha256File(p.PendingLauncher), nl.Sha256) && Hash.Same(r5.PendingLauncherSha, nl.Sha256),
+               "  ... the new launcher waits in staging\\pending, checked (" + string.Join(" ", r5.Notes.ToArray()) + ")");
+            Ok(Hash.Same(Hash.Sha256File(p.LauncherExe), oldLauncher) && !File.Exists(p.LauncherExe + ".part"), "  ... the running launcher was left alone, no half-copied file next to it");
+            Ok(Hash.Same(LauncherSwap.Waiting(p), nl.Sha256), "  ... the next launcher start finds it to swap in");
+            File.Copy(p.PendingLauncher, p.LauncherExe, true);   // (what DRBR Updater does, tested on Windows programs under Wine)
+            Ok(LauncherSwap.Waiting(p) == null && !File.Exists(p.PendingLauncher), "  ... once it is in place, the staged copy is removed and nothing is swapped again");
+            // no release there (yet): a clear message
+            c.Settings.UpdateUrlOverride = url + "/nothing/DRBR.zip"; c.Settings.Save(p);
+            string e4 = Throws(() => new LauncherCore(p).Check());
+            Ok(e4 != null && e4.StartsWith("no_release"), "no release at the address: a clear message (" + e4 + ")");
             // the server is down: a clear message, the installed DRBR stays playable
-            c.Settings.UpdateUrlOverride = "http://127.0.0.1:9/update-manifest.json"; c.Settings.Save(p);
+            c.Settings.UpdateUrlOverride = "http://127.0.0.1:9/DRBR.zip"; c.Settings.Save(p);
             string e3 = Throws(() => new LauncherCore(p).Check());
             Ok(e3 != null && e3.StartsWith("offline") && new InstallEngine(p).VerifyInstall(false) == null, "no connection: a clear message, DRBR still playable");
             c.Settings.UpdateUrlOverride = ""; c.Settings.Save(p);
+        }
+
+        // "RANGE <path> <first>-<last>" -> its bytes
+        static bool RangeOf(string l, out long a, out long b)
+        {
+            a = b = -1;
+            if (!l.StartsWith("RANGE ")) return false;
+            string[] w = l.Split(' ');
+            string[] ab = w[w.Length - 1].Split('-');
+            return ab.Length == 2 && long.TryParse(ab[0], out a) && long.TryParse(ab[1], out b);
+        }
+
+        static long RangeLen(string l)
+        {
+            long a, b;
+            return RangeOf(l, out a, out b) ? b - a + 1 : 0;
+        }
+
+        /// <summary>The published release, as a player's launcher reads it: the check (the end of DRBR.zip, the signature), then
+        /// where every file is inside it and a few of them read and checked by their bytes (DRBR_TEST_LIVE_FILES: how many; the
+        /// smallest first).</summary>
+        static void LiveTests()
+        {
+            string url = Env("DRBR_TEST_LIVE_URL", "https://github.com/ionizachip/DRBR/releases/latest/download/DRBR.zip");
+            DrbrPaths p = new DrbrPaths(Path.Combine(Work, "live"));
+            Directory.CreateDirectory(p.StagingDir);
+            UpdateEngine ue = new UpdateEngine(p, url);
+            UpdateInfo u = ue.Check("0.0.1", 0);
+            Ok(u.Manifest != null, "the release's manifest is read from " + url + " and its signature is DRBR's: version " + u.Manifest.Version + ", " + u.Manifest.Files.Count + " files, package " + u.PackageUrl);
+            HttpRangeSource src = new HttpRangeSource(u.PackageUrl ?? url);
+            Console.WriteLine("  " + (u.PackageUrl ?? url) + " -> " + src.FinalUrl.Split('?')[0] + " (" + src.Length + " bytes, ranges " + src.Ranges + ")");
+            DrbrPackage pkg = DrbrPackage.Open(src);
+            Ok(Hash.Same(Hash.Sha256Bytes(pkg.ManifestBytes()), Hash.Sha256Bytes(u.ManifestBytes)), "the versioned DRBR.zip has the same manifest as the latest one");
+            Dictionary<string, PackagedFile> at = pkg.PayloadFiles(u.Manifest.Files.Select(f => f.File));
+            Ok(at != null, "every file can be read in place (DRBR-Setup.exe and its package are stored): " + (at == null ? "NO - the zip was compressed again" : at.Count + " files"));
+            if (at == null) return;
+            int n = int.Parse(Env("DRBR_TEST_LIVE_FILES", "4"));
+            foreach (PayloadFile f in u.Manifest.Files.OrderBy(f => f.Size).Take(n))
+            {
+                string dst = Path.Combine(p.StagingDir, f.File);
+                Http.DownloadRange(src, at[f.File].Offset, dst, f.Size, f.Sha256, null);
+                Ok(Hash.Same(Hash.Sha256File(dst), f.Sha256), "  " + f.File + " (" + f.Size + " bytes at " + at[f.File].Offset + ") read from the release and checked");
+                File.Delete(dst);
+            }
+            Console.WriteLine("  " + src.Requests + " requests");
         }
 
         static void UninstallTests()

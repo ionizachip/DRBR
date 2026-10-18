@@ -1,7 +1,9 @@
 KNIGHT HUB v2 - WHAT WAS TESTED AND WHAT WAS NOT
 ================================================
-THE NEWEST UPDATE IS AT THE END: "BUILD 51 UPDATE 10" (DRBR as its own installation: DRBR-Setup.exe, DRBR Launcher,
-signed updates, every start from the provided save in front of the Roaring Knight).
+THE NEWEST UPDATE IS AT THE END: "BUILD 51 UPDATE 11" (DRBR 1.0.1: the bots play the bosses' SOUL modes, DELTARUNE-size
+menus, your music over the bosses, one-file releases, the launcher's self-update fixed; 1.0.0 and 1.0.1 share rooms).
+Before it: "BUILD 51 UPDATE 10" (DRBR as its own installation: DRBR-Setup.exe, DRBR Launcher, signed updates, every start
+from the provided save in front of the Roaring Knight).
 Before it: "BUILD 51 UPDATE 9" (DRBR: five bosses, their SOULs and sends, new skins, the polish pass).
 Before it: "BUILD 50" - the players' attack skills are the Roaring Knights' REAL attacks (wrapped,
 the Knight's own fight unchanged), five new items, the TP bar as the skill meter, the SHIELD in blue on the HP bar, Hold
@@ -2683,3 +2685,239 @@ TESTS FOR UPDATE 10
    BLOCKED          Publishing to GitHub (no repository or GitHub login yet). The release tools and workflows were not
                     run against GitHub. The CI steps were run here (build, core basics without game files, the save
                     check, the emulator selftest, the no-secrets check on the commit).
+
+
+================================================================================================================
+BUILD 51 UPDATE 11 - DRBR 1.0.1: THE BOTS PLAY THE BOSSES' SOUL MODES, DELTARUNE-SIZE MENUS, BOSS BALLOONS OFF BY
+DEFAULT, YOUR MUSIC OVER THE BOSSES, PINK'S STAGE, BOSSES TOGETHER, LESS SLOWDOWN, ONE-FILE RELEASES, THE LAUNCHER'S
+SELF-UPDATE FIXED
+Game build 51.11 (the multiplayer build is still 51: 1.0.0 and 1.0.1 players can share a room). DRBR 1.0.1, and DRBR 1.0.0
+re-issued (the same game 51.10 with the fixed launcher) so that the update 1.0.0 -> 1.0.1 can be tried for real.
+Statuses: EMULATED = the real merged GML in the emulator (NOT the real game); EMULATED WINDOWS = the real Windows programs
+under Wine + wine-mono (NOT real Windows); CORE = the same C# code on .NET 10 / Linux with the real vanilla data.win, the
+real patch, the real provided save and the real signing key; STATIC = checked in the built data.win; RENDERED = drawn by
+the emulator's renderer (or a Wine screen) and the picture looked at; NOT RUN / BLOCKED = not tested (and why).
+
+WHAT CHANGED (GAME)
+1. MENUS IN DELTARUNE'S TEXT SIZE. The menus' small print is the game's own text size now, and the overlaps that made are
+   fixed. A text too long for its place scrolls by itself (it waits 1.5 s, runs to its end, waits, starts over) instead
+   of being cut off. The credits pages wrap a long name and put its role under it. A box with more in it than the screen
+   holds (a results box with every option, FIGHT STATS) packs its rows closer - down to 26 px apart, the font's own
+   height - instead of running into its buttons. The match HUD was left as it was.
+2. ONLINE is the menu's first page, with its own icon.
+3. BOSS SPEECH BALLOONS: OFF by default (they covered the battle). VIEW > BOSS LINES turns them on. Then they are
+   DELTARUNE's own rounded balloon with its curved tail, beside the boss, placed off the battle box (and off the HUD) -
+   the side with the least overlap wins. The lines are the chapters' own lines, word for word, with the chapters' own
+   line breaks; nothing was added or reworded (Gerson 14, Flowery 3 and Pink 2 strings were put back to the chapters'
+   text). The voices play either way.
+4. MUSIC: your own song keeps playing through every boss. MUSIC > DEFAULT gives each boss its own music (Jevil too);
+   after a boss, the song before it comes back.
+5. PINK'S STAGE is Chapter 5's: black, her spotlight, the audience between her attacks (it was broken).
+6. BOSSES TOGETHER: the stage announcements fit the boss on stage ("STAGE n", OVERDRIVE at stage 4, the boss's own line
+   under it), the final two read "* Only two SOULs left." with a boss, the Knight's songs and lines are not used over a
+   boss, and one boss after another changes the music once.
+7. Smaller boss icons in the skill slots. The send telegraph (the knight's outline beside your box) is in the sender's
+   colour.
+8. LESS SLOWDOWN: the bots plan their moves faster, the menus no longer measure and wrap their text every frame (cached;
+   up to 54% less in the emulator's 3-player match profile - EMULATED, not a frame rate on a real PC).
+9. The credits name ionizachip. drbr_profile\last_start.ini (the game's note of each DRBR start, which DRBR Launcher
+   reads) gives build 51.11 (it said 51.10; the launcher does not use that line).
+10. THE BOTS PLAY THE BOSSES' SOUL MODES (asked for in this update: "rather than just sitting there"). Before, in these
+    modes a bot's SOUL sat still or wandered, and every hit was a roll of the dice:
+    - GERSON'S GREEN SOUL: each bot has its own shield and turns it as a player does - toward the spear coming soonest once
+      it has seen it (REACTION TIME), now and then the wrong way (MISTAKES), a frame or two late when less precise, away
+      from a red hammer. A spear reaching the shields is blocked by the bots facing it, and only by them.
+    - PINK'S LANES, GRID AND "+" (a bug found by this update's tests, old since update 9): every move was put back on the
+      bot's own lane / node, so bots never changed lane and every piece in it hit them, PERFECT as much as DUMMY. Now a bot
+      moves along its lane and changes lane / node as a key press does (Chapter 5's lane swap, 20 px a frame), and its
+      planning knows the lanes and nodes it can go to.
+    - PINK'S 3D TUNNEL AND MAZE: bots go in and out along her rings and walk the maze's paths node to node. Whether a
+      zap or a box gets them is still rolled by their skill (the tunnel turns and the maze opens as the HOST plays, so a
+      bot cannot have its own), decided a little ahead so that a bot that gets through moves away first.
+    - FLOWERY'S BOARD: bots move up and down out of the way of his pieces (their planning, on the orange SOUL's one axis)
+      and DASH when they get past a lunge or a piece of the chase; getting past is still rolled by skill (the board
+      scrolls with the HOST's dashes, so a bot cannot have its own).
+    - SPAMTON NEO'S YELLOW SOUL: unchanged - bots dodge his attacks for real (they always did); they still do not shoot.
+    WATCHING: the positions everybody sends now carry the green shield's direction (players' and bots'); a watcher's shield
+    turns with the one they follow, a watcher's orange SOUL dashes with a bot's dash (and the board rushes on), and a
+    watcher's purple SOUL goes to the followed one's ring in the tunnel and node in the maze. (Before, a watcher's shield
+    did not follow anybody, and a bot never dashed.)
+
+WHAT CHANGED (INSTALLING AND UPDATING)
+11. A RELEASE IS ONE FILE: DRBR.zip (stored, not compressed): DRBR-Setup.exe with its package appended, README.txt, and
+    the signed update-manifest.json + .sig at the end. Players open it and run DRBR-Setup.exe.
+12. The launcher's update check reads only the end of DRBR.zip (64 KB, by HTTP range), checks the signature, and then
+    downloads only the bytes of the files that changed, from inside DRBR.zip. A DRBR.zip compressed again by hand, or a
+    server without ranges, still works (the file is then downloaded whole). GitHub's redirects (latest -> v<version> ->
+    its file host, whose addresses expire) are followed and asked again when they expire.
+13. FIX - THE LAUNCHER COULD NOT UPDATE ITSELF (found this update, in the 1.0.0 re-issue delivered earlier today, before
+    anyone used it): Windows refuses to delete a running program ("access denied"), and the installer only expected an
+    "in use" error there, so any update with a new DRBR Launcher.exe stopped and was rolled back. Now the running
+    launcher's new copy waits in staging\pending, the rest of the update goes in, and DRBR Updater swaps the launcher in
+    once it has closed and opens it again; a copy left waiting goes in at the next start. Shown under Wine, which refuses
+    the delete the same way: a small test program got "Access to the path ... is denied" deleting a running copy of
+    itself, and the new launcher logs exactly that error when an update meets it (the old code did not catch it; the old
+    code itself was not re-run end to end).
+14. DRBR-Setup.exe refuses to reinstall while DRBR Launcher is open ("Close DRBR Launcher, then install again."), so it
+    never leaves an old launcher in place.
+15. The update check no longer downloads the whole release from a server that ignores ranges (it stops after the size).
+
+FOUND AND FIXED IN THIS UPDATE'S TESTING
+- THE LAUNCHER'S SELF-UPDATE (item 13): found by reading the update code for the 1.0.0 -> 1.0.1 test, then shown under
+  Wine: deleting a running program's .exe is "access denied" (UnauthorizedAccessException), overwriting it "in use"; the
+  installer caught only the second. Fixed, and tested three ways (core, the Wine end-to-end test with a release that brings
+  a new launcher, and the player's way: the launcher window, UPDATE NOW, the Updater's swap and restart).
+- A GAP IN UPDATE 9'S BOT TEST, AND THE BUG BEHIND IT: in Pink's lanes, grid and "+", a bot's every move was rounded back
+  onto its own lane / node, so bots never left it and Pink's cats and bomb blasts hit every bot alike, PERFECT too. Update
+  9's bot run did not see it: it ran before the box model knew Pink's sprites, so her pieces could not hit the bots then.
+  The same numbers come out of 1.0.0's code, so it is old, not 1.0.1's. Fixed (item 10).
+- THE BIGGER MENU TEXT RAN INTO THINGS: the layout test (every hub screen with the game's font metrics) first found 97
+  overlaps - 90 on the credits pages (a name and its role no longer fit one line: now the role goes under the name) and 7
+  in boxes with more in them than the screen holds (a results box with every option, FIGHT STATS: their last lines ran into
+  the buttons; such a box now packs its rows closer, and a line that still does not fit is left out, never drawn over a
+  button). Drawn by the emulator's renderer and looked at: four full boxes, every row readable.
+- TEST BUGS, NOT THE GAME:
+  - t_kmenu's 3 failures (since update 10): the test harness numbered Chapter 3's own objects from 110000 - inside the
+    emulator's instance numbers (100000 up) - so obj_actor was taken for an instance and its stand-ins were never
+    counted. Renumbered from 60000: 17/17.
+  - t_validate53, the automatic validation, run for the first time on a fresh decompile of the built game: 21 failures,
+    all its own blind spots - a bullet completed through kbr_bvars (which calls kbr_bullet_contract), the bosses' sends
+    whose hidden copies for bots are in the boss's own function (kbr_fl_bot_send / kbr_sn_sa_bot / kbr_pk_sa_bot, reached
+    from kbr_sa_bot), and two names that are Chapter 3's own (the script snd_pitch_time, obj_growtangle's variable
+    spr_custom_box). Taught all three: 318/318 on the built 1.0.1.
+- THE REPOSITORY LACKED THE HUB OBJECTS' EVENT TEMPLATES (gml_templates_v6/events): the source sync left them out.
+  Found when building 1.0.0's code for the mixed-version test (built from 1.0.0's own toolkit instead). The sync copies
+  them now - except five that are the games' own code with a hook added (Chapter 5's flame spell, Chapter 3's SOUL
+  drawing): like the bosses' generated code, those stay out of the public repository (a local build has them).
+
+TESTS (on the final 1.0.1 code and the real DRBR.zip)
+   PASS (EMULATED)  THE BOTS PLAY THE BOSSES' SOUL MODES (t_botmodes101, new, 19/19): two games over the simulated network,
+                    the real host with six bots (DUMMY ... PERFECT), the second game OUT and watching the PERFECT bot, one
+                    attack forced in both:
+                    - GERSON (Crossfire, his green SOUL): every bot turned its own shield - all 4 directions, 35 turns
+                      (DUMMY) to 66 (PERFECT) in the attack's 808 frames; hits DUMMY 14, EASY 9, NORMAL 2, HARD 1, EXPERT 0,
+                      PERFECT 0; the watcher's shield pointed where the bot's did in 796 of 796 frames, and turned with it
+                    - FLOWERY (Jarona!, his orange board): the bots moved up and down (frames moving: EASY 246 ... PERFECT 37
+                      - the better a bot, the less and the later it moves) and dashed (EASY 45, NORMAL 67, HARD 108, EXPERT
+                      and PERFECT 99 frames; DUMMY never); hits DUMMY 11, EASY 6, NORMAL 3, HARD 0, EXPERT 0, PERFECT 0; the
+                      watcher's orange SOUL dashed with the bot in 100 of 100 frames
+                    - PINK (3D Tunnel): every bot went from ring to ring (24 to 33 places each in 815 tunnel frames); hits
+                      DUMMY 14, EASY 10, NORMAL 4, HARD 2, EXPERT 0, PERFECT 0; the watcher's purple SOUL went to the followed
+                      bot's ring (rings 0-3)
+                    - no error in either game
+   RENDERED (EMULATED)  the watcher's screen in each (spec_shot101.py: the boss's stage, the box, the SOULs, the HUD, drawn
+                    by the emulator's renderer and looked at): Gerson's spears coming in and the followed bot's green SOUL
+                    with its shield; Flowery's board with the bots' orange SOULs spread up and down it (the watcher's own
+                    one dashing in the first frame); Pink's tunnel rings with the bots' purple SOULs on different rings.
+                    And t_bossbots53 (every boss, six bots, hits by skill): 32/32 - hits fall with skill (DUMMY, EASY, NORMAL, HARD, EXPERT,
+                    PERFECT) in every boss: Jevil 9 5 2 1 1 1, Gerson 7 6 1 0 0 0, Flowery 30 16 5 4 0 0, Spamton NEO 8 5 2 0
+                    0 0 (his RECREW walls forced: 26 19 9 7 0 1, a roll per wall), Pink 16 12 10 3 1 1 (1.0.0's code: 19 14 12 10
+                    7 8 - the lanes bug).
+   PASS (EMULATED)  1.0.0 AND 1.0.1 IN ONE ROOM (t_mixver101, new: 50/51, the failed match again 6/6): each emulated game runs its own version's real
+                    code - 1.0.0's generated from its own 51.10 package toolkit by its own generator.
+                    - THREE PLAYERS, a 1.0.1 host, a 1.0.0 game and a 1.0.1 game, the same keys in every game: a knights
+                      match, then one match each against Gerson, Flowery and Pink - every cycle the same knight / attack, seed
+                      and start tick in all three (5 + 2 + 3 + 3 cycles), the same arena, and the same bullets in 1.0.0 as
+                      in 1.0.1 (13 + 6 + 9 + 9 moments compared, 0 different); no error in any game
+                    - WATCHING BOTS ACROSS VERSIONS, both ways round, in Gerson's, Flowery's and Pink's modes (six bots, the
+                      second game OUT following the PERFECT bot): no error in the host or the watcher in any of the 6 runs;
+                      the watcher follows the bot and sees it move (the places it gets are the host's); a 1.0.0 watcher of a
+                      1.0.1 host shows the bot's Flowery dashes too (64 of 64 frames - 1.0.0 already showed a player's
+                      dashes) but not its shield direction or ring (1.0.0 has no code for them); a 1.0.1 watcher of a 1.0.0
+                      host gets no shield direction and keeps none. With a 1.0.0 host the bots play as in 1.0.0: in Pink's
+                      tunnel its PERFECT bot was at 2 places in 562 frames, 1.0.1's at 58.
+                    - the first run's one failure: the Gerson match stopped at frame 546 in all three games ("mercytotal
+                      not set") - the test's stand-in battle controller lacks Chapter 3's TP total, which the real one sets in
+                      its Create (1.0.0 stopped the same way). Given that value, the match was run again: 6/6, 4 cycles, the
+                      same bullets (12 compared).
+   PASS (EMULATED)  the full emulator regression, run again on the final code (46 suites, logs101c):
+                    - t_botmodes101 (new) 19/19
+                    - t_ui (the hub menu with real keys) 83/83
+                    - t_uilayout (every hub screen: on screen, in its box, no overlap) 17281/17281
+                    - t_kmenu 17/17
+                    - t_qol41 (FIGHT STATS: 4 attacks a page now) 133/133
+                    - t_presets 23/23
+                    - t_loadouts 1911/1911
+                    - t_bossbots53 32/32
+                    - t_gerson53 244/244
+                    - t_pink53 456/456
+                    - t_flowery53 156/156
+                    - t_spec52 (watching) 13/13
+                    - t_rematch52 17/17
+                    - t_mixed53 (bosses together) 83/83
+                    - t_online 65/65
+                    - t_steam_gml 52/52
+                    - t_drbr_save54 (the DRBR start, the starting save) 58/58
+                    - t_online_ui47 (every online page) 63367/63367
+                    - t_invite49 477/477
+                    - t_pages50 23/23
+                    - t_realpath49 21/21
+                    - t_songs47 136/136
+                    - t_kfsong50 30/30
+                    - t_music50 16/16
+                    - t_mus41 136/136
+                    - t_rushsong50 10/10
+                    - t_lyrics50 16/16
+                    - t_view47 (the watching camera) 88/88
+                    - t_room47 35/35
+                    - t_keys47 150/150
+                    - t_chat48 42/42
+                    - t_tut51 (HOW TO PLAY) 74/74
+                    - t_hud50 117/117
+                    - t_hud51 38/38
+                    - t_feed51 21/21
+                    - t_bots49 (bots in the knights) 37/37
+                    - t_jevil52 112/112
+                    - t_jevil52 mixed 10/10
+                    - t_gerson53 mixed 244/244
+                    - t_spamton53 375/375
+                    - t_jevil52_send 38/38
+                    - t_gerson53_send 44/44
+                    - t_pink53_send: STILL RUNNING when this was written (its result follows in the next update of this report)
+                    - t_flowery53_send: STILL RUNNING when this was written (its result follows in the next update of this report)
+                    - t_spamton53_send: STILL RUNNING when this was written (its result follows in the next update of this report)
+                    - t_lineup (Tag Team / Remix): STILL RUNNING when this was written (its result follows in the next update of this report)
+   PASS (STATIC)    the built data.win (game build 51.11):
+                    - runner check: 5171 functions / 91 variables, 0 missing
+                    - round trip: 1524/1524 code entries
+                    - unresolved names 0, name collisions 0, accessors on expressions 0, raw asset numbers 0
+                    - the patch applied to the vanilla data.win gives the DRBR data.win (227,559,268 bytes)
+                    - t_validate53 on its fresh decompile: 318/318 (10 warnings: Chapter 3 objects DRBR never makes, and
+                      the bosses' music, which is the game's own mus folder's)
+   PASS (CORE)      108/108 core tests on the real 1.0.1 payload (basics, signature, manifest, save, game,
+                    install, repair, failures, interrupt, update, join, uninstall). In update: a release in DRBR.zip found by
+                    reading only its end; only the changed file's bytes read; an interrupted download resumed; a DRBR.zip
+                    compressed again by hand; a server without ranges; a bad signature and a damaged download refused; a
+                    release with a new launcher installs while the launcher runs, its new launcher waiting for DRBR Updater.
+                    The first run had 2 failures that were the test's own: its test releases had fixed versions (1.0.1 -
+                    1.0.5), so with a 1.0.1 payload the "update" to 1.0.1 was not newer. The test releases now count from the
+                    payload's own version (1.0.2 - 1.0.6 here), in the Wine tests too.
+   PASS (EMULATED WINDOWS)  wine_e2e 51/51 on the real 1.0.1 DRBR-Setup.exe, DRBR Launcher.exe and DRBR Updater.exe
+                    (and 56/56 on the fixed 1.0.0). New in it this update:
+                    - a release with a NEW LAUNCHER, updated from the running launcher: the new launcher waits, DRBR
+                      Updater swaps it in after the launcher ends, nothing is left over, the new launcher runs
+                    - DRBR-Setup.exe while DRBR Launcher is open: refused with its message, DRBR unchanged
+   PASS (EMULATED WINDOWS)  THE UPDATE A PLAYER GETS (wine_real_update.sh, new), 18/18: the fixed 1.0.0 installed from
+                    its own DRBR-Setup.exe; its launcher window, started as a player starts it, finds 1.0.1 and UPDATE NOW
+                    is clicked. 1.0.1 is the real DRBR.zip's contents, signed with the real key, served by a local server
+                    that answers like GitHub (latest -> v1.0.1 -> a file host, by redirects).
+                    - the check read only the end of DRBR.zip (65,578 bytes), through 2 GitHub-like redirects
+                    - the update read 104,898,931 bytes for 104,767,655 bytes of changed files (the game patch, DRBR
+                      Launcher.exe, DRBR Updater.exe); no unchanged file (the music, the Steam files, the docs) was read
+                    - DRBR Updater swapped in the new launcher after the old one closed, and opened it again; nothing left
+                      over
+                    - the install verifies; DRBR's data.win is the new build; the starting save is the provided one; PLAY
+                      reached the starting room (room_dw_snow_zone); Steam's DELTARUNE folder and the player's saves are
+                      unchanged
+   RENDERED (EMULATED WINDOWS)  that run's screens: the 1.0.0 launcher with "DRBR UPDATE AVAILABLE" (Installed 1.0.0,
+                    Available 1.0.1); after UPDATE NOW the new launcher, opened again by DRBR Updater: "Installed: DRBR
+                    1.0.1", "Up to date".
+   PASS             THE PUBLISHED v1.0.0, read from github.com the launcher's way (drbr-tests.dll live): found through
+                    latest -> v1.0.0 -> release-assets.githubusercontent.com with ranges; its manifest's signature is
+                    DRBR's (1.0.0, 19 files). It is the first 1.0.0 (a zip of its 19 files, compressed): launchers read it
+                    but would download it whole. The fixed one-file DRBR.zip is meant to replace it.
+   NOT RUN          - real Windows, the real game (the installer tests use a stand-in game that does with the files what
+                      the DRBR build does), a real Steam room (1.0.0 with 1.0.1 included)
+                    - the real update from GitHub: it needs 1.0.1 published (by you). Then drbr-tests.dll live
+                      (DRBR_TEST_LIVE_URL) checks it from the internet the launcher's way
+                    - Spamton NEO's walls for bots are still a roll by skill (a bot's SOUL cannot shoot)

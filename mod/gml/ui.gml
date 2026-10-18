@@ -1,19 +1,39 @@
 
 // ===== Knight Hub menu: logic (state in global.knight_ui) =====
-// Built like DELTARUNE's own dark-world menu: five tab buttons on the top bar (KNIGHT, PARTY, POWER, RULES,
-// CONFIG), the box in the middle, the party panel at the bottom. While a tab is open the top bar shows the
+// Built like DELTARUNE's own dark-world menu: tab buttons on the top bar (DRBR 1.0.1: ONLINE, KNIGHT, PARTY, POWER,
+// RULES, CONFIG), the box in the middle, the party panel at the bottom. While a tab is open the top bar shows the
 // description of the highlighted row. Z = confirm, X = back, C = start the fight from any page.
 global.knight_ui = undefined;
+// (DRBR 1.0.1: the menu comes back after an offline fight - it opens on the KNIGHT page then, else on ONLINE)
+global.knight_ui_back = false;
 
 function knight_ui_tabs()
 {
-    return 5;
+    return 6;
+}
+
+// DRBR 1.0.1: the top bar's order - ONLINE first (its own page, tab 5), then KNIGHT, PARTY, POWER, RULES, CONFIG (tabs 0-4 keep
+// their numbers)
+function knight_ui_tab_order()
+{
+    return [5, 0, 1, 2, 3, 4];
+}
+
+function knight_ui_tab_pos(_t)
+{
+    var _o = knight_ui_tab_order();
+    for (var _i = 0; _i < array_length(_o); _i++)
+    {
+        if (_o[_i] == _t)
+            return _i;
+    }
+    return 0;
 }
 
 function knight_ui_open_state()
 {
     return {
-        tab: 0, focus: 0, lv: 0,
+        tab: 5, focus: 0, lv: 0,
         krow: 0, kpage: knight_page_of_ch(3),
         pslot: 0, prow: 0, ppick: 0, pscroll: 0,
         sslot: 0, srow: 0, sscroll: 0,
@@ -40,14 +60,18 @@ function knight_ui_init()
         if (knight_ui_fight_is_current(_f[_i]))
             global.knight_ui.krow = _i;
     }
+    // DRBR 1.0.1: back from an offline fight - the KNIGHT page, on that fight
+    if (variable_global_exists("knight_ui_back") && global.knight_ui_back)
+        global.knight_ui.tab = 0;
+    global.knight_ui_back = false;
     // build 43: back from an online match - straight to the room; build 45: the sign opens on the room while you are in one
+    // (DRBR 1.0.1: on the ONLINE page)
     if (is_struct(global.kfo) && (global.kfo.reopen || kfo_in_room()))
     {
         global.kfo.reopen = false;
         var _u = global.knight_ui;
-        _u.tab = 0;
+        _u.tab = 5;
         _u.focus = 1;
-        _u.krow = array_length(_f) - 1;
         _u.sub = kfo_in_room() ? "lobby" : "online";
         _u.notice = "";
     }
@@ -56,6 +80,8 @@ function knight_ui_init()
 function knight_menu_open(_sign)
 {
     knight_ensure_ctrl();
+    // DRBR 1.0.1: the songs are looked for again (a file put in while the game ran)
+    knight_music_cache_clear();
     // build 49: Steam starts with the hub's menu (not only with the ONLINE page), so invites from friends arrive
     kfo_get();
     kfo_steam_load();
@@ -157,7 +183,7 @@ function knight_ui_fights()
     array_push(_l, { kind: "random", k: -1 });
     array_push(_l, { kind: "tag", k: -1 });
     array_push(_l, { kind: "remix", k: -1 });
-    array_push(_l, { kind: "online", k: -1 });
+    // (DRBR 1.0.1: ONLINE is its own page now, the first of the top bar)
     return _l;
 }
 
@@ -434,6 +460,9 @@ function knight_ui_cfg_desc(_id)
     switch (_id)
     {
         case "song":
+            // DRBR 1.0.1: its preview playing (it was a small PLAYING beside the row)
+            if (knight_preview_playing())
+                return "Its preview is playing (the name in yellow).#Z: the song list.";
             // build 47: the song's credit (artist, where it is from)
             var _sg = global.knight_songs[clamp(global.knight_cfg.song, 0, array_length(global.knight_songs) - 1)];
             if (_sg.file == "@random")
@@ -618,7 +647,7 @@ function knight_ui_open_attacks()
     }
     _u.sub = "attacks";
     _u.at_row = clamp(_c.p_atk, 0, array_length(knight_reg(_c.knight).atk) - 1);
-    _u.at_scroll = clamp(_u.at_row - 4, 0, max(0, array_length(knight_reg(_c.knight).atk) - 9));
+    _u.at_scroll = clamp(_u.at_row - 3, 0, max(0, array_length(knight_reg(_c.knight).atk) - 7));
     snd_play(snd_select);
     return 1;
 }
@@ -634,8 +663,8 @@ function knight_ui_step_attacks(_up, _down, _left, _right, _ok)
         _u.at_row = knight_ui_cycle(_u.at_row, _up ? -1 : 1, _n);
         if (_u.at_row < _u.at_scroll)
             _u.at_scroll = _u.at_row;
-        if (_u.at_row >= _u.at_scroll + 9)
-            _u.at_scroll = _u.at_row - 8;
+        if (_u.at_row >= _u.at_scroll + 7)
+            _u.at_scroll = _u.at_row - 6;
         snd_play(snd_menumove);
     }
     if (_left || _right)
@@ -1545,11 +1574,19 @@ function knight_ui_step()
     {
         if (_left || _right)
         {
-            _u.tab = knight_ui_cycle(_u.tab, _left ? -1 : 1, knight_ui_tabs());
+            var _ord = knight_ui_tab_order();
+            _u.tab = _ord[knight_ui_cycle(knight_ui_tab_pos(_u.tab), _left ? -1 : 1, array_length(_ord))];
             _u.lv = 0;
             snd_play(snd_menumove);
         }
-        if (_ok || _down)
+        if ((_ok || _down) && _u.tab == 5)
+        {
+            // DRBR 1.0.1: the ONLINE page - its menu (the room's, while you are in one)
+            _u.focus = 1;
+            _u.lv = 0;
+            kfo_ui_open();
+        }
+        else if (_ok || _down)
         {
             _u.focus = 1;
             _u.lv = 0;
@@ -1561,6 +1598,10 @@ function knight_ui_step()
     }
     switch (_u.tab)
     {
+        case 5:
+            // (the ONLINE page is its menu: kfo_ui_step - here only when that menu was left without going back up)
+            _u.focus = 0;
+            break;
         case 0:
             var _f = knight_ui_fights();
             var _n = array_length(_f);
@@ -1882,10 +1923,10 @@ function knight_rec_defs()
     return [
         ["WINS", "clears / attempts"],
         ["BEST", "fastest win (battle only)"],
-        ["LOW DMG", "least HP lost in a win"],
+        ["DMG", "least HP lost in a win"],
         ["STREAK", "no-hit wins in a row"],
         ["LEFT", "fights you left early"],
-        ["", "Normal, Rules, No-Hit and Practice runs are kept apart. Joke fights and random parties are not recorded."]
+        ["", "Each kind of run is kept apart. Joke fights and random parties are not recorded."]
     ];
 }
 
@@ -1905,7 +1946,7 @@ function knight_credit_entry(_i)
     }
     if (_i == knight_count() + 1)
         return { title: "MUSIC", credits: knight_credit_music(), song: "" };
-    return { title: kdr_on() ? "DRBR" : "KNIGHT HUB", credits: global.knight_hub_credits, song: "" };
+    return { title: kdr_on() ? "DRBR" : "KNIGHT HUB", credits: global.knight_hub_credits, song: "", ver: true };
 }
 
 // build 50: every song of the FIGHT SONG list, one by one: its title, its artist, its credits, where it is from
@@ -1944,17 +1985,104 @@ function knight_credit_lines(_i)
         array_push(_l, ["h", "Music", ""]);
         array_push(_l, ["n", _e.song, ""]);
     }
+    // DRBR 1.0.1: which build this is (it was small print under the menu)
+    if (variable_struct_exists(_e, "ver"))
+    {
+        array_push(_l, ["h", "Version", ""]);
+        array_push(_l, ["n", knight_build_stamp_short(), string_replace(string_replace(knight_build_stamp(), "DRBR - " + knight_build_stamp_short() + " - ", ""), "KNIGHT HUB V2 - " + knight_build_stamp_short() + " - ", "")]);
+    }
     return _l;
+}
+
+// DRBR 1.0.1: the lines as the page shows them, in the menu's size: a heading; a name with its role on one line when both fit
+// (500 px); else the name, then its role under it (wrapped, "r" lines)
+function knight_credit_rows(_i)
+{
+    // (the same every frame: made once per entry - 1.0.1 optimization, they were measured and wrapped three times a frame)
+    if (!variable_global_exists("knight_cr_c") || !is_array(global.knight_cr_c))
+        global.knight_cr_c = [];
+    if (_i >= 0 && _i < array_length(global.knight_cr_c) && is_array(global.knight_cr_c[_i]))
+        return global.knight_cr_c[_i];
+    var _o = knight_credit_rows_now(_i);
+    if (_i >= 0)
+        global.knight_cr_c[_i] = _o;
+    return _o;
+}
+
+function knight_credit_rows_now(_i)
+{
+    var _l = knight_credit_lines(_i);
+    var _o = [];
+    scr_84_set_draw_font("mainbig");
+    for (var _k = 0; _k < array_length(_l); _k++)
+    {
+        var _ln = _l[_k];
+        if (_ln[0] == "n" && _ln[2] != "" && string_width(_ln[1] + "  -  " + _ln[2]) <= 500)
+        {
+            array_push(_o, _ln);
+            continue;
+        }
+        // (every row fits the box: a long name, heading or role is wrapped - a web address too, at its slashes)
+        var _w = knight_wrap_hard((_ln[0] == "h") ? string_upper(_ln[1]) : _ln[1], 500);
+        for (var _j = 0; _j < array_length(_w); _j++)
+            array_push(_o, [(_ln[0] == "h") ? "h" : ((_j == 0) ? _ln[0] : "c"), _w[_j], ""]);
+        if (_ln[0] == "n" && _ln[2] != "")
+        {
+            _w = knight_wrap_hard(_ln[2], 500);
+            for (var _j = 0; _j < array_length(_w); _j++)
+                array_push(_o, ["r", _w[_j], ""]);
+        }
+    }
+    return _o;
+}
+
+// DRBR 1.0.1: wrapped to _w (the menu's font), and a word still too long for it (a web address) cut where it can be read: after
+// a "/" or before a "-" or "_", else where it reaches the edge
+function knight_wrap_hard(_s, _w)
+{
+    var _l = knight_wrap(_s, _w);
+    var _o = [];
+    scr_84_set_draw_font("mainbig");
+    for (var _i = 0; _i < array_length(_l); _i++)
+    {
+        var _r = _l[_i];
+        while (string_width(_r) > _w && string_length(_r) > 1)
+        {
+            // the longest start that fits, then back to a "/" / "-" / "_" in it
+            var _n = 1;
+            while (_n < string_length(_r) && string_width(string_copy(_r, 1, _n + 1)) <= _w)
+                _n++;
+            var _cut = _n;
+            for (var _j = _n; _j > max(1, floor(_n / 2)); _j--)
+            {
+                var _ch = string_char_at(_r, _j);
+                if (_ch == "/")
+                {
+                    _cut = _j;
+                    break;
+                }
+                if ((_ch == "-" || _ch == "_") && _j > 1)
+                {
+                    _cut = _j - 1;
+                    break;
+                }
+            }
+            array_push(_o, string_copy(_r, 1, _cut));
+            _r = string_delete(_r, 1, _cut);
+        }
+        array_push(_o, _r);
+    }
+    return _o;
 }
 
 function knight_credit_per_page()
 {
-    return 13;
+    return 8;
 }
 
 function knight_credit_pages(_i)
 {
-    return max(1, ceil(array_length(knight_credit_lines(_i)) / knight_credit_per_page()));
+    return max(1, ceil(array_length(knight_credit_rows(_i)) / knight_credit_per_page()));
 }
 
 // ---------- build 48: the song list (FIGHT SONG offline, MUSIC online) ----------
@@ -1971,10 +2099,10 @@ function knight_songpick_list(_from)
         var _s = global.knight_songs[_i];
         var _t = string_upper(_s.name);
         if (_i == 0)
-            _t = (_from == "onl") ? "THE KNIGHTS' OWN" : "MOD DEFAULT";
+            _t = (_from == "onl") ? "DEFAULT" : "MOD DEFAULT";
         var _by = _s.by;
         if (_i == 0)
-            _by = "each knight's own song";
+            _by = (_from == "onl") ? "each boss's own music" : "each knight's own song";
         else if (_s.file == "@random")
             _by = (knight_song_on_count() > 0) ? "a new one every fight" : "NO SONGS SELECTED";
         array_push(_l, [_i, _t, _by, _s.file]);
@@ -1997,6 +2125,7 @@ function knight_songpick_cur(_from)
 
 function knight_songpick_open(_from)
 {
+    knight_music_cache_clear();
     var _l = knight_songpick_list(_from);
     var _cur = knight_songpick_cur(_from);
     var _sel = 0;
@@ -2011,7 +2140,7 @@ function knight_songpick_open(_from)
     return _m;
 }
 
-#macro KNIGHT_SONGPICK_ROWS 10
+#macro KNIGHT_SONGPICK_ROWS 8
 
 function knight_songpick_step(_m, _up, _down, _left, _right, _ok, _back)
 {
@@ -2086,6 +2215,7 @@ function knight_songpick_step(_m, _up, _down, _left, _right, _ok, _back)
 
 function knight_songpick_draw(xx, yy, _m)
 {
+    // DRBR 1.0.1: every line in the menu's size (8 songs a page; the song you have is green; the keys on two lines at the bottom)
     var _d = _m.data;
     var _l = knight_songpick_list(_d.from);
     var _n = array_length(_l);
@@ -2101,55 +2231,49 @@ function knight_songpick_draw(xx, yy, _m)
     scr_darkbox_black(_x0, _y0, _x1, _y1);
     draw_set_halign(fa_center);
     draw_set_color(c_white);
-    knight_txt(xx + 320, _y0 + 20, _m.title);
+    knight_txt(xx + 320, _y0 + 16, _m.title);
     draw_set_color(c_gray);
-    knight_txt_small(xx + 320, _y0 + 50, string(_d.sel + 1) + " / " + string(_n));
+    knight_txt(xx + 320, _y0 + 50, string(_d.sel + 1) + " / " + string(_n));
     draw_set_halign(fa_left);
-    knight_txt_small(_x0 + 54, _y0 + 50, "SONG");
+    knight_txt(_x0 + 60, _y0 + 50, "SONG");
     draw_set_halign(fa_right);
-    knight_txt_small(_x1 - 26, _y0 + 50, "ARTIST");
+    knight_txt(_x1 - 26, _y0 + 50, "ARTIST");
     draw_set_halign(fa_left);
-    var _ry = _y0 + 72;
+    var _ry = _y0 + 86;
     for (var _i = _d.scroll; _i < _n && _i < _d.scroll + KNIGHT_SONGPICK_ROWS; _i++)
     {
         var _e = _l[_i];
         var _y = _ry + ((_i - _d.scroll) * 30);
         var _hot = (_i == _d.sel);
         var _miss = (_e[3] != "" && !knight_music_exists(_e[3]));
-        draw_set_color(_miss ? c_gray : (_hot ? c_yellow : c_white));
-        // (the menu's big text, as you asked; the artist in the small text on the right)
-        knight_txt(_x0 + 54, _y, knight_fit(_e[1], 330));
+        draw_set_color(_miss ? c_gray : (_hot ? c_yellow : ((_e[0] == _cur) ? c_lime : c_white)));
+        knight_txt(_x0 + 60, _y, knight_fit(_e[1], 286));
         draw_set_halign(fa_right);
         draw_set_color(_miss ? c_dkgray : (_hot ? c_yellow : c_ltgray));
-        knight_txt_small(_x1 - 26, _y + 6, knight_fit_small(_miss ? "NOT FOUND" : _e[2], 150));
+        knight_txt(_x1 - 26, _y, knight_fit(_miss ? "NOT FOUND" : _e[2], 170));
         draw_set_halign(fa_left);
-        if (_e[0] == _cur)
-        {
-            draw_set_color(c_lime);
-            knight_txt_small(_x0 + 22, _y + 6, "*");
-        }
         if (_hot)
-            knight_heart(_x0 + 30, _y + 6);
+            knight_heart(_x0 + 40, _y + 8);
         // build 50: in RANDOM (+) or turned off (-)
         if (_e[0] >= 0 && knight_song_real(_e[0]))
         {
             var _in = knight_song_on(_e[0]);
             draw_set_color(_in ? c_lime : c_red);
-            knight_txt_small(_x0 + 8, _y + 6, _in ? "+" : "-");
+            knight_txt(_x0 + 22, _y, _in ? "+" : "-");
         }
     }
-    // more above / below
-    draw_set_color(c_gray);
+    // more above / below: the game's arrows
+    knight_ui_arrows(xx + 320, _ry - 10, _ry + (KNIGHT_SONGPICK_ROWS * 30) - 2, _d.scroll > 0, _d.scroll + KNIGHT_SONGPICK_ROWS < _n, global.knight_ui.siner);
     draw_set_halign(fa_center);
-    if (_d.scroll > 0)
-        knight_txt_small(xx + 320, _ry - 18, "^");
-    if (_d.scroll + KNIGHT_SONGPICK_ROWS < _n)
-        knight_txt_small(xx + 320, _ry + (KNIGHT_SONGPICK_ROWS * 30) - 4, "v");
-    var _foot = "Z: PICK   C: " + (knight_preview_playing() ? "STOP" : "LISTEN") + "   A: IN RANDOM +/-   X: BACK   < >: PAGE";
-    if (_d.msg != "")
-        _foot = _d.msg;
     draw_set_color(c_white);
-    knight_txt_small(xx + 320, _y1 - 26, knight_fit_small(_foot, 520));
+    if (_d.msg != "")
+        knight_para_fit(xx + 320, _y1 - 76, _d.msg, 520, 2);
+    else
+    {
+        knight_txt(xx + 320, _y1 - 76, "Z: PICK   C: " + (knight_preview_playing() ? "STOP" : "LISTEN") + "   X: BACK");
+        draw_set_color(c_gray);
+        knight_txt(xx + 320, _y1 - 46, "A: IN RANDOM + / -   < >: PAGE");
+    }
     draw_set_halign(fa_left);
     return 1;
 }

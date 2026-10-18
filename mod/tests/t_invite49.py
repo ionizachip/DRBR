@@ -6,7 +6,7 @@ import sys, json
 sys.path.insert(0, '/home/claude/work/uiref')
 sys.path.insert(0, '/home/claude/work/tests')
 SRC = open('/home/claude/work/tests/t_online_ui47.py').read()
-exec(SRC[:SRC.index('# ---------------------------------------------------------------- KNIGHT tab with ONLINE')])
+exec(SRC[:SRC.index('# ---------------------------------------------------------------- KNIGHT tab')])
 FR = ['76561|1|1|Susie', '2002|1|0|Ralsei', '2003|3|0|WWWWWWWWWWWWWWWWWWWW', '2004|0|0|Noelle']
 for i in range(20):
     FR.append('%d|0|0|Friend%d' % (3000 + i, i))

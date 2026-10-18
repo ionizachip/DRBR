@@ -33,7 +33,7 @@ function kbr_enc_defs()
           tt: [240, 240, 240, 240, 240, 300, 240, 240, 240, 270, 240, 240, 240, 330, 240, 1500],
           cond: [2, 0, 2, 5, 0, 2, 0, 0, 0, 2, 0, 5, 2, 2, 0, 5],
           inv: [60, 60, 60, 60, 20, 60, 60, 60, 20, 60, 60, 60, 60, 60, 60, 60],
-          line: ["CHAOS, CHAOS,&CATCH ME&IF YOU CAN!", "SHALL WE&PLAY THE&RING-AROUND?", "MY HEARTS GO&OUT TO ALL&YOU SINNERS!",
+          line: ["CHAOS, CHAOS,&&CATCH ME&IF YOU CAN!", "SHALL WE&PLAY THE&RING-AROUND?", "MY HEARTS GO&OUT TO ALL&YOU SINNERS!",
                  "HA, HA, LET'S&MAKE THE&DEVILSKNIFE.", "PIIP PIIP,&LET'S RIDE THE&CAROUSEL GAME.", "HEE HEE,&HAVING FUN!?&JOIN THE&CLUB!",
                  "HEARTS,&DIAMONDS,&I CAN DO&ANYTHING!", "WHO KEEPS&SPINNING THE&WORLD&AROUND?", "YOU KIDS ARE&REALLY&KEEPING UP!",
                  "NU-HA!!&I NEVER HAD&SUCH FUN,&FUN!!", "A BEAUTY IS&JOYING IN&MY HEART!", "EVEN&DEVILSKNIFE&IS SMILING!",
@@ -316,30 +316,20 @@ function kbr_jv_say(_d, _ai)
     return 1;
 }
 
-// his speech balloon (white, beside him, Chapter 1's & line breaks)
+// his speech balloon (Chapter 1's & line breaks; DRBR's balloon, VIEW > BOSS LINES)
 function kbr_jv_draw()
 {
     if (!kbr_on() || say_t <= 0 || say == "")
         return 0;
-    var _l = string_split(say, "&");
-    var _a = clamp(say_t / 10, 0, 1);
-    draw_set_font(fnt_main);
-    var _w = 0;
-    for (var _i = 0; _i < array_length(_l); _i++)
-        _w = max(_w, string_width(_l[_i]));
-    var _h = array_length(_l) * 16;
-    var _x1 = x - _w - 34;
-    var _y1 = y - 4;
-    draw_set_alpha(_a);
-    draw_set_color(c_white);
-    draw_rectangle(_x1 - 8, _y1 - 6, _x1 + _w + 8, _y1 + _h + 6, false);
-    draw_triangle(_x1 + _w + 8, _y1 + 6, _x1 + _w + 8, _y1 + 18, _x1 + _w + 20, _y1 + 12, false);
-    draw_set_color(c_black);
-    for (var _i = 0; _i < array_length(_l); _i++)
-        draw_text(_x1, _y1 + (_i * 16), _l[_i]);
-    draw_set_alpha(1);
-    draw_set_color(c_white);
-    return 1;
+    // (where his body is drawn: obj_jv_body, its x + 20, y + 18 at 2x)
+    var _bx = x;
+    var _by = y;
+    if (variable_instance_exists(id, "body") && instance_exists(body))
+    {
+        _bx = body.x;
+        _by = body.y;
+    }
+    return kbr_enc_say(_bx - 22, _by - 22, _bx + 62, _by + 60, say, clamp(say_t / 10, 0, 1));
 }
 
 // ---------- the background: on while Jevil is out; the knights' arena hidden meanwhile ----------
@@ -354,44 +344,10 @@ function kbr_jv_bg_step()
 }
 
 // ---------- the music: THE WORLD REVOLVING while he is out, the match's song after ----------
+// (1.0.1: kbr_enc_music does it, as for every boss - two handlers queued two songs when he came on after another boss)
 function kbr_jv_music()
 {
-    var _M = kbr_match();
-    if (is_undefined(_M))
-        return 0;
-    if (!variable_struct_exists(_M, "jvmus"))
-    {
-        _M.jvmus = false;
-        _M.jvmus_old = "";
-    }
-    var _on = kbr_jv_on();
-    if (_on == _M.jvmus || !knight_mus_ok())
-        return 0;
-    var _f = kbr_enc_def0().music;
-    if (_on)
-    {
-        if (!knight_music_exists(_f))
-        {
-            _M.jvmus = true;
-            return 0;
-        }
-        _M.jvmus = true;
-        _M.jvmus_old = knight_mus_cur_file();
-        var _old = global.batmusic[0];
-        knight_mus_cut_ext(15, true);
-        array_push(global.knight_mus_q, { k: "song", file: _f, old: _old, fin: 30, t: 16 });
-    }
-    else
-    {
-        _M.jvmus = false;
-        var _back = _M.jvmus_old;
-        if (_back == "" || !knight_music_exists(_back) || _back == _f)
-            return 0;
-        var _old2 = global.batmusic[0];
-        knight_mus_cut_ext(15, true);
-        array_push(global.knight_mus_q, { k: "song", file: _back, old: _old2, fin: 30, t: 16 });
-    }
-    return 1;
+    return 0;
 }
 
 // ---------- his attacks' pieces: the SOUL's extra speed, the bots' box, clean-up ----------

@@ -472,11 +472,11 @@ function kfo_world_box(xx, yy)
     draw_set_color(c_white);
     draw_rectangle(xx + 6, yy + 6, xx + 6 + _w, yy + 62, true);
     draw_set_color(c_yellow);
-    knight_txt_small(xx + 12, yy + 10, _l1);
+    knight_txt_tiny(xx + 12, yy + 10, _l1);
     draw_set_color(c_white);
-    knight_txt_small(xx + 12, yy + 26, _l2);
+    knight_txt_tiny(xx + 12, yy + 26, _l2);
     draw_set_color(c_ltgray);
-    knight_txt_small(xx + 12, yy + 42, _l3);
+    knight_txt_tiny(xx + 12, yy + 42, _l3);
     kfo_net_light(xx + _w - 8, yy + 14);
     return 1;
 }

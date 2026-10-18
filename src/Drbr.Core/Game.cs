@@ -37,6 +37,7 @@ namespace Drbr
         public string LockFile { get { return Path.Combine(Root, "drbr-transaction.json"); } }
         public string LauncherExe { get { return Path.Combine(Root, "DRBR Launcher.exe"); } }
         public string UpdaterExe { get { return Path.Combine(Root, "DRBR Updater.exe"); } }
+        public string PendingLauncher { get { return Path.Combine(StagingDir, "pending", "DRBR Launcher.exe"); } }   // waits for DRBR Updater
         public string Xdelta { get { return Path.Combine(Root, "tools", "xdelta3.exe"); } }
         public string SaveProfileDir { get { return Path.Combine(Root, "save-profile"); } }   // the launcher's own copy of the template + profile.json
         public string LiveProfile { get { return Path.Combine(SaveArea, "drbr_profile"); } }  // what the game writes in DRBR mode

@@ -261,9 +261,14 @@ function kfo_ui_boss_keys()
 {
     var _k = kfo_ui_boss_hot();
     var _l1 = "Z: PRACTICE AGAINST IT ALONE";
+    // (DRBR 1.0.1: [2] the page's own short line, in the menu's size)
+    var _s = "Z: PRACTICE";
     if (kfo_in_room())
+    {
         _l1 = kfo_is_host() ? (kfo_boss_in_room(_k) ? "Z: TAKE IT OUT OF THE ROOM" : "Z: PUT IT IN THE ROOM") : "THE HOST PICKS THE ROOM'S BOSSES";
-    return [_l1, "< >: KNIGHTS / BOSSES   X: BACK"];
+        _s = kfo_is_host() ? (kfo_boss_in_room(_k) ? "Z: TAKE IT OUT" : "Z: PUT IT IN") : "HOST PICKS THEM";
+    }
+    return [_l1, "< >: KNIGHTS / BOSSES   X: BACK", _s];
 }
 
 function kfo_ui_draw_boss(xx, yy)
@@ -279,23 +284,24 @@ function kfo_ui_draw_boss(xx, yy)
     var _tx = xx + 84;
     for (var _i = 0; _i < array_length(_cats); _i++)
     {
-        var _t = _cats[_i][1] + " (" + string(array_length(kfo_boss_cat_list(_i))) + ")";
-        scr_84_set_draw_font("main");
+        // (DRBR 1.0.1: in the menu's size - the group's name only, the list under it shows how many)
+        var _t = _cats[_i][1];
+        scr_84_set_draw_font("mainbig");
         var _tw = string_width(_t);
         draw_set_color((_i == _ci) ? c_yellow : c_gray);
-        knight_txt_small(_tx, yy + 100, _t);
+        knight_txt(_tx, yy + 94, _t);
         if (_i == _ci)
-            draw_rectangle(_tx, yy + 116, _tx + _tw - 1, yy + 117, false);
-        _tx += _tw + 14;
+            draw_rectangle(_tx, yy + 120, _tx + _tw - 1, yy + 121, false);
+        _tx += _tw + 18;
     }
     // its bosses: the name (the knights by their short names), the SOUL it gives you at the end of the row; in a room the ones
     // it fights are white, the others grey
     var _sel = clamp(_u.bs_i, 0, max(0, array_length(_l) - 1));
     var _inr = kfo_in_room();
-    for (var _i = 0; _i < array_length(_l) && _i < 8; _i++)
+    for (var _i = 0; _i < array_length(_l) && _i < 7; _i++)
     {
         var _k = _l[_i];
-        var _y = yy + 126 + (_i * 34);
+        var _y = yy + 130 + (_i * 34);
         var _hot = (_i == _sel);
         var _rd = kfo_boss_ready(_k);
         var _on = !_inr || kfo_boss_in_room(_k);
@@ -309,13 +315,15 @@ function kfo_ui_draw_boss(xx, yy)
         if (_hot)
             knight_heart(xx + 66, _y + 8);
     }
-    // the keys
-    var _ky = kfo_ui_boss_keys();
-    draw_set_halign(fa_center);
-    draw_set_color(c_gray);
-    knight_txt_small(xx + 185, yy + 360, knight_fit_small(_ky[0], 228));
-    knight_txt_small(xx + 185, yy + 376, knight_fit_small(_ky[1], 228));
-    draw_set_halign(fa_left);
+    // what Z does (the keys between the groups are in the top bar's text)
+    if (array_length(_l) <= 7)
+    {
+        var _ky = kfo_ui_boss_keys();
+        draw_set_halign(fa_center);
+        draw_set_color(c_gray);
+        knight_txt(xx + 185, yy + 376, knight_fit(_ky[2], 228));
+        draw_set_halign(fa_left);
+    }
     if (array_length(_l) > 0)
         kfo_ui_boss_card(_l[_sel], xx, yy);
     draw_set_color(c_white);
@@ -324,10 +332,12 @@ function kfo_ui_draw_boss(xx, yy)
 // the card of boss _k, right of the list
 function kfo_ui_boss_card(_k, xx, yy)
 {
+    // DRBR 1.0.1: every line in the menu's size - its name and what it is, its look, then its SOUL, its sends, its attacks, and
+    // whether it is in the room (in a room) or who made it / its music
     var _bx = xx + 330;
-    var _by = yy + 100;
+    var _by = yy + 98;
     var _bw = 238;
-    var _bh = 300;
+    var _bh = 308;
     var _col = kbr_ok_color(_k);
     draw_set_color(c_black);
     draw_rectangle(_bx, _by, _bx + _bw, _by + _bh, false);
@@ -335,11 +345,11 @@ function kfo_ui_boss_card(_k, xx, yy)
     draw_rectangle(_bx, _by, _bx + _bw, _by + _bh, true);
     var _cx = _bx + (_bw / 2);
     draw_set_halign(fa_center);
-    knight_txt(_cx, _by + 8, knight_fit(string_upper(kbr_ok_name(_k)), _bw - 16));
+    knight_txt(_cx, _by + 6, knight_fit(string_upper(kbr_ok_name(_k)), _bw - 16));
     draw_set_color(c_ltgray);
-    knight_txt_small(_cx, _by + 36, knight_fit_small(kfo_boss_what(_k), _bw - 12));
+    knight_txt(_cx, _by + 34, knight_fit(string_replace(string_replace(kfo_boss_what(_k), "CHAPTER ", "CH "), " - ", " "), _bw - 12));
     var _rd = kfo_boss_ready(_k);
-    // its look: the whole sprite at the largest whole scale that fits 212 x 136 (half size for a big one); the Knightmare is the
+    // its look: the whole sprite at the largest whole scale that fits 212 x 110 (half size for a big one); the Knightmare is the
     // Normal Knight's look in its own red
     var _s = _rd ? kfo_boss_look(_k) : -1;
     if (_s >= 0)
@@ -348,58 +358,52 @@ function kfo_ui_boss_card(_k, xx, yy)
         var _r = sprite_get_bbox_right(_s) + 1;
         var _t = sprite_get_bbox_top(_s);
         var _b = sprite_get_bbox_bottom(_s) + 1;
-        var _sc = clamp(floor(min(212 / max(1, _r - _l), 136 / max(1, _b - _t))), 1, 3);
-        if ((_r - _l) > 212 || (_b - _t) > 136)
+        var _sc = clamp(floor(min(212 / max(1, _r - _l), 110 / max(1, _b - _t))), 1, 3);
+        if ((_r - _l) > 212 || (_b - _t) > 110)
             _sc = 0.5;
         var _fr = floor(((current_time - (variable_struct_exists(global.knight_ui, "bs_t0") ? global.knight_ui.bs_t0 : 0)) / 1000) * 6) mod max(1, sprite_get_number(_s));
         var _mx = ((_l + _r) / 2) - sprite_get_xoffset(_s);
         var _my = ((_t + _b) / 2) - sprite_get_yoffset(_s);
-        draw_sprite_ext(_s, _fr, round(_cx - (_mx * _sc)), round((_by + 120) - (_my * _sc)), _sc, _sc, 0, kbr_ok_row(_k).nm ? _col : c_white, 1);
+        draw_sprite_ext(_s, _fr, round(_cx - (_mx * _sc)), round((_by + 124) - (_my * _sc)), _sc, _sc, 0, kbr_ok_row(_k).nm ? _col : c_white, 1);
     }
     else
     {
         draw_set_color(make_color_rgb(255, 150, 120));
-        knight_txt_small(_cx, _by + 112, "MISSING ART");
+        knight_txt(_cx, _by + 112, "MISSING ART");
     }
     draw_set_halign(fa_left);
     draw_set_color(c_dkgray);
-    draw_line(_bx + 12, _by + 190, _bx + _bw - 12, _by + 190);
-    // what it means for you: its SOUL (and what that SOUL does), its sends, its attacks, its music
+    draw_line(_bx + 12, _by + 182, _bx + _bw - 12, _by + 182);
+    // what it means for you: its SOUL (what that SOUL does is in the top bar), its sends, its attacks
     var _x0 = _bx + 14;
-    var _y0 = _by + 198;
+    var _y0 = _by + 188;
     var _sm = kfo_boss_soul(_k);
     if (_sm == "yellow")
-        kfo_soul_draw_up(_x0, _y0, 1, kfo_boss_soul_col(_sm), 1, c_black);
+        kfo_soul_draw_up(_x0, _y0 + 6, 1, kfo_boss_soul_col(_sm), 1, c_black);
     else
-        kfo_soul_draw(_x0, _y0, 1, kfo_boss_soul_col(_sm), 1, c_black);
+        kfo_soul_draw(_x0, _y0 + 6, 1, kfo_boss_soul_col(_sm), 1, c_black);
     draw_set_color(kfo_boss_soul_col(_sm));
-    knight_txt_small(_x0 + 24, _y0 + 1, string_upper(_sm) + " SOUL");
-    var _hint = kbr_soul_hint_text(_sm);
-    draw_set_color(c_ltgray);
-    knight_txt_small(_x0, _y0 + 20, knight_fit_small((_hint != "") ? _hint : "ARROWS MOVE, X SLOWS - DODGE!", _bw - 28));
+    knight_txt(_x0 + 26, _y0, string_upper(_sm) + " SOUL");
     var _sn = kfo_boss_sends(_k);
     draw_set_color(c_white);
-    knight_txt_small(_x0, _y0 + 40, knight_fit_small("SENDS: " + string_upper(_sn[0]) + " (" + string(_sn[1]) + ")", _bw - 28));
-    knight_txt_small(_x0, _y0 + 56, knight_fit_small(string(kfo_boss_natk(_k)) + " ATTACKS", _bw - 28));
-    var _song = kfo_boss_song(_k);
-    if (_song != "")
-    {
-        draw_set_color(c_gray);
-        knight_txt_small(_x0, _y0 + 72, knight_fit_small("MUSIC: " + _song, _bw - 28));
-    }
-    var _au = kfo_boss_author(_k);
-    if (_au != "")
-    {
-        draw_set_color(c_gray);
-        knight_txt_small(_x0, _y0 + 88, knight_fit_small("MOD BY " + string_upper(_au), _bw - 28));
-    }
-    // in a room: whether it fights there (the room's SETTINGS > BOSSES)
+    knight_txt_fit(_x0, _y0 + 28, string(_sn[1]) + " " + string_upper(_sn[0]) + " SENDS", _bw - 28);
+    knight_txt(_x0, _y0 + 56, knight_fit(string(kfo_boss_natk(_k)) + " ATTACKS", _bw - 28));
+    // in a room: whether it fights there (the room's SETTINGS > BOSSES); else who made it, or its music
+    var _last = "";
+    var _lc = c_gray;
     if (kfo_in_room())
     {
-        draw_set_halign(fa_right);
-        draw_set_color(kfo_boss_in_room(_k) ? c_lime : c_gray);
-        knight_txt_small(_bx + _bw - 10, _y0 + 1, kfo_boss_in_room(_k) ? "IN THIS ROOM" : "NOT IN THIS ROOM");
-        draw_set_halign(fa_left);
+        _last = kfo_boss_in_room(_k) ? "IN THIS ROOM" : "NOT IN THIS ROOM";
+        _lc = kfo_boss_in_room(_k) ? c_lime : c_gray;
+    }
+    else if (kfo_boss_author(_k) != "")
+        _last = "BY " + string_upper(kfo_boss_author(_k));
+    else if (kfo_boss_song(_k) != "")
+        _last = "MUSIC: " + string_upper(kfo_boss_song(_k));
+    if (_last != "")
+    {
+        draw_set_color(_lc);
+        knight_txt_fit(_x0, _y0 + 84, _last, _bw - 28);
     }
     return 1;
 }
@@ -408,30 +412,20 @@ function kfo_ui_boss_card(_k, xx, yy)
 // alignment is left centred, as the page had it)
 function kfo_ui_boss_teaser(_cx, _y)
 {
+    // DRBR 1.0.1: in the menu's size - how many, the bosses' names (each in its colour, two to a line), what Z shows
     draw_set_halign(fa_center);
-    draw_set_color(c_gray);
-    knight_txt_small(_cx, _y, "WHO YOU CAN FIGHT");
     var _l0 = kfo_boss_cat_list(0);
     var _l1 = kfo_boss_cat_list(1);
     draw_set_color(c_white);
-    knight_txt_small(_cx, _y + 18, string(array_length(_l0)) + " KNIGHTS AND " + string(array_length(_l1)) + " BOSSES");
-    // the bosses' names, two lines, each in its colour
-    var _w = 0;
-    scr_84_set_draw_font("main");
-    for (var _i = 0; _i < array_length(_l1); _i++)
-        _w += string_width(kbr_ok_short(_l1[_i])) + ((_i > 0) ? 10 : 0);
-    var _x = _cx - (_w / 2);
-    draw_set_halign(fa_left);
+    knight_txt(_cx, _y, string(array_length(_l0)) + " KNIGHTS, " + string(array_length(_l1)) + " BOSSES");
     for (var _i = 0; _i < array_length(_l1); _i++)
     {
-        var _t = kbr_ok_short(_l1[_i]);
         draw_set_color(kfo_boss_ready(_l1[_i]) ? kbr_ok_color(_l1[_i]) : c_dkgray);
-        knight_txt_small(_x, _y + 38, _t);
-        _x += string_width(_t) + 10;
+        var _nx = (_i == array_length(_l1) - 1 && (_i mod 2) == 0) ? _cx : (_cx + (((_i mod 2) == 0) ? -66 : 66));
+        knight_txt(_nx, _y + 32 + ((_i div 2) * 28), knight_fit(kbr_ok_short(_l1[_i]), 128));
     }
-    draw_set_halign(fa_center);
     draw_set_color(c_gray);
-    knight_txt_small(_cx, _y + 58, "Z: EACH ONE'S SOUL AND SENDS");
+    knight_txt(_cx, _y + 32 + (ceil(array_length(_l1) / 2) * 28) + 6, "Z: THEIR SOULS");
     // (left centred: the ONLINE page goes on drawing centred under it)
     return 1;
 }

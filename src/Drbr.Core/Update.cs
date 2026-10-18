@@ -19,6 +19,7 @@ namespace Drbr
         public bool LauncherTooOld;      // this launcher is older than the release's min_launcher_version
         public bool ProtocolChanged;     // online play needs the update (the other players will have it)
         public string Url;
+        public string PackageUrl;        // a release that is one DRBR.zip: the files are downloaded from inside it
     }
 
     public sealed class UpdateEngine
@@ -40,19 +41,68 @@ namespace Drbr
             return BuildInfo.UpdatesConfigured ? BuildInfo.UpdateManifestUrl : null;
         }
 
-        /// <summary>Downloads update-manifest.json and its .sig, checks the signature, compares versions.</summary>
+        /// <summary>A release that is one file (DRBR.zip): the update address names a .zip.</summary>
+        public static bool IsPackageUrl(string url)
+        {
+            if (string.IsNullOrEmpty(url)) return false;
+            string u = url.Split('?')[0];
+            return u.EndsWith(".zip", StringComparison.OrdinalIgnoreCase);
+        }
+
+        /// <summary>Reads the release's manifest and its signature (from the end of DRBR.zip, or update-manifest.json and its
+        /// .sig), checks the signature, compares versions.</summary>
         public UpdateInfo Check(string installedVersion, int installedProtocol)
         {
             if (string.IsNullOrEmpty(ManifestUrl)) throw new DrbrException("updates_off", "Update checks are not set up in this DRBR build (no GitHub repository yet).");
-            byte[] mb = Http.GetBytes(ManifestUrl, 4 * 1048576);
-            byte[] sb = Http.GetBytes(ManifestUrl + ".sig", 64 * 1024);
-            if (!Signature.Verify(mb, Encoding.ASCII.GetString(sb)))
+            byte[] mb;
+            string sig;
+            string packageUrl = null;
+            if (IsPackageUrl(ManifestUrl))
+            {
+                // DRBR.zip: only its end is read (the zip's directory, the manifest and the signature are the last entries)
+                HttpRangeSource src = new HttpRangeSource(ManifestUrl);
+                DrbrPackage pkg;
+                if (src.Ranges) pkg = DrbrPackage.Open(src);
+                else
+                {
+                    string whole = Path.Combine(P.StagingDir, "check-" + Guid.NewGuid().ToString("N") + ".zip");
+                    Directory.CreateDirectory(P.StagingDir);
+                    try
+                    {
+                        Http.DownloadWhole(ManifestUrl, whole, src.Length, null);
+                        using (FileSource fs = new FileSource(whole))
+                        {
+                            DrbrPackage p2 = DrbrPackage.Open(fs);
+                            mb = p2.ManifestBytes();
+                            sig = p2.SignatureText();
+                        }
+                    }
+                    finally { try { File.Delete(whole); } catch { } }
+                    pkg = null;
+                    goto verify;
+                }
+                mb = pkg.ManifestBytes();
+                sig = pkg.SignatureText();
+            }
+            else
+            {
+                mb = Http.GetBytes(ManifestUrl, 4 * 1048576);
+                sig = Encoding.ASCII.GetString(Http.GetBytes(ManifestUrl + ".sig", 64 * 1024));
+            }
+        verify:
+            if (!Signature.Verify(mb, sig))
             {
                 Log.Error("Update manifest REJECTED: its signature is not DRBR's (" + ManifestUrl + ").");
                 throw new DrbrException("bad_signature", "The update information is not signed by DRBR's release key, so it was refused. Nothing was downloaded or changed.");
             }
             Manifest m = Manifest.Parse(Encoding.UTF8.GetString(mb));
-            UpdateInfo u = new UpdateInfo { Manifest = m, ManifestBytes = mb, Installed = installedVersion, Url = ManifestUrl };
+            if (IsPackageUrl(ManifestUrl))
+            {
+                // the files come from this exact release's DRBR.zip (its own address - not "latest", which could move on meanwhile)
+                string b = m.BaseUrl;
+                packageUrl = string.IsNullOrEmpty(b) ? ManifestUrl : (b.EndsWith("/") ? b : b + "/") + Uri.EscapeDataString(m.PackageName);
+            }
+            UpdateInfo u = new UpdateInfo { Manifest = m, ManifestBytes = mb, Installed = installedVersion, Url = ManifestUrl, PackageUrl = packageUrl };
             u.Available = installedVersion == null || Ver.IsNewer(m.Version, installedVersion);
             u.LauncherNewer = Ver.IsNewer(m.LauncherVersion, BuildInfo.Version);
             u.LauncherTooOld = Ver.IsNewer(m.MinLauncherVersion, BuildInfo.Version);
@@ -104,20 +154,86 @@ namespace Drbr
                 todo.Add(f);
                 total += f.Size;
             }
-            foreach (PayloadFile f in todo)
+            if (u.PackageUrl != null && todo.Count > 0)
+                DownloadFromPackage(u, todo, dir, total, progress);
+            else
             {
-                string dst = Path.Combine(dir, f.File);
-                long before = done;
-                Http.Download(baseUrl + Uri.EscapeDataString(f.File), dst, f.Size, f.Sha256, (got) =>
+                foreach (PayloadFile f in todo)
                 {
-                    if (progress != null && total > 0) progress("Downloading " + f.File + " (" + Fs.Mb(before + got) + " of " + Fs.Mb(total) + ")", (int)(100 * (before + got) / total));
-                });
-                done += f.Size;
+                    string dst = Path.Combine(dir, f.File);
+                    long before = done;
+                    Http.Download(baseUrl + Uri.EscapeDataString(f.File), dst, f.Size, f.Sha256, (got) =>
+                    {
+                        if (progress != null && total > 0) progress("Downloading " + f.File + " (" + Fs.Mb(before + got) + " of " + Fs.Mb(total) + ")", (int)(100 * (before + got) / total));
+                    });
+                    done += f.Size;
+                }
             }
             // the signed manifest is the new package's payload.json (the install checks every file against it again)
             File.WriteAllBytes(Path.Combine(dir, "payload.json"), u.ManifestBytes);
             Log.Info("Update " + m.Version + ": " + todo.Count + " file(s) downloaded (" + Fs.Mb(total) + "), the rest reused.");
             return dir;
+        }
+
+        /// <summary>The changed files, from inside the release's DRBR.zip: just their bytes (HTTP ranges, resumed when cut off);
+        /// a DRBR.zip that was compressed again (or a server without ranges) is downloaded whole and unpacked here instead.
+        /// Every file is checked against the signed manifest either way.</summary>
+        void DownloadFromPackage(UpdateInfo u, List<PayloadFile> todo, string dir, long total, Action<string, int> progress)
+        {
+            HttpRangeSource src = new HttpRangeSource(u.PackageUrl);
+            Dictionary<string, PackagedFile> where = null;
+            if (src.Ranges)
+            {
+                DrbrPackage pkg = DrbrPackage.Open(src);
+                // (it has to be the release whose manifest was checked)
+                if (!Hash.Same(Hash.Sha256Bytes(pkg.ManifestBytes()), Hash.Sha256Bytes(u.ManifestBytes)))
+                    throw new DrbrException("bad_download", "The DRBR release changed while it was being read (its manifest differs). Check for updates again.");
+                where = pkg.PayloadFiles(todo.ConvertAll(f => f.File));
+            }
+            if (where != null)
+            {
+                long done = 0;
+                foreach (PayloadFile f in todo)
+                {
+                    PackagedFile pf = where[f.File];
+                    if (pf.Size != f.Size) throw new DrbrException("bad_download", "The DRBR release's " + f.File + " is not the size its manifest says. Nothing was changed.");
+                    long before = done;
+                    Http.DownloadRange(src, pf.Offset, Path.Combine(dir, f.File), f.Size, f.Sha256, (got) =>
+                    {
+                        if (progress != null && total > 0) progress("Downloading " + f.File + " (" + Fs.Mb(before + got) + " of " + Fs.Mb(total) + ")", (int)(100 * (before + got) / total));
+                    });
+                    done += f.Size;
+                }
+                Log.Info("Update: " + todo.Count + " file(s) read from inside " + u.PackageUrl + " (" + src.Requests + " requests).");
+                return;
+            }
+            // the whole release, then its files from it
+            Log.Info("The release " + u.PackageUrl + " cannot be read in parts (" + (src.Ranges ? "it was compressed again" : "no HTTP ranges") + "): downloading it whole.");
+            string whole = Path.Combine(dir, u.Manifest.PackageName + ".whole");
+            Http.DownloadWhole(u.PackageUrl, whole, src.Length, (got) =>
+            {
+                if (progress != null) progress("Downloading " + u.Manifest.PackageName + " (" + Fs.Mb(got) + " of " + Fs.Mb(src.Length) + ")", (int)(100 * got / Math.Max(1, src.Length)));
+            });
+            try
+            {
+                using (FileSource fs = new FileSource(whole))
+                {
+                    DrbrPackage pkg = DrbrPackage.Open(fs);
+                    if (!Hash.Same(Hash.Sha256Bytes(pkg.ManifestBytes()), Hash.Sha256Bytes(u.ManifestBytes)))
+                        throw new DrbrException("bad_download", "The DRBR release changed while it was being read (its manifest differs). Check for updates again.");
+                }
+                DrbrPackage.ExtractPayload(whole, todo.ConvertAll(f => f.File), dir, dir);
+            }
+            finally { try { File.Delete(whole); } catch { } }
+            foreach (PayloadFile f in todo)
+            {
+                string p = Path.Combine(dir, f.File);
+                if (new FileInfo(p).Length != f.Size || !Hash.Same(Hash.Sha256File(p), f.Sha256))
+                {
+                    File.Delete(p);
+                    throw new DrbrException("bad_download", "The download of " + f.File + " was damaged and was refused. Nothing was changed.");
+                }
+            }
         }
     }
 
@@ -125,7 +241,7 @@ namespace Drbr
     {
         public static int TimeoutMs = 60000;
 
-        static HttpWebRequest Req(string url)
+        internal static HttpWebRequest Req(string url)
         {
             HttpWebRequest r = (HttpWebRequest)WebRequest.Create(url);
             r.UserAgent = "DRBR-Launcher/" + BuildInfo.Version;
@@ -157,6 +273,95 @@ namespace Drbr
             {
                 throw new DrbrException("offline", "Could not reach the DRBR update server (" + e.Message + "). You can still play the installed version.", e);
             }
+        }
+
+        /// <summary>Bytes [offset, offset + size) of a release file to dst (via dst.part, resumed when one is there), then checks
+        /// size and SHA-256 - a file that fails is downloaded once more, then refused.</summary>
+        public static void DownloadRange(HttpRangeSource src, long offset, string dst, long size, string sha, Action<long> progress)
+        {
+            string part = dst + ".part";
+            for (int attempt = 0; attempt < 2; attempt++)
+            {
+                long have = File.Exists(part) ? new FileInfo(part).Length : 0;
+                if (have > size) { File.Delete(part); have = 0; }
+                if (have < size)
+                {
+                    try
+                    {
+                        using (HttpWebResponse resp = src.Open(offset + have, size - have))
+                        using (Stream s = resp.GetResponseStream())
+                        using (FileStream fs = new FileStream(part, have > 0 ? FileMode.Append : FileMode.Create, FileAccess.Write))
+                        {
+                            byte[] buf = new byte[1 << 20];
+                            int n;
+                            long got = have;
+                            while ((n = s.Read(buf, 0, buf.Length)) > 0)
+                            {
+                                if (got + n > size) throw new DrbrException("too_big", "The server sent more than expected for " + Path.GetFileName(dst));
+                                fs.Write(buf, 0, n);
+                                got += n;
+                                if (progress != null) progress(got);
+                            }
+                        }
+                    }
+                    catch (IOException e)
+                    {
+                        throw new DrbrException("download", "The download of " + Path.GetFileName(dst) + " stopped (" + e.Message + "). Run the update again to continue where it stopped.", e);
+                    }
+                }
+                if (new FileInfo(part).Length == size && Hash.Same(Hash.Sha256File(part), sha))
+                {
+                    if (File.Exists(dst)) File.Delete(dst);
+                    File.Move(part, dst);
+                    return;
+                }
+                Log.Warn("Downloaded " + Path.GetFileName(dst) + " failed its checksum; downloading it again.");
+                File.Delete(part);
+            }
+            throw new DrbrException("bad_download", "The download of " + Path.GetFileName(dst) + " was damaged twice and was refused. Nothing was changed.");
+        }
+
+        /// <summary>A whole file of a known size to dst (via dst.part, resumed when one is there). No checksum here: what is
+        /// inside it is checked.</summary>
+        public static void DownloadWhole(string url, string dst, long size, Action<long> progress)
+        {
+            string part = dst + ".part";
+            long have = File.Exists(part) ? new FileInfo(part).Length : 0;
+            if (have > size) { File.Delete(part); have = 0; }
+            if (have < size)
+            {
+                HttpWebRequest r = Req(url);
+                if (have > 0) r.AddRange(have);
+                try
+                {
+                    using (HttpWebResponse resp = (HttpWebResponse)r.GetResponse())
+                    {
+                        bool append = have > 0 && resp.StatusCode == HttpStatusCode.PartialContent;
+                        if (!append) have = 0;
+                        using (Stream s = resp.GetResponseStream())
+                        using (FileStream fs = new FileStream(part, append ? FileMode.Append : FileMode.Create, FileAccess.Write))
+                        {
+                            byte[] buf = new byte[1 << 20];
+                            int n;
+                            long got = have;
+                            while ((n = s.Read(buf, 0, buf.Length)) > 0)
+                            {
+                                if (got + n > size) throw new DrbrException("too_big", "The server sent more than expected for " + url);
+                                fs.Write(buf, 0, n);
+                                got += n;
+                                if (progress != null) progress(got);
+                            }
+                        }
+                    }
+                }
+                catch (WebException e)
+                {
+                    throw new DrbrException("download", "The download of " + Path.GetFileName(dst) + " stopped (" + e.Message + "). Run the update again to continue where it stopped.", e);
+                }
+            }
+            if (new FileInfo(part).Length != size) throw new DrbrException("download", "The download of " + url + " is incomplete. Run the update again to continue where it stopped.");
+            if (File.Exists(dst)) File.Delete(dst);
+            File.Move(part, dst);
         }
 
         /// <summary>Downloads to dst (via dst.part, resumed with an HTTP Range when a .part is there), then checks size and

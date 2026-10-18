@@ -1,0 +1,13 @@
+cur_jewel = 0;
+title = "";
+lines = [];
+opts = [];
+sel = 0;
+wide = false;
+autoact = "";
+timer = 0;
+fade = 0;
+fade_act = "";
+delay = 8;
+msg = "";
+global.interact = 1;

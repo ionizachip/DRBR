@@ -63,7 +63,9 @@ def chain(o):
 
 
 # ---------------------------------------------------------------- 3. projectile types
-CONTRACT = re.compile(r'\b(scr_bullet_init|kbr_bullet_contract|kbr_jv_vars)\s*\(|\bdestroyonhit\s*=')
+# (DRBR 1.0.1: kbr_bvars too - it calls kbr_bullet_contract(1) for every obj_collidebullet child; obj_sn_headstream's Create
+# completes it that way, which this check did not see)
+CONTRACT = re.compile(r'\b(scr_bullet_init|kbr_bullet_contract|kbr_jv_vars|kbr_bvars)\s*\(|\bdestroyonhit\s*=')
 
 
 def create_inits(o):
@@ -193,6 +195,23 @@ for sid in range(1, cnt):
         b1 = case_body('kbr_sa_step', sid)
         b2 = case_body('kbr_sa_bot', sid)
         if b2 is None:
+            # (DRBR 1.0.1: the bosses' sends - kbr_sa_bot hands them to the boss's own function before its switch: Flowery's to
+            # kbr_fl_bot_send (played by the odds, as his board), Spamton NEO's to kbr_sn_sa_bot and Pink's to kbr_pk_sa_bot,
+            # each with a case per send; this check looked only in kbr_sa_bot's own switch)
+            for _is, _fn, _per in (('kbr_fl_is_send', 'kbr_fl_bot_send', False), ('kbr_sn_is_send', 'kbr_sn_sa_bot', True), ('kbr_pk_is_send', 'kbr_pk_sa_bot', True)):
+                if J('%s(%d)' % (_is, sid)):
+                    _bsrc = ''.join(open(_f, encoding='utf8').read() for _f in sorted(glob.glob(T + 'online_*.gml')))
+                    _a = _bsrc.find('function %s(' % _fn)
+                    if _a >= 0 and 'kbr_sa_bot' in open(T + 'online_sent50.gml').read() and re.search(r'\b%s\(' % _is, sa_src) and re.search(r'\b%s\(' % _fn, sa_src):
+                        _b = _bsrc.find('\nfunction ', _a + 10)
+                        _body = _bsrc[_a:_b if _b > 0 else len(_bsrc)]
+                        if not _per:
+                            b2 = _body
+                        else:
+                            _m = re.search(r'\bcase %d:(.*?)(?=\n\s*case \d+:|\n\s*default:|\n\}\n)' % sid, _body, flags=re.S)
+                            b2 = _m.group(1) if _m else None
+                    break
+        if b2 is None:
             # the knights' sends: the bots get twin bullets from kbr_skill_land's own patterns
             sk_src = open(T + 'online_br_skill.gml').read()
             a_ = sk_src.find('function kbr_skill_land(')
@@ -215,6 +234,11 @@ for f in glob.glob(T + 'online_*.gml') + glob.glob(T + 'drbr53.gml') + glob.glob
 FN = {'snd_play', 'snd_play_x', 'snd_stop', 'snd_loop', 'snd_volume', 'snd_pitch', 'snd_free', 'snd_init', 'snd_is_playing', 'snd_free_all', 'snd_pause', 'snd_resume', 'snd_play_pitch', 'snd_play_volume'}
 names = set(re.findall(r'\b((?:spr|obj|snd)_[A-Za-z0-9_]+)\b', src)) - FN
 fnames = set(re.findall(r'\bfunction\s+(\w+)', src))
+# (DRBR 1.0.1: and the built game's own functions and instance variables - Chapter 3's snd_pitch_time() is a script, and
+# obj_growtangle's spr_custom_box a variable (spr_custom_box = sprite_index); neither is a sprite / sound)
+for _t in code.values():
+    fnames.update(re.findall(r'\bfunction\s+((?:spr|obj|snd)_\w+)', _t))
+    fnames.update(re.findall(r'(?:^|[;{}\s])((?:spr|obj|snd)_\w+)\s*=(?!=)', _t, flags=re.M))
 miss = sorted(a for a in names if a not in fnames and not (a in assets['obj'] or a in assets['spr'] or a in assets['snd']))
 ok(not miss, 'every sprite / object / sound the DRBR code names is in the build (%d names; missing: %r)' % (len(names), miss[:12]))
 

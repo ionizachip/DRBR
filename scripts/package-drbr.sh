@@ -1,7 +1,7 @@
 #!/bin/bash
 # DRBR: a complete, signed release in dist/<version>/release from the built game package.
 #   1. the DRBR programs (scripts/build-installer.sh)      2. the payload (packaging/make_payload.py)
-#   3. DRBR-Setup.exe with the payload appended             4. the release assets + update-manifest.json(.sig) + checks
+#   3. DRBR-Setup.exe with the payload appended             4. the release: DRBR.zip (Setup + README + the signed manifest), checked
 # Usage: scripts/package-drbr.sh <version> [game package dir] [release notes .md]
 #        env DRBR_SIGNING_KEY_FILE (or DRBR_KEY) = the private key - never in the repository
 #        env DRBR_NO_MUSIC=1 = leave out the mod's fight songs (third-party works - see docs/RELEASING.md)
@@ -19,6 +19,6 @@ bash "$HERE/scripts/build-installer.sh"
 MUSIC=(); [ "${DRBR_NO_MUSIC:-0}" = 1 ] && MUSIC=(--no-music)
 python3 "$HERE/packaging/make_payload.py" --pkg "$PKG" --apps "$HERE/build/bin" --out "$D/payload" --version "$VER" --notes "$NOTES" "${MUSIC[@]}"
 python3 "$HERE/packaging/release_tools.py" setup --exe "$HERE/build/bin/DRBR-Setup.exe" --payload "$D/payload" --out "$D/DRBR-Setup.exe"
-python3 "$HERE/packaging/release_tools.py" release --payload "$D/payload" --setup "$D/DRBR-Setup.exe" --out "$D/release" --key "$KEY"
-python3 "$HERE/packaging/release_tools.py" check "$D/release"
-echo "release $VER ready: $D/release"
+python3 "$HERE/packaging/release_tools.py" package --payload "$D/payload" --setup "$D/DRBR-Setup.exe" --out "$D/release/DRBR.zip" --key "$KEY"
+python3 "$HERE/packaging/release_tools.py" check "$D/release/DRBR.zip"
+echo "release $VER ready: $D/release/DRBR.zip (upload it as it is - its one asset)"

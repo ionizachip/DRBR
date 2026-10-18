@@ -380,6 +380,17 @@ GENERAL > SPECTATORS lets room members watch, WATCH PLACES 0-4 extra places for 
 480 ("Spacewar"): kf_steam.dll, steam_api64.dll and steam_appid.txt stay in chapter3_windows; Steam must be running and
 signed in. The relay: knightfights_server.zip (Node.js 18+, TCP 7777); everyone types its address in MORE OPTIONS > SERVER.
 
+Known issues and limits (DRBR 1.0.1 - build 51 update 11)
+--------------------------------------------------------
+- The bots now PLAY the bosses' SOUL modes: on Gerson's green SOUL each bot turns its own shield toward the spears (a block
+  depends on where it faces); on Flowery's board it moves up and down out of the way and dashes past a lunge; in Pink's
+  lanes, grid and "+" it changes lane / spot as a player does; in her 3D tunnel it goes from ring to ring and in her maze
+  it walks the paths. Watching a bot shows all of it (its shield, its dashes, its ring, its maze spot). Tested in the
+  emulator (TESTING_REPORT.txt, BUILD 51 UPDATE 11), not yet in the real game.
+- Bots still cannot shoot: Spamton NEO's mail walls are played by the odds for them (a roll per wall, by their skill).
+- 1.0.0 and 1.0.1 share rooms (the same multiplayer build 51). In a mixed room a 1.0.0 game watching a bot shows its SOUL
+  moving but not the new details (shield direction, ring, maze spot).
+
 Known issues and limits (build 51 update 9 - DRBR)
 --------------------------------------------------
 - THE FIVE BOSSES (Jevil, Gerson, Flowery, Spamton NEO, Pink), their SOUL modes, their sends, the BOSSES and SKINS pages and
@@ -390,7 +401,8 @@ Known issues and limits (build 51 update 9 - DRBR)
 - The bosses' music is read from DELTARUNE's shared mus folder (joker.ogg, ch4_extra_boss.ogg, Flowerman_Arrangement.ogg,
   spamton_neo_mix_ex_wip.ogg, pink.ogg): an install without Chapters 1-5 has no music for that boss.
 - Bots cannot shoot, dash or change lanes like a player: Spamton NEO's mail walls, Flowery's board and Pink's tunnel and
-  maze are played by the odds for them (a roll per hazard, by their skill).
+  maze are played by the odds for them (a roll per hazard, by their skill). (DRBR 1.0.1: only Spamton NEO's walls now -
+  see above.)
 - Everyone in a room needs this update (another build is told so and cannot join).
 
 Known issues and limits (build 50)

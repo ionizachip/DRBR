@@ -90,13 +90,13 @@ lines = sim.py(sim.eval('knight_stats_lines(global.krun)'))
 txt = repr(lines)
 ok('Susie' in txt and 'Noelle' in txt and 'Stars 1' in txt, 'stats box: members and attacks (%s)' % txt[:200])
 ok(lines[1][0] == 's' and 'Kris' in lines[1][1], 'stats box: a row per member')
-# many attacks: pages of 8, most hits first
+# many attacks: pages of 4 (DRBR 1.0.1: the box's lines are in the menu's size; 8 before), most hits first
 for i in range(12):
     sim.run('knight_stats_atk_set("A%d"); global.mnfight = 2; knight_stats_turn_begin(); %s global.mnfight = 0;' % (i, 'knight_hit_event(); ' * (i % 3)))
 lines = sim.py(sim.eval('knight_stats_lines(global.krun)'))
 hdr = [i for i, l in enumerate(lines) if l[0] == 's' and l[1] == 'ATTACKS'][0]
 rows = [l for l in lines[hdr + 1:] if l[0] == 's']
-eq(len(rows), 8, 'stats box: 8 attacks a page')
+eq(len(rows), 4, 'stats box: 4 attacks a page')
 ok(rows[0][3] == '2', 'stats box: most hits first (%s)' % rows[0])
 sim.run('global.krun.st.page = 1;')
 lines = sim.py(sim.eval('knight_stats_lines(global.krun)'))

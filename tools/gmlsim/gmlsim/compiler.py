@@ -2,6 +2,7 @@
 import re
 
 from . import ops
+from . import rt as _rt
 from .errors import GMError, GMThrow
 from .parser import parse, parse_expression, FuncDef
 from .rt import (Frame, BRK, CNT, RET, share, get_field, set_field, vars_of, array_get, array_set, elem_for_write,
@@ -1236,6 +1237,17 @@ class Compiler:
                 return call_func(sim, fn, args, f.self, f.other, f.ev)
             ent = sim.builtins.get(name)
             if ent is not None:
+                if _rt.PROF is not None:
+                    t0 = _rt.prof_enter()
+                    try:
+                        if ent[1]:
+                            return ent[0](sim, f, *args)
+                        return ent[0](sim, *args)
+                    except _CALL_ERRORS as e:
+                        raise GMError("%s(): %s: %s" % (name, e.__class__.__name__, e), "builtin_args") from e
+                    finally:
+                        if _rt.PROF is not None:
+                            _rt.prof_leave("B:" + name, t0)
                 try:
                     if ent[1]:
                         return ent[0](sim, f, *args)

@@ -1,16 +1,16 @@
 {
   "product": "DRBR",
   "title": "DRBR - DELTARUNE BATTLE ROYALE",
-  "version": "1.0.0",
-  "mod_build": "51.10",
+  "version": "1.0.1",
+  "mod_build": "51.11",
   "protocol": 51,
-  "launcher_version": "1.0.0",
+  "launcher_version": "1.0.1",
   "min_launcher_version": "1.0.0",
   "github": {
     "owner": "ionizachip",
     "repo": "DRBR"
   },
-  "update_manifest_url": "https://github.com/{owner}/{repo}/releases/latest/download/update-manifest.json",
+  "update_manifest_url": "https://github.com/{owner}/{repo}/releases/latest/download/DRBR.zip",
   "release_download_base": "https://github.com/{owner}/{repo}/releases/download/v{version}/",
   "public_key": {
     "alg": "RSA-3072 PKCS#1 v1.5 SHA-256",
@@ -33,5 +33,6 @@
     "starting_room_id": 30108,
     "starting_plot": 320,
     "default_start_mode": "template"
-  }
+  },
+  "release_package": "DRBR.zip"
 }

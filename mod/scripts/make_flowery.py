@@ -327,6 +327,9 @@ def main():
     F['gml_Object_obj_fl_flowery_Step_0.gml'] = 'kbr_fl_step();\n'
     F['gml_Object_obj_fl_flowery_Draw_0.gml'] = 'kbr_fl_draw();\n'
     F['gml_Object_obj_drbr_none_Create_0.gml'] = '// DRBR: the stand-in for objects of another chapter that are not imported: never kept\ninstance_destroy();\n'
+    # ---- 1.0.1: his line while his Jarona copy stands in for him (he hides for those attacks)
+    jd = 'gml_Object_obj_fl_jarona_Draw_0.gml'
+    F[jd] = F[jd].rstrip('\n') + '\nkbr_fl_jarona_say();\n'
     for s in EXTRA_SPR:
         assert s in B.S['spr'], s
         B.sprites.add(s)

@@ -1117,11 +1117,12 @@ function kbr_sudden_death()
     return 1;
 }
 
-function kbr_final_two_fx()
+function kbr_final_two_fx(_c)
 {
     var _M = kbr_match();
-    // build 51: the big announcement
-    kbr_bn_show("FINAL TWO", "* Only two SOULs left. The Roaring is coming.", make_color_rgb(255, 60, 60));
+    // build 51: the big announcement (DRBR 1.0.1: when a boss has that attack, its own finale comes, not the Knight's Roaring)
+    var _boss = !is_undefined(_c) && is_struct(kbr_ok_enc(_c.ok));
+    kbr_bn_show("FINAL TWO", _boss ? "* Only two SOULs left." : "* Only two SOULs left. The Roaring is coming.", make_color_rgb(255, 60, 60));
     _M.flash = 8;
     if (_M.eff.ftmus)
         kfo_mus_situ("lms");

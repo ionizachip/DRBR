@@ -3,8 +3,8 @@
 #   scripts/release-drbr.sh <version>   (a DRAFT GitHub release with every asset)
 # This workflow then, for that draft:
 #   1. builds the programs from source and runs the tests that need no game files,
-#   2. downloads every asset of the draft and checks it completely: the manifest's signature against the public key in
-#      drbr.json, every file's size and SHA-256, the payload inside DRBR-Setup.exe, SHA256SUMS.txt,
+#   2. downloads the draft's DRBR.zip (its one asset) and checks it completely, the way the launcher reads it: the manifest's
+#      signature against the public key in drbr.json, every file's size and SHA-256 at its place, nothing compressed,
 #   3. publishes the release - only after a maintainer approves the "release" environment (Settings > Environments).
 name: release
 on:
@@ -40,9 +40,9 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           mkdir -p dist/check
-          gh release download "v${{ inputs.version }}" --repo "${{ github.repository }}" --dir dist/check
-      - name: check every asset (signature, checksums, the Setup's payload)
-        run: python3 packaging/release_tools.py check dist/check
+          gh release download "v${{ inputs.version }}" --repo "${{ github.repository }}" --pattern DRBR.zip --dir dist/check
+      - name: check DRBR.zip (signature, checksums, the Setup's payload, the launcher's way)
+        run: python3 packaging/release_tools.py check dist/check/DRBR.zip
   publish:
     needs: check-release
     runs-on: ubuntu-latest

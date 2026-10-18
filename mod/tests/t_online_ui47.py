@@ -145,28 +145,39 @@ def room(sim, n, host=1, me=1, st='lobby', prac=0, res=None, mode='direct'):
                 'global.kfo.M.st = { an: 3, sn: 5, pl: [] };')
 
 
-# ---------------------------------------------------------------- KNIGHT tab with ONLINE
+# ---------------------------------------------------------------- KNIGHT tab (DRBR 1.0.1: ONLINE is its own page, the first)
 for focus in (0, 1):
-    for row in range(11):
+    for row in range(10):
         sim, rec = setup()
         draw(sim, rec, 'U.tab=0; U.focus=%d; U.krow=%d;' % (focus, row))
         check('knight f%d r%d' % (focus, row), rec)
         if focus:
             desc_ok(sim, 'knight r%d' % row)
 sim, rec = setup()
-eq(sim.eval('knight_ui_fight_label(knight_ui_fights()[10])'), 'ONLINE', 'ONLINE is the last fight row')
+eq(sim.py(sim.eval('knight_ui_tab_order()')), [5, 0, 1, 2, 3, 4], '1.0.1: the top bar - ONLINE first, then KNIGHT, PARTY, POWER, RULES, CONFIG')
+eq(sim.eval('global.knight_ui.tab'), 5, '1.0.1: the menu opens on the ONLINE page')
+ok(all(sim.eval('knight_ui_fights()[%d].kind' % i) != 'online' for i in range(sim.eval('array_length(knight_ui_fights())'))), '1.0.1: no ONLINE on the KNIGHT page')
+for row in range(10):
+    sim, rec = setup()
+    draw(sim, rec, 'U.tab=5; U.focus=0; U.onl_row=%d;' % row)
+    check('online tab (top bar) r%d' % row, rec)
+    ok(not any(o[0] == 'spr' and o[1] == 'spr_heart' and 88 <= o[4] <= 400 for o in rec.ops), 'online tab (top bar) r%d: no row picked (no heart)' % row)
+    if row == 0:
+        shot_if(rec, 'tab_online')
 for mode in ('direct', 'steam', 'prac'):
     sim, rec = setup()
     room(sim, 3, mode=mode if mode != 'prac' else 'direct', prac=1 if mode == 'prac' else 0)
-    draw(sim, rec, 'U.tab=0; U.focus=1; U.krow=10;')
-    check('knight card in room (%s)' % mode, rec)
+    draw(sim, rec, 'U.tab=5; U.focus=0;')
+    check('online tab in room (%s)' % mode, rec)
+    if mode == 'steam':
+        shot_if(rec, 'tab_online_room')
 
 # ---------------------------------------------------------------- ONLINE page
 NROW = 10
 for row in range(NROW):
     for variant in ('idle', 'long', 'busy', 'steambusy', 'failed', 'steam', 'nosteam'):
         sim, rec = setup()
-        code = 'U.tab=0; U.focus=1; U.krow=10; U.sub="online"; U.onl_row=%d; U.onl_scroll=%d;' % (row, max(0, row - 7))
+        code = 'U.tab=5; U.focus=1; U.sub="online"; U.onl_row=%d; U.onl_scroll=%d;' % (row, max(0, row - 7))
         steam(sim, variant in ('steam', 'steambusy'), 'kf_steam.dll is missing (run Install Knight Fights again).' if variant == 'nosteam' else 'Steam is not running or not signed in: Steam client not running.')
         if variant == 'long':
             code += 'global.kfo.name = "WWWWWWWWWWWW"; global.kfo.srv = "relay-server.example-host.org"; global.kfo.port = 25565; global.kfo.skin = 3;'
@@ -186,7 +197,7 @@ for row in range(NROW):
 for row in range(8):
     for variant in ('plain', 'long'):
         sim, rec = setup()
-        code = 'U.tab=0; U.focus=1; U.krow=10; U.sub="onl_opt"; U.opt_row=%d;' % row
+        code = 'U.tab=5; U.focus=1; U.sub="onl_opt"; U.opt_row=%d;' % row
         if variant == 'long':
             code += ('global.kfo.srv = "relay-server.example-host.org"; global.kfo.port = 25565; global.kfo.view.names = 0; global.kfo.vis = 2; global.kfo.view.sop = 35;'
                      'global.kfo.view.show = 0; global.kfo.look.col = make_color_rgb(160, 64, 255); global.kfo.song = 9;'
@@ -239,14 +250,14 @@ for ci in (0, 1):
             desc_ok(sim, name)
             ok(sim.eval('kfo_boss_ready(%d)' % k), '%s: its art is in the game' % name)
             txt = ' '.join(b[4] for b in boxes(rec))
-            ok('SOUL' in txt and 'SENDS:' in txt and 'ATTACKS' in txt, '%s: the card has its SOUL, sends and attacks (%s)' % (name, txt[-200:]))
+            ok('SOUL' in txt and 'SENDS' in txt and 'ATTACKS' in txt, '%s: the card has its SOUL, sends and attacks (%s)' % (name, txt[-200:]))
             if variant != 'online':
                 ok(('IN THIS ROOM' in txt), '%s: the card says whether the room fights it' % name)
             if variant == 'online' or i == 0:
                 shot_if(rec, 'bosses_%s_%d_%d' % (variant, ci, k))
 
 # ---------------------------------------------------------------- build 47: SOUL VISIBILITY / SOUL APPEARANCE / VIEW pages
-PAGES = {'onl_view': 6, 'onl_look': 8, 'onl_mview': 15}   # build 48: SOUL SETTINGS 5 rows + DONE; SOUL COLOR 7 (with the OUTLINE rows) + DONE
+PAGES = {'onl_view': 6, 'onl_look': 8, 'onl_mview': 16}   # build 48: SOUL SETTINGS 5 rows + DONE; SOUL COLOR 7 (with the OUTLINE rows) + DONE; 1.0.1: VIEW + BOSS LINES
 for pg, nrow in PAGES.items():
     sim0, _ = setup()
     eq(sim0.eval('array_length(kfo_ui_pg_rows("%s"))' % pg), nrow, '%s has %d rows' % (pg, nrow))
@@ -255,7 +266,7 @@ for pg, nrow in PAGES.items():
             sim, rec = setup()
             if variant == 'room':
                 room(sim, 5, mode='steam')
-            code = 'U.tab=0; U.focus=1; U.krow=10; kfo_ui_pg_open("%s", "%s"); U.pg_row=%d; U.pg_scroll=%d;' % (pg, 'lobby' if variant == 'room' else 'onl_opt', row, max(0, row - 13))
+            code = 'U.tab=5; U.focus=1; kfo_ui_pg_open("%s", "%s"); U.pg_row=%d; U.pg_scroll=%d;' % (pg, 'lobby' if variant == 'room' else 'onl_opt', row, max(0, row - 13))
             if variant == 'extreme':
                 # every setting at its widest value
                 code += ('var _V = global.kfo.view; _V.sop = 100; _V.nop = 100; _V.cmode = 3; _V.skfx = 2; _V.spv = 2; _V.shud = 2; _V.cam = 3; _V.zoom = 3;'
@@ -272,11 +283,11 @@ for v in (0, 20, 55, 100):
     sim, rec = setup()
     sim.load_source('gml_GlobalScript_sld_log', SLD)
     sim.run('global.SLD = [];')
-    draw(sim, rec, 'U.tab=0; U.focus=1; U.krow=10; kfo_ui_pg_open("onl_view", "onl_opt"); U.pg_row=3; global.kfo.view.sop = %d;' % v)
+    draw(sim, rec, 'U.tab=5; U.focus=1; kfo_ui_pg_open("onl_view", "onl_opt"); U.pg_row=3; global.kfo.view.sop = %d;' % v)
     sl = sim.py(sim.eval('global.SLD'))
     ok(any(x[3] == v and x[4] for x in sl), 'OPACITY %d%%: drawn as a slider: %s' % (v, sl))
 sim, rec = setup()
-sim.run('U.tab=0; U.focus=1; U.krow=10; kfo_ui_pg_open("onl_view", "onl_opt"); U.pg_row=3; global.kfo.view.sop = 20; global.knight_ui.inputdelay = 0;'.replace('U.', U + '.'))
+sim.run('U.tab=5; U.focus=1; kfo_ui_pg_open("onl_view", "onl_opt"); U.pg_row=3; global.kfo.view.sop = 20; global.knight_ui.inputdelay = 0;'.replace('U.', U + '.'))
 held_keys = {'right': 0}
 sim.mock('right_p', lambda s: 1 if s.kp == 'right' else 0)
 sim.mock('left_p', lambda s: 1 if s.kp == 'left' else 0)
@@ -314,7 +325,7 @@ eq(sim.eval('global.kfo.view.sop'), 15, 'OPACITY slider: down to 15 (build 49: n
 # the SOUL color code box: a good code and a bad one
 for txt, good in (('#A040FF', True), ('#GG0000', False), ('#12345', False), ('#FFF', True)):
     sim, rec = setup()
-    sim.run('U.tab=0; U.focus=1; U.krow=10; kfo_ui_pg_open("onl_look", "onl_opt"); kfo_ui_text("hex"); keyboard_string = "%s";'.replace('U.', U + '.') % txt)
+    sim.run('U.tab=5; U.focus=1; kfo_ui_pg_open("onl_look", "onl_opt"); kfo_ui_text("hex"); keyboard_string = "%s";'.replace('U.', U + '.') % txt)
     sim.run('kfo_ui_text_step(global.knight_ui.modal);')
     c0 = sim.eval('global.kfo.look.col')
     rec.ops.clear()
@@ -340,7 +351,7 @@ for nb in (0, 1, 4, 9, 14):
                       'ver': [45, 45, 44, 46][i % 4], 'st': ['lobby', 'match'][i % 2]})
     sim.run('global.kfo.browse = json_parse(@\'%s\'); global.kfo.browse_st = "%s";' % (json.dumps(rooms), '' if nb == 0 else ('%d PUBLIC ROOMS.' % nb)))
     for row in (0, max(0, nb - 1)):
-        draw(sim, rec, 'U.tab=0; U.focus=1; U.krow=10; U.sub="onl_br"; U.br_row=%d;' % row)
+        draw(sim, rec, 'U.tab=5; U.focus=1; U.sub="onl_br"; U.br_row=%d;' % row)
         check('browse %d r%d' % (nb, row), rec)
         desc_ok(sim, 'browse %d' % nb)
     if nb in (0, 9):
@@ -360,7 +371,7 @@ for n in (1, 2, 5, 8):
                 for row in range(nrows):
                     sim, rec = setup()
                     room(sim, n, host=1, me=(1 if who != 'player' else 2), st=st, prac=(1 if who == 'practice' else 0), res=res, mode=mode)
-                    draw(sim, rec, 'U.tab=0; U.focus=1; U.krow=10; U.sub="lobby"; U.lob_row=%d; U.lob_scroll=%d;' % (row, max(0, row - 5)))
+                    draw(sim, rec, 'U.tab=5; U.focus=1; U.sub="lobby"; U.lob_row=%d; U.lob_scroll=%d;' % (row, max(0, row - 5)))
                     name = 'lobby n%d %s %s %s r%d' % (n, who, st, mode, row)
                     check(name, rec)
                     desc_ok(sim, name)
@@ -390,7 +401,7 @@ for n, prac in ((8, 1), (3, 1), (4, 0)):
         for row in range(nr):
             sim, rec = setup()
             room(sim, n, prac=prac)
-            draw(sim, rec, 'U.tab=0; U.focus=1; U.krow=10; U.sub="%s"; U.pg_row=%d; U.pg_scroll=%d; U.pg_from="lobby"; U.bot_i=0;' % (pg, row, max(0, row - 13)))
+            draw(sim, rec, 'U.tab=5; U.focus=1; U.sub="%s"; U.pg_row=%d; U.pg_scroll=%d; U.pg_from="lobby"; U.bot_i=0;' % (pg, row, max(0, row - 13)))
             name = '%s n%d prac%d r%d' % (pg, n, prac, row)
             check(name, rec)
             desc_ok(sim, name)
@@ -423,7 +434,7 @@ for n in (8, 10, 12):
     sim.run('var _pl = global.kfo.lobby.players; for (var _i = array_length(_pl); _i < %d; _i++) array_push(_pl, { pid: _i + 1, n: "WWWWWWWWWWWW", s: 1 + _i mod 4, rd: 0, inm: 0, bot: 0, sp: 1 });'
             'for (var _i = 0; _i < array_length(_pl); _i++) { _pl[_i].cl = kfo_col_presets()[_i mod 9][1]; _pl[_i].lat = 30 + _i * 40; }' % n)
     for row in (0, 3):
-        draw(sim, rec, 'U.tab=0; U.focus=1; U.krow=10; U.sub="lobby"; U.lob_row=%d; U.lob_scroll=0;' % row)
+        draw(sim, rec, 'U.tab=5; U.focus=1; U.sub="lobby"; U.lob_row=%d; U.lob_scroll=0;' % row)
         check('lobby colours n%d r%d' % (n, row), rec)
     shot_if(rec, 'lobby_colours_%d' % n)
 
@@ -431,7 +442,7 @@ for n in (8, 10, 12):
 sim, rec = setup()
 room(sim, 8, mode='steam')
 rows = sim.py(sim.eval('kfo_ui_lobby_rows()'))
-sim.run('U.tab=0; U.focus=1; U.krow=10; U.sub="lobby"; U.lob_row=%d; U.lob_scroll=%d;'.replace('U.', U + '.') % (rows.index('kick'), max(0, rows.index('kick') - 5)))
+sim.run('U.tab=5; U.focus=1; U.sub="lobby"; U.lob_row=%d; U.lob_scroll=%d;'.replace('U.', U + '.') % (rows.index('kick'), max(0, rows.index('kick') - 5)))
 sim.inp['ok'] = 1
 sim.run('knight_ui_step();')
 sim.inp['ok'] = 0
@@ -453,7 +464,7 @@ for who in ('host', 'player'):
         for focus, opt in [(0, 0)] + [(1, o) for o in sorted(set([0, nit // 2, nit - 1]))]:
             sim, rec = setup()
             room(sim, 3, me=(2 if who == 'player' else 1))
-            draw(sim, rec, 'U.tab=0; U.focus=1; U.krow=10; U.sub="onl_set"; U.set_row=%d; U.set_focus=%d; U.set_opt=%d; U.set_scroll=%d;'
+            draw(sim, rec, 'U.tab=5; U.focus=1; U.sub="onl_set"; U.set_row=%d; U.set_focus=%d; U.set_opt=%d; U.set_scroll=%d;'
                  % (cat, focus, opt, max(0, opt - 12)))
             check('settings %s c%d f%d o%d' % (who, cat, focus, opt), rec)
             desc_ok(sim, 'settings %s c%d f%d o%d' % (who, cat, focus, opt))
@@ -478,7 +489,7 @@ for row in range(10):
         sim, rec = setup()
         if variant == 'room':
             room(sim, 5, mode='steam')
-        code = 'U.tab=0; U.focus=1; U.krow=10; U.sub="onl_keys"; U.keys_row=%d; U.keys_from="%s";' % (row, 'lobby' if variant == 'room' else 'onl_opt')
+        code = 'U.tab=5; U.focus=1; U.sub="onl_keys"; U.keys_row=%d; U.keys_from="%s";' % (row, 'lobby' if variant == 'room' else 'onl_opt')
         if variant == 'long':
             code += ('kfo_key_set("breath", 20); kfo_key_set("use", 34); kfo_key_set("charge", 220); kfo_key_set("hold", 111); kfo_key_set("list", 162);'
                      'kfo_key_set("quit", 93); kfo_key_set("quick", 145);')
@@ -490,7 +501,7 @@ for row in range(10):
 # the box that waits for a key (with a refused key explained)
 for k in (88, 161, 38, 115, 13):
     sim, rec = setup()
-    sim.run('U.tab=0; U.focus=1; U.krow=10; U.sub="onl_keys"; U.keys_row=1;'.replace('U.', U + '.'))
+    sim.run('U.tab=5; U.focus=1; U.sub="onl_keys"; U.keys_row=1;'.replace('U.', U + '.'))
     sim.inp['ok'] = 1
     sim.run('knight_ui_step();')
     sim.inp['ok'] = 0
@@ -506,7 +517,7 @@ for k in (88, 161, 38, 115, 13):
 for what, txt in (('name', 'WWWWWWWWWWWW'), ('code', 'VNRTK'), ('scode', 'ABCDEFG'), ('server', 'relay-server.example-host.org:25565'),
                   ('import', 'KF45:' + 'eyJrbiI6WzAsMSwyLDMsNCw1XSwicnVzaCI6Nn0' * 6)):
     sim, rec = setup()
-    sim.run('U.tab=0; U.focus=1; U.krow=10; U.sub="online"; kfo_ui_text("%s"); keyboard_string = "%s";'.replace('U.', U + '.') % (what, txt))
+    sim.run('U.tab=5; U.focus=1; U.sub="online"; kfo_ui_text("%s"); keyboard_string = "%s";'.replace('U.', U + '.') % (what, txt))
     sim.run('kfo_ui_text_step(global.knight_ui.modal);')
     rec.ops.clear()
     sim.run('knight_ui_draw();')
@@ -739,11 +750,19 @@ def press(k, n=1):
 
 for _ in range(10):
     frame()
+# DRBR 1.0.1: the menu opens on the ONLINE page (the first button): X from its menu goes back up to the top bar; RIGHT is the KNIGHT page
+eq(sim.eval('global.knight_ui.tab'), 5, 'the menu opens on ONLINE')
 press('ok')
-# build 52: the KNIGHT page is a carousel over the MODE strip: DOWN to the strip, LEFT from its first entry wraps to ONLINE
-press('down')
+eq(sim.eval('global.knight_ui.sub'), 'online', 'Z on ONLINE opens its menu')
+press('back')
+ok(sim.eval('global.knight_ui.sub') == '' and sim.eval('global.knight_ui.focus') == 0 and sim.eval('global.knight_ui.tab') == 5, 'X: back up to the top bar, on ONLINE')
+press('right')
+eq(sim.eval('global.knight_ui.tab'), 0, 'RIGHT from ONLINE: KNIGHT')
 press('left')
-eq(sim.eval('global.knight_ui.krow'), 10, 'DOWN to the MODE strip, LEFT wraps round to ONLINE')
+eq(sim.eval('global.knight_ui.tab'), 5, 'LEFT back to ONLINE')
+press('left')
+eq(sim.eval('global.knight_ui.tab'), 4, 'LEFT from ONLINE wraps round to CONFIG')
+press('right')
 press('ok')
 eq(sim.eval('global.knight_ui.sub'), 'online', 'Z opens the ONLINE page')
 # build 51: HOW TO PLAY, PRACTICE, (DRBR: BOSSES,) HOST A ROOM, JOIN WITH CODE, FIND ROOMS, NAME, SKIN, MORE... (relay + SETTINGS under it)
@@ -843,7 +862,7 @@ sim2, rec2 = setup()
 sim, rec = sim2, rec2
 for _ in range(4):
     frame()
-sim.run('kfo_practice_start(); global.knight_ui.tab = 0; global.knight_ui.focus = 1; global.knight_ui.krow = 10; global.knight_ui.sub = "lobby";')
+sim.run('kfo_practice_start(); global.knight_ui.tab = 5; global.knight_ui.focus = 1; global.knight_ui.sub = "lobby";')
 frame()
 frame()
 rows = sim.py(sim.eval('kfo_ui_lobby_rows()'))
@@ -903,7 +922,7 @@ print('online ui: %d checks, %d failed%s' % (N[0], len(FAILS), (', %d shots' % n
 sim, rec = setup()
 for _ in range(4):
     frame()
-sim.run('global.knight_ui.tab = 0; global.knight_ui.focus = 1; global.knight_ui.krow = 10; global.knight_ui.sub = "online"; global.knight_ui.onl_row = 2;')
+sim.run('global.knight_ui.tab = 5; global.knight_ui.focus = 1; global.knight_ui.sub = "online"; global.knight_ui.onl_row = 2;')
 frame()
 saved_kn = sim.py(sim.eval('kfo_set_clean(global.kfo.set).kn'))
 press('ok')

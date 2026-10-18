@@ -17,5 +17,5 @@ sleep 1
 export DOTNET_ROOT="${DOTNET_ROOT:-/home/claude/dotnet}"; export PATH="$PATH:$DOTNET_ROOT" DOTNET_CLI_TELEMETRY_OPTOUT=1 DOTNET_NOLOGO=1
 dotnet build "$HERE/src/Drbr.Tests" -c Release -o "$HERE/build/tests" 2>&1 | grep -E " error |Build succeeded" | sort -u
 DRBR_TEST_WORK="$WORK/w" DRBR_TEST_VANILLA="$VANILLA" DRBR_TEST_PAYLOAD="$PAYLOAD" DRBR_TEST_KEY="$KEY" \
-DRBR_TEST_RELEASE2="$WORK/releases/good" DRBR_TEST_HTTP="http://127.0.0.1:$PORT" DRBR_TEST_HTTP_LOG="$WORK/http.log" \
+DRBR_TEST_RELEASES="$WORK/releases" DRBR_TEST_HTTP="http://127.0.0.1:$PORT" DRBR_TEST_HTTP_LOG="$WORK/http.log" \
   dotnet "$HERE/build/tests/drbr-tests.dll" "$@"

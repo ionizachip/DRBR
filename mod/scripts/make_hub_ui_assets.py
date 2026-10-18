@@ -78,6 +78,25 @@ ICON_RULES = [  # skull
     "................",
 ]
 
+ICON_ONLINE = [  # DRBR 1.0.1: the ONLINE page - a globe
+    ".....######.....",
+    "...##..##..##...",
+    "..#...#..#...#..",
+    ".#...#....#...#.",
+    ".#...#....#...#.",
+    "################",
+    "#....#....#....#",
+    "#....#....#....#",
+    "#....#....#....#",
+    "#....#....#....#",
+    "################",
+    ".#...#....#...#.",
+    ".#...#....#...#.",
+    "..#...#..#...#..",
+    "...##..##..##...",
+    ".....######.....",
+]
+
 def make_button(icon):
     frames = []
     for f in range(3):
@@ -137,11 +156,14 @@ T_U = L(["#..#"] * 15 + ["####"])
 T_L = L(["#..."] * 15 + ["####"])
 T_E = L(["####"] + ["#..."] * 5 + ["###."] + ["#..."] * 8 + ["####"])
 T_S = L(["####"] + ["#..."] * 5 + ["####"] + ["...#"] * 8 + ["####"])
+# DRBR 1.0.1: O, as the game's own POWER / CONFIG captions draw it
+T_O = L(["####"] + ["#..#"] * 14 + ["####"])
 
 TALL = {
     'KNIGHT': [T_K, T_N, T_I, T_G, T_H, T_T],
     'PARTY': [T_P, T_A, T_R, T_T, T_Y],
     'RULES': [T_R, T_U, T_L, T_E, T_S],
+    'ONLINE': [T_O, T_N, T_L, T_I, T_N, T_E],
 }
 
 # ---------------- small boxed captions (76x9) -------------
@@ -259,7 +281,9 @@ def main():
     sprites['spr_khub_bt_knight'] = ('spr_darkequipbt', make_button(ICON_KNIGHT))
     sprites['spr_khub_bt_party'] = ('spr_darkequipbt', make_button(ICON_PARTY))
     sprites['spr_khub_bt_rules'] = ('spr_darkequipbt', make_button(ICON_RULES))
-    sprites['spr_khub_menudesc'] = ('spr_darkmenudesc', [tall(TALL[w]) for w in ('KNIGHT', 'PARTY', 'RULES')])
+    # DRBR 1.0.1: the ONLINE page's button and caption (frame 3)
+    sprites['spr_khub_bt_online'] = ('spr_darkequipbt', make_button(ICON_ONLINE))
+    sprites['spr_khub_menudesc'] = ('spr_darkmenudesc', [tall(TALL[w]) for w in ('KNIGHT', 'PARTY', 'RULES', 'ONLINE')])
     sprites['spr_khub_captions'] = ('spr_dmenu_captions', [caption(w, letters) for w in CAPTIONS])
     # build 48: a WHITE SOUL (spr_dodgeheart's size and origin), drawn tinted with a player's colour - no fog, no shader:
     # frame 0 = the heart (spr_heart's shape, 2 px in), frame 1 = only its 2-px edge (the game's own black SOUL edge, heart-shaped)

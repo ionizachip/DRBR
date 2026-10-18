@@ -491,16 +491,53 @@ function knight_song_dir()
     return "mus/";
 }
 
+// DRBR 1.0.1: each file's answer is kept for 3 seconds. The menus and the fights asked every frame (the song list's rows, the
+// CONFIG page's SONG, the fight's lyrics and song card): a look on the disk each time, and for a KF Song Pack song its song.json
+// read and parsed - a slowdown. A file put in or taken out while the game runs is seen within 3 seconds; opening the hub's menu
+// or the song list forgets every answer (knight_music_cache_clear).
+global.knight_mex = {};
+global.knight_kfi = {};
+function knight_music_cache_clear()
+{
+    global.knight_mex = {};
+    global.knight_kfi = {};
+    return 1;
+}
+
+// a kept answer for key _k in cache _m (undefined when there is none, or it is older than 3 seconds)
+function knight_cache_get(_m, _k)
+{
+    if (!is_struct(_m) || !variable_struct_exists(_m, _k))
+        return undefined;
+    var _c = variable_struct_get(_m, _k);
+    if (!is_array(_c) || current_time < _c[1] || current_time - _c[1] >= 3000)
+        return undefined;
+    return _c[0];
+}
+
 function knight_music_exists(_f)
 {
     if (_f == "")
         return false;
+    // build 48: RANDOM is there when any song file is (asked of each song, so the song list's on / off is seen at once)
+    if (_f == "@random")
+        return knight_song_random_file() != "";
+    if (!variable_global_exists("knight_mex") || !is_struct(global.knight_mex))
+        global.knight_mex = {};
+    var _c = knight_cache_get(global.knight_mex, _f);
+    if (!is_undefined(_c))
+        return _c;
+    var _r = knight_music_exists_now(_f);
+    variable_struct_set(global.knight_mex, _f, [_r, current_time]);
+    return _r;
+}
+
+// the look on the disk itself
+function knight_music_exists_now(_f)
+{
     // build 50: a KF Song Pack song ("@kf:<song_id>": kfsongs/<song_id>/ next to data.win)
     if (knight_kf_id(_f) != "")
         return knight_kf_exists(knight_kf_id(_f));
-    // build 48: RANDOM is there when any song file is
-    if (_f == "@random")
-        return knight_song_random_file() != "";
     var _d = knight_song_dir();
     if (file_exists(_d + _f))
         return true;
@@ -1066,8 +1103,20 @@ function knight_kf_exists(_id)
     return _id != "" && kf_song_path("kfsongs/" + _id + "/song.json") != "" && knight_kf_inst(_id) != "";
 }
 
-// the instrumental's path ("" when it is not there)
+// the instrumental's path ("" when it is not there; DRBR 1.0.1: kept for 3 seconds, as knight_music_exists)
 function knight_kf_inst(_id)
+{
+    if (!variable_global_exists("knight_kfi") || !is_struct(global.knight_kfi))
+        global.knight_kfi = {};
+    var _c = knight_cache_get(global.knight_kfi, _id);
+    if (!is_undefined(_c))
+        return _c;
+    var _r = knight_kf_inst_now(_id);
+    variable_struct_set(global.knight_kfi, _id, [_r, current_time]);
+    return _r;
+}
+
+function knight_kf_inst_now(_id)
 {
     var _p = kf_song_path("kfsongs/" + _id + "/song.json");
     if (_p == "")

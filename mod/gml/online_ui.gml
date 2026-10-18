@@ -82,13 +82,14 @@ function kfo_ui_opt_rows()
     return ["server", "vis", "view", "mview", "keys", "song", "done"];
 }
 
-// the online MUSIC row: -1 = the hub's own SONG setting, 0 = the knights' own music, then every song of the list
+// the online MUSIC row: -1 = the hub's own SONG setting, 0 = DEFAULT (each knight's and boss's own music), then every song of
+// the list (DRBR 1.0.1: a song picked plays through the whole match, over every boss - kbr_mus_own)
 function kfo_song_name(_i)
 {
     if (_i < 0)
         return "AS IN THE HUB";
     if (_i == 0)
-        return "THE BOSSES' OWN";
+        return "DEFAULT";
     var _s = global.knight_songs[clamp(_i, 0, array_length(global.knight_songs) - 1)];
     return string_upper(_s.name);
 }
@@ -419,6 +420,9 @@ function kfo_ui_step_online(_up, _down, _left, _right, _ok, _back, _alt)
     if (_back)
     {
         _u.sub = "";
+        // (DRBR 1.0.1: up to the top bar, on the ONLINE page)
+        if (_u.tab == 5)
+            _u.focus = 0;
         snd_play(snd_menumove);
         return 0;
     }
@@ -638,9 +642,11 @@ function kfo_ui_step_lobby(_up, _down, _left, _right, _ok, _back, _alt)
     var _o = kfo_get();
     if (_back)
     {
-        // back to the KNIGHT list; you stay in the room (not ready)
+        // back up to the top bar (the ONLINE page shows the room); you stay in the room (not ready)
         kfo_ui_unready();
         _u.sub = "";
+        if (_u.tab == 5)
+            _u.focus = 0;
         snd_play(snd_menumove);
         return 0;
     }
@@ -1051,7 +1057,7 @@ function kfo_ui_step_set(_up, _down, _left, _right, _ok, _back)
         snd_play(snd_menumove);
     }
     _u.set_opt = clamp(_u.set_opt, 0, _ni - 1);
-    _u.set_scroll = clamp(_u.set_scroll, max(0, _u.set_opt - 8), min(_u.set_opt, max(0, _ni - 9)));
+    _u.set_scroll = clamp(_u.set_scroll, max(0, _u.set_opt - 7), min(_u.set_opt, max(0, _ni - 8)));
     var _id = _items[_u.set_opt];
     var _s = kfo_ui_set_cur();
     // presets
@@ -1206,7 +1212,7 @@ function kfo_ui_desc()
             case "view": return "Z: show the other SOULs, your SOUL COLOR,#names, their opacity, highlight yours.";
             case "look": return "Z: your own SOUL's color (presets, RGB, hex),#outline and highlight. Others see the color.";
             case "mview": return "Z: watching (camera, HUD), the match info and#network stats, shake, flashing, key hints.";
-            case "song": return "< >: the music of your online matches (only on#your computer). Z: the song list (C listens).";
+            case "song": return (kfo_get().song == 0) ? "DEFAULT: each boss brings its own music.#< >: or a song of your own, over every boss. Z: list." : "< >: your match music, over every boss (only on#your computer). DEFAULT: the bosses' own. Z: list.";
             case "keys": return "Z: your keys for the match (Hold Breath,#skills, the player list, quick settings...).";
             case "done": return "Z: back.";
         }
@@ -1239,8 +1245,8 @@ function kfo_ui_desc()
         var _lr = kfo_ui_lobby_rows();
         switch (_lr[clamp(_u.lob_row, 0, array_length(_lr) - 1)])
         {
-            case "start": return kfo_prac_room() ? "Z or C: start the practice match.#X: back to the knights." : "Z or C: start the match.   X: back#(the room's READY CHECK decides who plays)";
-            case "ready": return kfo_ui_after_match() ? "Z: vote for a rematch (the host starts it when#the votes are in). X: back to the knights." : "Z: ready for the next match.#X: back to the knights (not ready).";
+            case "start": return kfo_prac_room() ? "Z or C: start the practice match.#X: back." : "Z or C: start the match.   X: back#(the room's READY CHECK decides who plays)";
+            case "ready": return kfo_ui_after_match() ? "Z: vote for a rematch (the host starts it when#the votes are in). X: back." : "Z: ready for the next match.#X: back (not ready).";
             case "spectate": return (kfo_ui_lobby_why("spectate") == "") ? "Z: watch the match that is running (you play#the next one). It goes on as it is." : ("NOT NOW: " + kfo_ui_lobby_why("spectate"));
             case "join": return "NOT NOW: a match takes no new players once it#started. SPECTATE it, play the next one.";
             case "look": return "< >: your SOUL's color (everyone sees it).#Z: all colors, your own mix, a color code.";
@@ -1261,6 +1267,9 @@ function kfo_ui_desc()
     }
     if (_u.sub == "onl_set")
     {
+        // (DRBR 1.0.1: not the host - they can look; only the host changes them: said here, it was small print under the title)
+        if (!kfo_is_host() && _u.set_focus == 0 && _u.set_row != kfo_cat_pre())
+            return "Only the host changes these settings.#Z: look at them.   X: back";
         if (_u.set_focus == 0)
             return kfo_cat_desc(_u.set_row);
         var _items = kfo_ui_set_items(_u.set_row);
@@ -1293,6 +1302,29 @@ function kfo_ui_desc()
 }
 
 // ---------- drawing ----------
+// DRBR 1.0.1: the ONLINE page on the top bar (before Z opens it): its menu as it is, with no row picked - the room's while you are
+// in one
+function kfo_ui_draw_tab(xx, yy)
+{
+    var _u = global.knight_ui;
+    kfo_get();
+    kfo_ui_fields(_u);
+    global.kfo_ui_pvf = true;
+    if (kfo_in_room())
+        kfo_ui_draw_lobby(xx, yy);
+    else
+        kfo_ui_draw_online(xx, yy);
+    global.kfo_ui_pvf = false;
+    return 1;
+}
+
+// the ONLINE page drawn on the top bar: no row is picked (kfo_ui_draw_tab)
+global.kfo_ui_pvf = false;
+function kfo_ui_pv()
+{
+    return variable_global_exists("kfo_ui_pvf") && global.kfo_ui_pvf;
+}
+
 function kfo_ui_draw(xx, yy)
 {
     var _u = global.knight_ui;
@@ -1320,6 +1352,7 @@ function kfo_ui_draw_online(xx, yy)
 {
     var _u = global.knight_ui;
     var _o = kfo_get();
+    var _pv = kfo_ui_pv();
     draw_set_color(c_white);
     draw_rectangle(xx + 300, yy + 91, xx + 305, yy + 410, false);
     knight_caption_hub("ONLINE", xx + 112, yy + 84);
@@ -1329,86 +1362,75 @@ function kfo_ui_draw_online(xx, yy)
     for (var _i = _u.onl_scroll; _i < array_length(_rows) && _i < _u.onl_scroll + 8; _i++)
     {
         var _y = yy + 104 + ((_i - _u.onl_scroll) * 36);
-        var _hot = (_u.onl_row == _i);
+        // (DRBR 1.0.1: on the top bar - the ONLINE page before Z - no row is picked)
+        var _hot = (_u.onl_row == _i) && !_pv;
         var _dim = _busy || (string_pos("s_", _rows[_i]) == 1 && !_steam);
         draw_set_color(_dim ? (_hot ? c_orange : c_gray) : (_hot ? c_yellow : c_white));
         knight_txt(xx + 100, _y, knight_fit(kfo_ui_row_label(_rows[_i]), 190));
         if (_hot && !_busy)
             knight_heart(xx + 75, _y + 10);
     }
-    // more rows above / below
-    draw_set_color(c_gray);
-    if (_u.onl_scroll > 0)
-        knight_txt_small(xx + 280, yy + 84, "^");
-    if (_u.onl_scroll + 8 < array_length(_rows))
-        knight_txt_small(xx + 280, yy + 392, "v");
+    // more rows above / below: the game's arrows
+    knight_ui_arrows(xx + 284, yy + 98, yy + 392, _u.onl_scroll > 0, _u.onl_scroll + 8 < array_length(_rows), _u.siner);
+    // DRBR 1.0.1: the right side in the menu's size - DRBR, your name, your skin, then Steam and the relay server (or the skin /
+    // the bosses while their row is picked), then what DRBR is or what is happening
     var _cx = xx + 443;
-    var _id = _rows[clamp(_u.onl_row, 0, array_length(_rows) - 1)];
+    var _id = _pv ? "" : _rows[clamp(_u.onl_row, 0, array_length(_rows) - 1)];
     draw_set_halign(fa_center);
     draw_set_color(c_yellow);
-    // DRBR: the mode's name (it was KNIGHT FIGHTS ONLINE): DRBR, and what it stands for under it
-    knight_txt(_cx, yy + 92, "DRBR");
+    knight_txt(_cx, yy + 96, "DRBR");
     draw_set_color(c_white);
-    knight_txt_small(_cx, yy + 120, "DELTARUNE BATTLE ROYALE");
-    draw_set_color(c_gray);
-    knight_txt_small(_cx, yy + 134, "NAME");
+    knight_txt(_cx, yy + 124, "BATTLE ROYALE");
     draw_set_color((_id == "name") ? c_yellow : c_white);
-    knight_txt(_cx, yy + 150, knight_fit(_o.name, 250));
-    draw_set_color(c_gray);
-    var _steam_hide = false;
-    knight_txt_small(_cx, yy + 186, "SKIN");
+    knight_txt(_cx, yy + 160, knight_fit(_o.name, 250));
     var _sk = kfo_skin_ok(_o.skin);
-    kfo_skin_head_draw(_sk, _cx - 76, yy + 204);
+    kfo_skin_head_draw(_sk, _cx - 96, yy + 198);
     // build 52: the look's own colour for its name (yellow while picked)
     draw_set_color((_id == "skin") ? c_yellow : (kfo_skin_cosmetic(_sk) ? kfo_skin_col(_sk) : c_white));
-    knight_txt(_cx + 16, yy + 202, "< " + string_upper(kfo_skin_name(_sk)) + " >");
+    knight_txt(_cx + 4, yy + 196, knight_fit("< " + string_upper(kfo_skin_name(_sk)) + " >", 160));
     // build 47: how you walk around the room with it (the skin's own walking frames)
     var _ws = kfo_world_skin_spr(_sk, 0);
-    draw_sprite_ext(_ws, (current_time div 200) mod max(1, sprite_get_number(_ws)), _cx + 92, yy + 192, 1, 1, 0, c_white, 1);
-    // build 52: picking a skin - its preview in place of the STEAM / RELAY lines: the portrait (when it has one), the battle
-    // pose, and what it is
+    draw_sprite_ext(_ws, (current_time div 200) mod max(1, sprite_get_number(_ws)), _cx + 100, yy + 188, 1, 1, 0, c_white, 1);
+    var _side = false;
+    // build 52: picking a skin - its preview in place of the STEAM / RELAY lines
     if (_id == "skin")
     {
         kfo_ui_skin_preview(_sk, _cx, yy + 236);
-        _steam_hide = true;
+        _side = true;
     }
     // DRBR: BOSSES picked: who there is to fight, in place of the STEAM / RELAY lines
     if (_id == "bosses")
     {
         kfo_ui_boss_teaser(_cx, yy + 240);
-        _steam_hide = true;
+        _side = true;
     }
-    draw_set_color(c_gray);
-    if (!_steam_hide)
+    if (!_side)
     {
-        knight_txt_small(_cx, yy + 240, "STEAM");
         draw_set_color(_steam ? c_lime : make_color_rgb(255, 150, 120));
-        knight_txt_small(_cx, yy + 256, knight_fit_small(_steam ? ("READY - " + kfo_steam_name() + " (" + kfo_vis_name(_o.vis) + " ROOMS)") : kfo_steam_why_short(), 260));
-        draw_set_color(c_gray);
-        knight_txt_small(_cx, yy + 280, "RELAY SERVER");
-        draw_set_color(c_white);
-        knight_txt_small(_cx, yy + 296, knight_fit_small(kfo_server_text(), 250));
+        knight_txt(_cx, yy + 236, knight_fit(_steam ? "STEAM: READY" : kfo_steam_why_short(), 262));
+        draw_set_color(c_ltgray);
+        knight_txt(_cx, yy + 268, knight_fit("RELAY: " + kfo_server_text(), 262));
+        // status: connecting, or why the last try failed, or what DRBR is
+        var _st = "";
+        var _col = c_white;
+        if (_busy)
+        {
+            _st = (_o.mode == "steam") ? "Talking to Steam..." : ((_o.st == "connecting") ? ("Connecting to " + kfo_server_text() + "...") : "Asking for the room...");
+            _col = c_yellow;
+        }
+        else if (_o.err != "")
+        {
+            _st = _o.err;
+            _col = make_color_rgb(255, 110, 110);
+        }
+        else
+        {
+            _st = "Up to 8 players. The last SOUL standing wins.";
+            _col = c_gray;
+        }
+        draw_set_color(_col);
+        knight_para_fit(_cx, yy + 308, _st, 262, 3);
     }
-    // status: connecting, or why the last try failed
-    var _st = "";
-    var _col = c_white;
-    if (_busy)
-    {
-        _st = (_o.mode == "steam") ? "TALKING TO STEAM..." : ((_o.st == "connecting") ? ("CONNECTING TO " + string_upper(kfo_server_text()) + "...") : "ASKING FOR THE ROOM...");
-        _col = c_yellow;
-    }
-    else if (_o.err != "")
-    {
-        _st = _o.err;
-        _col = make_color_rgb(255, 110, 110);
-    }
-    else
-    {
-        _st = "2 TO 8 PLAYERS, ONE SHARED BOSS. THE LAST SOUL STANDING WINS.";
-        _col = c_gray;
-    }
-    draw_set_color(_col);
-    knight_para_small(_cx, yy + 324, _st, 260, 4);
     draw_set_halign(fa_left);
 }
 
@@ -1442,7 +1464,7 @@ function kfo_ui_draw_opt(xx, yy)
         if (_val != "")
         {
             draw_set_color(c_yellow);
-            knight_txt_small(xx + 345, _y + 8, knight_fit_small(_val, 230));
+            knight_txt(xx + 336, _y, knight_fit(_val, 236));
         }
         if (_hot)
             knight_heart(xx + 75, _y + 10);
@@ -1452,19 +1474,25 @@ function kfo_ui_draw_opt(xx, yy)
 
 function kfo_ui_draw_keys(xx, yy)
 {
+    // DRBR 1.0.1: in the menu's size - 10 rows at a time (the list scrolls with the heart), the key and the controller's button
+    // beside each action
     var _u = global.knight_ui;
     draw_set_color(c_white);
-    draw_rectangle(xx + 300, yy + 91, xx + 305, yy + 410, false);
+    draw_rectangle(xx + 326, yy + 91, xx + 329, yy + 410, false);
     knight_caption_hub("KEYBINDS", xx + 112, yy + 84);
     var _rows = kfo_ui_keys_rows();
+    var _n = array_length(_rows);
+    var _shown = min(10, _n);
+    var _first = clamp(_u.keys_row - (_shown - 1), 0, _n - _shown);
     draw_set_color(c_gray);
-    knight_txt_small(xx + 345, yy + 94, "KEY");
-    knight_txt_small(xx + 490, yy + 94, "CONTROLLER");
-    for (var _i = 0; _i < array_length(_rows); _i++)
+    knight_txt(xx + 342, yy + 90, "KEY");
+    draw_set_halign(fa_right);
+    knight_txt(xx + 572, yy + 90, "CONTROLLER");
+    draw_set_halign(fa_left);
+    for (var _i = _first; _i < _first + _shown; _i++)
     {
         var _id = _rows[_i];
-        // DRBR: 20 px rows (14 of them: the last, DONE, used to sit on the frame's bottom edge)
-        var _y = yy + 108 + (_i * 20);
+        var _y = yy + 120 + ((_i - _first) * 28);
         var _hot = (_u.keys_row == _i);
         var _lab = "";
         switch (_id)
@@ -1473,64 +1501,85 @@ function kfo_ui_draw_keys(xx, yy)
             case "done": _lab = "DONE"; break;
             default: _lab = kfo_key_title(_id); break;
         }
-        // build 48: 13 rows (the targeting keys) - the page's smaller text so they fit
         draw_set_color(_hot ? c_yellow : c_white);
-        knight_txt_small(xx + 100, _y + 4, knight_fit_small(_lab, 190));
+        knight_txt(xx + 100, _y, knight_fit(_lab, 220));
         if (_id != "reset" && _id != "done")
         {
             draw_set_color(_hot ? c_yellow : c_white);
-            knight_txt_small(xx + 345, _y + 4, knight_fit_small(kfo_key_label(_id), 135));
+            knight_txt(xx + 342, _y, knight_fit(kfo_key_label(_id), 130));
+            draw_set_halign(fa_right);
             draw_set_color(c_gray);
-            knight_txt_small(xx + 490, _y + 4, kfo_key_pad_name(_id));
+            knight_txt(xx + 572, _y, knight_fit(kfo_key_pad_name(_id), 92));
+            draw_set_halign(fa_left);
         }
         if (_hot)
-            knight_heart(xx + 75, _y + 6);
+            knight_heart(xx + 75, _y + 8);
     }
-    draw_set_halign(fa_center);
-    draw_set_color(c_gray);
-    knight_txt_small(xx + 443, yy + 388, "ARROWS: MOVE   X: SLOW (THE GAME'S)");
-    draw_set_halign(fa_left);
+    knight_ui_arrows(xx + 84, yy + 116, yy + 120 + (_shown * 28) - 6, _first > 0, _first + _shown < _n, _u.siner);
 }
 
 function kfo_ui_draw_browse(xx, yy)
 {
+    // DRBR 1.0.1: in the menu's size (a room of another build: OLD or NEW)
     var _u = global.knight_ui;
     var _o = kfo_get();
     knight_caption_hub("ONLINE", xx + 112, yy + 84);
     var _l = _o.browse;
     draw_set_color(c_gray);
-    knight_txt_small(xx + 100, yy + 100, "CODE");
-    knight_txt_small(xx + 210, yy + 100, "HOST");
-    knight_txt_small(xx + 420, yy + 100, "PLAYERS");
-    knight_txt_small(xx + 510, yy + 100, "STATE");
-    for (var _i = 0; _i < array_length(_l) && _i < 9; _i++)
+    knight_txt(xx + 100, yy + 96, "CODE");
+    knight_txt(xx + 214, yy + 96, "HOST");
+    draw_set_halign(fa_right);
+    knight_txt(xx + 466, yy + 96, "PLAYERS");
+    knight_txt(xx + 566, yy + 96, "STATE");
+    draw_set_halign(fa_left);
+    // (8 at a time: the list scrolls with the heart)
+    var _first = clamp(_u.br_row - 7, 0, max(0, array_length(_l) - 8));
+    knight_ui_arrows(xx + 84, yy + 124, yy + 128 + (8 * 30) - 6, _first > 0, _first + 8 < array_length(_l), _u.siner);
+    for (var _i = _first; _i < array_length(_l) && _i < _first + 8; _i++)
     {
         var _e = _l[_i];
-        var _y = yy + 122 + (_i * 30);
+        var _y = yy + 128 + ((_i - _first) * 30);
         var _hot = (_u.br_row == _i);
         var _bad = (_e.ver != kfo_version()) || _e.np >= _e.mx;
         draw_set_color(_bad ? c_gray : (_hot ? c_yellow : c_white));
-        knight_txt_small(xx + 100, _y, _e.code);
-        knight_txt_small(xx + 210, _y, knight_fit_small(_e.host, 200));
-        knight_txt_small(xx + 420, _y, string(_e.np) + "/" + string(_e.mx));
-        knight_txt_small(xx + 510, _y, (_e.ver != kfo_version()) ? ("BUILD " + string(_e.ver)) : string_upper(_e.st));
+        knight_txt(xx + 100, _y, _e.code);
+        knight_txt(xx + 214, _y, knight_fit(_e.host, 150));
+        draw_set_halign(fa_right);
+        knight_txt(xx + 466, _y, string(_e.np) + "/" + string(_e.mx));
+        knight_txt(xx + 566, _y, (_e.ver != kfo_version()) ? ((_e.ver < kfo_version()) ? "OLD" : "NEW") : knight_fit(string_upper(_e.st), 90));
+        draw_set_halign(fa_left);
         if (_hot)
-            knight_heart(xx + 75, _y + 2);
+            knight_heart(xx + 75, _y + 8);
     }
     draw_set_halign(fa_center);
     draw_set_color(c_ltgray);
     var _msg = _o.browse_st;
     if (_msg == "" && array_length(_l) == 0)
-        _msg = "NO PUBLIC ROOMS RIGHT NOW. C: LOOK AGAIN.";
+        _msg = "No public rooms right now. C: look again.";
     // (DRBR: above the frame's bottom edge - it used to be drawn over it)
-    knight_txt_small(xx + 320, yy + 388, _msg);
+    knight_para_fit(xx + 320, yy + 372, _msg, 500, 1);
     draw_set_halign(fa_left);
+}
+
+// DRBR 1.0.1: a player's status as the room's list shows it (5 letters at most - the names stay readable beside it)
+function kfo_ui_pstatus_short(_t)
+{
+    switch (_t)
+    {
+        case "WATCHING": return "WATCH";
+        case "WAITING": return "WAIT";
+        case "REMATCH": return "VOTED";
+    }
+    if (string_copy(_t, 1, 5) == "OUT #")
+        return "OUT " + string_delete(_t, 1, 5);
+    return _t;
 }
 
 function kfo_ui_draw_lobby(xx, yy)
 {
     var _u = global.knight_ui;
     var _o = kfo_get();
+    var _pv = kfo_ui_pv();
     draw_set_color(c_white);
     draw_rectangle(xx + 300, yy + 91, xx + 305, yy + 410, false);
     knight_caption_hub("PLAYERS", xx + 112, yy + 84);
@@ -1538,44 +1587,44 @@ function kfo_ui_draw_lobby(xx, yy)
     var _pl = kfo_lobby_players();
     var _hostid = is_struct(_o.lobby) ? kfo_jn(_o.lobby, "host", _o.hostid) : _o.hostid;
     var _match = kfo_lobby_matching();
-    // build 47: each player's skin, SOUL color (the small SOUL), name, status (HOST / READY / REMATCH / ALIVE / OUT / WATCHING)
-    // and ping; more than 8 (watch places) in shorter rows
+    // build 47: each player's skin, SOUL color (the small SOUL), name, status (HOST / READY / VOTED / ALIVE / OUT / WATCH) and
+    // ping; more than 8 (watch places) in shorter rows. DRBR 1.0.1: all in the menu's size - the status short, the ping a bar
+    // (green / yellow / red) at the row's end
     var _many = (array_length(_pl) > 8);
     var _rh = _many ? 25 : 37;
     for (var _i = 0; _i < array_length(_pl) && _i < 12; _i++)
     {
         var _p = _pl[_i];
-        var _y = yy + 104 + (_i * _rh);
+        var _y = yy + (_many ? 96 : 104) + (_i * _rh);
         var _pid = kfo_jn(_p, "pid", -2);
         if (!_many)
-        {
             kfo_skin_head_draw(kfo_skin_ok(kfo_jn(_p, "s", 1)), xx + 64, _y + 4);
-        }
         var _pc = kfo_col_ok(kfo_jn(_p, "cl", -1), kbr_pcol(_i));
         if (kfo_jn(_p, "bot", 0) == 1)
             _pc = kbr_pcol(_i);
-        kfo_soul_draw(xx + (_many ? 66 : 88), _y + (_many ? 3 : 9), 0.625, _pc, 1, kfo_col_outline(_pc, 0));
-        draw_set_color((_pid == _o.my) ? c_yellow : c_white);
-        if (_many)
-            knight_txt_small(xx + 84, _y + 2, knight_fit_small(kfo_js(_p, "n", "?"), 120));
-        else
-            knight_txt(xx + 104, _y, knight_fit(kfo_js(_p, "n", "?"), 112));
+        kfo_soul_draw(xx + (_many ? 66 : 88), _y + (_many ? 6 : 9), 0.625, _pc, 1, kfo_col_outline(_pc, 0));
         var _ps = kfo_ui_pstatus(_p, _hostid, _match);
+        var _st = kfo_ui_pstatus_short(_ps[0]);
+        scr_84_set_draw_font("mainbig");
+        var _sw = string_width(_st);
+        var _nx = xx + (_many ? 84 : 104);
+        draw_set_color((_pid == _o.my) ? c_yellow : c_white);
+        knight_txt(_nx, _y, knight_fit(kfo_js(_p, "n", "?"), (xx + 286 - _sw - 8) - _nx));
         draw_set_halign(fa_right);
         draw_set_color(_ps[1]);
-        knight_txt_small(xx + 294, _y + (_many ? 2 : 4), _ps[0]);
+        knight_txt(xx + 286, _y, _st);
+        draw_set_halign(fa_left);
         var _lat = kfo_jn(_p, "lat", -1);
-        if (!_many && kfo_jn(_p, "bot", 0) != 1 && _pid != _hostid && _lat >= 0)
+        if (kfo_jn(_p, "bot", 0) != 1 && _pid != _hostid && _lat >= 0)
         {
             draw_set_color((_lat < 100) ? c_lime : ((_lat < 200) ? c_yellow : c_red));
-            knight_txt_small(xx + 294, _y + 18, kbr_ping_text(_lat));
+            draw_rectangle(xx + 291, _y + 6, xx + 293, _y + 20, false);
         }
-        draw_set_halign(fa_left);
     }
     if (array_length(_pl) == 0)
     {
         draw_set_color(c_gray);
-        knight_txt_small(xx + 100, yy + 110, "WAITING FOR THE HOST...");
+        knight_para(xx + 80, yy + 110, "WAITING FOR THE HOST...", 210, 2);
     }
     // the room: code, my rows, the settings in short, what is going on
     var _cx = xx + 443;
@@ -1593,7 +1642,7 @@ function kfo_ui_draw_lobby(xx, yy)
     for (var _i = _sc; _i < array_length(_rows) && _i < _sc + _shown; _i++)
     {
         var _y = yy + 132 + ((_i - _sc) * _rh2);
-        var _hot = (_u.lob_row == _i);
+        var _hot = (_u.lob_row == _i) && !_pv;
         var _t = "";
         switch (_rows[_i])
         {
@@ -1625,30 +1674,21 @@ function kfo_ui_draw_lobby(xx, yy)
         if (_hot)
             knight_heart(xx + 320, _y + 10);
     }
-    // more rows above / below: at the right end of the first / last row shown, inside the frame
-    draw_set_color(c_gray);
-    if (_sc > 0)
-        knight_txt_small(xx + 564, yy + 132 + 4, "^");
-    if (_sc + _shown < array_length(_rows))
-        knight_txt_small(xx + 564, yy + 132 + ((min(_shown, array_length(_rows)) - 1) * _rh2) + 8, "v");
+    // more rows above / below: the game's arrows at the rows' right end, inside the frame
+    knight_ui_arrows(xx + 566, yy + 130, yy + 132 + (min(_shown, array_length(_rows)) * _rh2) - 6, _sc > 0, _sc + _shown < array_length(_rows), _u.siner);
+    // the settings in short (the preset; its modifiers, else its summary), then what the room is doing
     var _s = kfo_lobby_set();
-    var _ty = yy + 132 + (min(_shown, array_length(_rows)) * _rh2) + 4;
+    var _ty = yy + 132 + (min(_shown, array_length(_rows)) * _rh2) + 2;
     draw_set_halign(fa_center);
     draw_set_color(c_yellow);
-    knight_txt_small(_cx, _ty, "PRESET: " + _s.pre);
-    draw_set_color(c_ltgray);
-    knight_txt_small(_cx, _ty + 16, knight_fit_small(kfo_kn_short_list(_s.kn, ", "), 260));
-    knight_txt_small(_cx, _ty + 32, knight_fit_small(kfo_set_summary(_s), 260));
+    knight_txt(_cx, _ty, knight_fit("PRESET: " + _s.pre, 262));
     var _mt = kfo_set_muts_text(_s);
-    if (_mt != "")
-    {
-        draw_set_color(c_orange);
-        knight_txt_small(_cx, _ty + 48, knight_fit_small(_mt, 260));
-    }
+    draw_set_color((_mt != "") ? c_orange : c_ltgray);
+    knight_txt(_cx, _ty + 28, knight_fit((_mt != "") ? _mt : kfo_set_summary(_s), 262));
     draw_set_color(c_white);
     // the room's status under it: as many lines as fit above the frame's bottom edge (y 406)
-    var _sy = _ty + ((_mt != "") ? 68 : 52);
-    knight_para_small(_cx, _sy, kfo_ui_lobby_status(), 260, clamp(floor(((yy + 406) - _sy - 13) / 16) + 1, 1, 3));
+    var _sy = _ty + 58;
+    knight_para_fit(_cx, _sy, kfo_ui_lobby_status(), 262, clamp(floor(((yy + 406) - _sy) / 30), 1, 2));
     draw_set_halign(fa_left);
 }
 
@@ -1721,11 +1761,12 @@ function kfo_ui_draw_set(xx, yy)
     }
     var _items = kfo_ui_set_items(_u.set_row);
     var _ni = array_length(_items);
-    var _rows = 9;
-    var _y0 = yy + 116;
+    // DRBR 1.0.1: the preset line in the menu's size (only the host changes them: the top bar says so), 8 rows under it
+    var _rows = 8;
+    var _y0 = yy + 132;
     draw_set_halign(fa_center);
     draw_set_color((_u.set_row == kfo_cat_pre()) ? c_gray : kfo_preset_col_name(_s.pre));
-    knight_txt_small(xx + 410, yy + 99, (_u.set_row == kfo_cat_pre()) ? "PICK ONE, PRESS Z" : knight_fit_small("PRESET: " + _s.pre + (_host ? "" : "  -  ONLY THE HOST CHANGES"), 320));
+    knight_txt(xx + 410, yy + 98, (_u.set_row == kfo_cat_pre()) ? "PICK ONE, PRESS Z" : knight_fit("PRESET: " + _s.pre, 320));
     draw_set_halign(fa_left);
     var _vx = xx + 558;
     for (var _i = _u.set_scroll; _i < _ni && _i < _u.set_scroll + _rows; _i++)
@@ -1769,8 +1810,8 @@ function kfo_ui_draw_set(xx, yy)
             {
                 var _bob = round(sin(current_time / 160) * 1.5);
                 draw_set_color(c_yellow);
-                knight_txt_small(_vx - _vw - 14 - _bob, _y + 6, "<");
-                knight_txt_small(_vx + 3 + _bob, _y + 6, ">");
+                knight_txt(_vx - _vw - 16 - _bob, _y, "<");
+                knight_txt(_vx + 2 + _bob, _y, ">");
             }
         }
         // build 52: a preset in its own colour (the picked one yellow)
@@ -1785,30 +1826,32 @@ function kfo_ui_draw_set(xx, yy)
     // more above / below
     draw_set_color(c_white);
     if (_u.set_scroll > 0)
-        draw_sprite_ext(spr_morearrow, 0, xx + 560, yy + 114 - round(abs(sin(current_time / 200)) * 3), 1, -1, 0, c_white, 1);
+        draw_sprite_ext(spr_morearrow, 0, xx + 560, yy + 128 - round(abs(sin(current_time / 200)) * 3), 1, -1, 0, c_white, 1);
     if (_u.set_scroll + _rows < _ni)
         draw_sprite_ext(spr_morearrow, 0, xx + 560, yy + 396 + round(abs(sin(current_time / 200)) * 3), 1, 1, 0, c_white, 1);
     // (DRBR: that only the host changes them is said in the line under the title - it used to sit on the box's frame here)
 }
 
-// build 52: the big menu font, squeezed sideways only when it does not fit _w (left-aligned / right-aligned at _x)
+// build 52: the big menu font in _w at _x (left-aligned / centred / right-aligned). DRBR 1.0.1: a text too long for _w scrolls by
+// itself (knight_fit) - it was squeezed sideways
 function knight_txt_fit(_x, _y, _s, _w)
 {
-    scr_84_set_draw_font("mainbig");
-    var _sw = string_width(_s);
-    if (_sw <= _w)
-        draw_text(_x, _y, _s);
-    else
-        draw_text_transformed(_x, _y, _s, max(0.55, _w / _sw), 1, 0);
+    draw_set_halign(fa_left);
+    knight_txt(_x, _y, knight_fit(_s, _w));
+}
+
+// (it leaves the alignment centred, as where it is used)
+function knight_txt_fit_c(_x, _y, _s, _w)
+{
+    draw_set_halign(fa_center);
+    knight_txt(_x, _y, knight_fit(_s, _w));
 }
 
 function knight_txt_fit_r(_x, _y, _s, _w)
 {
-    scr_84_set_draw_font("mainbig");
-    var _sw = string_width(_s);
-    var _k = (_sw <= _w) ? 1 : max(0.55, _w / _sw);
+    draw_set_halign(fa_right);
+    knight_txt(_x, _y, knight_fit(_s, _w));
     draw_set_halign(fa_left);
-    draw_text_transformed(_x - (_sw * _k), _y, _s, _k, 1, 0);
 }
 
 // the KNIGHT tab card for ONLINE
@@ -1820,7 +1863,7 @@ function kfo_ui_card(xx, yy)
     draw_set_color(c_yellow);
     // DRBR (it was KNIGHT FIGHTS ONLINE)
     knight_txt(_cx, yy + 110, "DRBR");
-    knight_txt_small(_cx, yy + 142, "DELTARUNE BATTLE ROYALE");
+    knight_txt(_cx, yy + 140, "BATTLE ROYALE");
     draw_set_color(c_white);
     knight_txt(_cx, yy + 186, "2 TO 8 SOULS");
     knight_txt(_cx, yy + 216, "ONE SHARED BOSS");
@@ -1885,11 +1928,11 @@ function kfo_ui_skin_preview(_sk, _cx, _y)
         {
             draw_set_color(make_color_rgb(255, 150, 120));
             draw_set_halign(fa_center);
-            knight_txt_small(_bx, _y + 30, "MISSING ART");
+            knight_txt(_bx, _y + 30, "MISSING ART");
         }
     }
     draw_set_halign(fa_center);
     draw_set_color(_d.own ? c_gray : _d.col);
-    knight_txt_small(_cx, _y + 72, _d.own ? "THE GAME'S OWN HERO" : "ONLINE-ONLY LOOK - SAME HP AND SOUL");
+    knight_para_fit(_cx, _y + 72, _d.own ? "THE GAME'S OWN HERO" : "ONLINE LOOK: SAME HP AND SOUL", 262, 2);
     return 1;
 }

@@ -254,10 +254,11 @@ function knight_stats_taken(_c, _d)
     return 0;
 }
 
-// the FIGHT STATS box: damage per member, then the attacks (most hits first), 8 per page
+// the FIGHT STATS box: damage per member, then the attacks (most hits first), 4 per page (8 before 1.0.1)
 function knight_stats_per_page()
 {
-    return 8;
+    // (DRBR 1.0.1: 4 - the box's lines are in the menu's size)
+    return 4;
 }
 
 function knight_stats_lines(_r)
@@ -292,9 +293,9 @@ function knight_stats_lines(_r)
         var _a = _st.atk[_ord[_i]];
         array_push(_l, ["s", "  " + _a.n, "x" + string(_a.seen), string(_a.hits), _a.hits == 0]);
     }
-    var _foot = string(_st.turns) + " enemy turns, " + string(_n) + ((_n == 1) ? " attack." : " different attacks.") + " Yellow: never hit you.";
+    var _foot = string(_st.turns) + " turns, " + string(_n) + ((_n == 1) ? " attack." : " attacks.") + " Yellow: never hit you.";
     if (_pages > 1)
-        _foot = "Page " + string((_p0 div _per) + 1) + " of " + string(_pages) + ". " + _foot;
+        _foot = "Page " + string((_p0 div _per) + 1) + "/" + string(_pages) + ". " + _foot;
     array_push(_l, ["~", _foot]);
     return _l;
 }

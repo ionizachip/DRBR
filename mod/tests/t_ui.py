@@ -28,13 +28,17 @@ def press(k, n=1):
 for _ in range(12): frame()
 eq((U('tp'), U('bp')), (80, 60), 'bars slid in')
 eq(U('focus'), 0, 'starts on the tab bar')
-eq(U('tab'), 0, 'KNIGHT tab first')
-press('right'); eq(U('tab'), 1, 'right: PARTY'); press('left', 2); eq(U('tab'), 4, 'left wraps to CONFIG')
-press('right'); eq(U('tab'), 0, 'right wraps to KNIGHT')
+# DRBR 1.0.1: the top bar is ONLINE, KNIGHT, PARTY, POWER, RULES, CONFIG (ONLINE is its own page, tab 5; the others keep 0-4)
+eq(U('tab'), 5, 'ONLINE tab first')
+press('right'); eq(U('tab'), 0, 'right: KNIGHT'); press('right'); eq(U('tab'), 1, 'right: PARTY')
+press('left', 3); eq(U('tab'), 4, 'left wraps to CONFIG')
+press('right'); eq(U('tab'), 5, 'right wraps to ONLINE')
+press('right'); eq(U('tab'), 0, 'right: KNIGHT again')
 # KNIGHT tab: rows wrap, Z selects + opens START
 press('ok'); eq(U('focus'), 1, 'Z enters the tab')
-# build 52: the KNIGHT page is a carousel (< > the knights) over the MODE strip (< > the modes, ONLINE last); UP / DOWN switch
-press('down'); press('left'); eq(U('krow'), 10, 'DOWN to the MODE strip, LEFT wraps to ONLINE')
+# build 52: the KNIGHT page is a carousel (< > the knights) over the MODE strip (< > the modes); UP / DOWN switch
+# (DRBR 1.0.1: ONLINE is no longer in the strip - the last mode is ATTACK REMIX, row 9)
+press('down'); press('left'); eq(U('krow'), 9, 'DOWN to the MODE strip, LEFT wraps to ATTACK REMIX')
 press('up'); eq(U('krow'), 0, 'UP back to the carousel, on the knight it was on (NORMAL)')
 press('right'); eq(U('krow'), 1, 'RIGHT to KAIZO')
 press('ok')
@@ -85,7 +89,10 @@ for name in ('presets', 'records', 'credits'):
         eq(U('cr_i'), c0, 'credits: right cycles through every page and wraps')
         pages = sim.eval('knight_credit_pages(1)'); sim.run('global.knight_ui.cr_i = 1;')
         if pages > 1:
-            press('ok'); eq(U('cr_page'), 1, 'credits: Z next page'); press('ok'); eq(U('cr_page'), 0, 'credits: wraps to page 1')
+            # (DRBR 1.0.1: as many pages as the entry has in the menu's size - Z goes through them all and wraps)
+            press('ok'); eq(U('cr_page'), 1, 'credits: Z next page')
+            for _ in range(int(pages) - 1): press('ok')
+            eq(U('cr_page'), 0, 'credits: wraps to page 1 after its %d pages' % int(pages))
     press('back'); eq(U('sub'), '', 'X leaves ' + name)
 # presets: save into slot 1, rename, load, delete
 sim.run('global.knight_ui.crow = %d;' % ids.index('presets')); press('ok')
@@ -122,7 +129,7 @@ ok(sim.eval('global.knight_ui.warnok'), 'a yellow Loaded note shows')
 press('back'); press('back')
 # PARTY: change member in slot 3 to nobody, then Noelle
 eq(U('focus'), 0, 'on the tab bar'); eq(U('tab'), 4, 'still CONFIG')
-press('right', 2); press('ok'); eq(U('tab'), 1, 'PARTY')
+press('right', 3); press('ok'); eq(U('tab'), 1, 'PARTY')   # (CONFIG -> ONLINE -> KNIGHT -> PARTY)
 press('right', 2); eq(U('pslot'), 2, 'slot 3')
 p0 = sim.eval('global.knight_cfg.party[2]')
 press('down'); ok(sim.eval('global.knight_cfg.party[2]') != p0, 'down changes the member')

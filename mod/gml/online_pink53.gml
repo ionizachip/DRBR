@@ -35,8 +35,8 @@ function kbr_enc_def_pink()
                "What the heck&is happening!?&Why are we SPLIT!?", "It's YOU! You&guys are making&her act funny&Die. Die! DIE!!!",
                "Hey, you're MY&body, GET IT!?&My body means...", "You do... what&I WANT!!!", "No... NO, it&can't be! It's&ME! It needs to do&what I SAY!!!",
                "AND STOP! MAKING!&MY HEART BEAT!!", "What? Nowadays just&being a tough battle&isn't enough to&scrape by, mew!", "Body! Listen!!&I'll... I'll&show you!!"],
-        again: ["Stop... looking!", "Stop making my&body purr, you&jerks!", "Mew.&Mew!&MEW!", "What! WHAT do&I look like,&a pincushion!?", "I want to&DATE, mew!", "I like you,&mew!"],
-        flavor: ["* Pink mews madly!", "* Pink spins her head around and laughs.", "* Pink stares at a mirror.. she doesn't turn around.",
+        again: ["Stop... looking!", "Stop making my&body purr, you&jerks!", "Mew.&Mew!&MEW!", "What!? WHAT do&I look like,&a pincushion!?", "I want to&DATE, mew!", "I like you,&mew!"],
+        flavor: ["* Pink mews madly!", "* Pink spins her head around and laughs.", "* Pink stares at a mirror... she doesn't turn around.",
                  "* The air swirls in rosy chaos.", "* Smells like perfume and plastic."],
         // her pieces that are not bullets (the cut's own clean-up never sees them)
         objs: [obj_pk_purple, obj_pk_move, obj_pk_smoke, obj_pk_chargeball, obj_pk_chargestar, obj_pk_meteor, obj_pk_flamebit, obj_pk_rollbg,
@@ -232,6 +232,28 @@ function kbr_pk_puppet(_tx, _ty)
             case 2:
                 lane_x = clamp(round((_dx / 40) + 1.5), 0, 3);
                 lane_y = clamp(round((_dy / 40) + 1.5), 0, 3);
+                break;
+            case 7:
+                // (DRBR 1.0.1) the tunnel: on the ring the followed one is on
+                var _dist = point_distance(0, 0, _dx, _dy);
+                var _bl = -1;
+                var _bd = 9999;
+                for (var _i = 0; _i < 8; _i++)
+                {
+                    if (tunnel_radius[_i] > 6 && abs(tunnel_radius[_i] - _dist) < _bd)
+                    {
+                        _bd = abs(tunnel_radius[_i] - _dist);
+                        _bl = _i;
+                    }
+                }
+                if (_bl >= 0 && heart_travel == 0)
+                    tunnel_lane_layer = _bl;
+                break;
+            case 8:
+                // (DRBR 1.0.1) the maze: off to the node the followed one is at (the maze moves it there as it moves a SOUL)
+                var _nn = instance_nearest(_tx, _ty, obj_pk_node);
+                if (_nn != noone && _nn != node_id && point_distance(_nn.x, _nn.y, _tx, _ty) < 24 && heart_travel <= 0)
+                    node_id = _nn;
                 break;
             default:
                 x_ongrid = _dx;
@@ -438,8 +460,33 @@ function kbr_pk_draw()
     }
     draw_sprite_ext(_sp, siner, x + _ox, y + _oy, 2, 2, 0, c_white, image_alpha);
     if (say_t > 0)
-        kbr_enc_balloon(x - 6, y + 30, say, min(1, say_t / 10));
+        kbr_enc_say(x, y, x + 82, y + 84, say, min(1, say_t / 10));
     return 1;
+}
+
+// her line while she is in the battle herself (obj_pk_move's Draw: her own object is hidden meanwhile) - by where it shows her
+function kbr_pk_move_say()
+{
+    if (!instance_exists(obj_pk_pink))
+        return 0;
+    var _p = instance_find(obj_pk_pink, 0);
+    if (_p.visible || _p.say_t <= 0)
+        return 0;
+    // where the Draw above puts her (in the air: on her jump's arc), and her sprite's size there
+    var _xx = x;
+    var _yy = y;
+    if (air_time > 0)
+    {
+        _xx = lerp(dest_x, x, air_time);
+        _yy = lerp(dest_y, y, air_time) + lengthdir_y(air_height, (1 - air_time) * 180);
+    }
+    if (sprite_index == spr_pk_pink_idle)
+    {
+        _xx -= (24 * image_xscale);
+        _yy -= (19 * image_yscale);
+    }
+    var _r = kbr_bl_spr_rect(_xx, _yy);
+    return kbr_enc_say(_r[0], _r[1], _r[2], _r[3], _p.say, min(1, _p.say_t / 10));
 }
 
 // ---------- the cut (the attack's end in this game): her pieces go, the SOUL is itself again, the box and she come back ----------
@@ -508,15 +555,60 @@ function kbr_pk_bg_create()
 {
     a = 0;
     t = 0;
+    // 1.0.1: Chapter 5's stage. Black behind it all (her fight takes the battle background away); while the stage is lit (Chapter
+    // 5: the player's turn - here the moments between her attacks) her spotlight is on and the audience is in: the back row
+    // dropped in from above (yoffset 124), the front row risen from below (-300); during her attacks they go and it is dark
+    lit = 0;
+    dyb = 0;
+    dyf = 0;
+    sx = 0;
     visible = true;
     return 1;
 }
 
 function kbr_pk_bg_step()
 {
-    a = clamp(a + (kbr_pk_on() ? 0.05 : -0.05), 0, 1);
+    var _on = kbr_pk_on();
+    a = clamp(a + (_on ? 0.05 : -0.05), 0, 1);
     t++;
+    var _lit = _on && !kbr_pk_attacking();
+    lit = lerp(lit, _lit ? 1 : 0, 0.3);
+    dyb = lerp(dyb, _lit ? 124 : 0, 0.1);
+    dyf = lerp(dyf, _lit ? -300 : 0, 0.1);
+    // (Chapter 5's dummies walk left 2 a frame and come back round)
+    sx = (sx + 2) mod 98736;
     return 1;
+}
+
+// a dummy's jump (_k: its place in the row, _fg: the front row) - Chapter 5's patterns, a new one every 120 frames (no random
+// numbers: the same in every game): a wave (each jumps in turn, vspeed -8, gravity 1), every other one jumping (gravity 0.8),
+// or the glowsticks bobbing (no jumps)
+function kbr_pk_bg_jump(_k, _fg)
+{
+    var _pl = [0, 0, 1, 0, 2];
+    var _pat = _pl[(t div 120) mod 5];
+    var _p = 0;
+    if (_pat == 0)
+    {
+        _p = (t + (_k * (_fg ? 8 : 4))) mod 60;
+        return (_p < 16) ? -((8 * _p) - (0.5 * _p * _p)) : 0;
+    }
+    if (_pat == 1)
+    {
+        _p = (t + ((_k mod 2) * 15)) mod 30;
+        return (_p < 20) ? -((8 * _p) - (0.4 * _p * _p)) : 0;
+    }
+    return 0;
+}
+
+// a glowstick's tilt and bob (Chapter 5: swung +-30 in the wave, raised and bobbed in the third pattern)
+function kbr_pk_bg_stick(_k, _fg)
+{
+    var _pl = [0, 0, 1, 0, 2];
+    var _pat = _pl[(t div 120) mod 5];
+    if (_pat == 2)
+        return [10, ((((t + (_k * 3)) div 5) mod 2) == 0) ? (_fg ? -8 : -3) : 0];
+    return [sin((t + (_k * 4)) * 0.3) * 30, 0];
 }
 
 function kbr_pk_bg_draw()
@@ -525,61 +617,208 @@ function kbr_pk_bg_draw()
         return 0;
     var _cx = camerax();
     var _cy = cameray();
-    draw_set_alpha(a);
-    draw_set_color(make_color_rgb(18, 4, 22));
-    draw_rectangle(_cx - 10, _cy - 10, _cx + 650, _cy + 490, false);
-    draw_set_alpha(1);
-    draw_set_color(c_white);
-    // her spotlight (Chapter 5's spr_pink_spotlight_pink over her place)
-    draw_sprite_ext(spr_pk_pink_spotlight_pink, 0, _cx + 470 + 40, _cy, 2, 2, 0, c_white, a * 0.6);
-    // the back row of the audience (Chapter 5: 16 dummies, every other one jumping with the beat)
-    for (var _i = 0; _i < 16; _i++)
+    draw_sprite_ext(spr_pxwhite, 0, _cx - 10, _cy - 10, 660, 500, 0, c_black, a);
+    // the back row: 16 dummies with glowsticks, 51 apart (Chapter 5: from the view's top - 62, at 2x)
+    if (dyb > 0.5)
     {
-        var _jy = ((((t div 15) + _i) mod 2) == 0) ? -4 : 0;
-        draw_sprite_ext(((_i mod 3) == 0) ? spr_pk_pink_bg_dummy_glowstick : spr_pk_pink_bg_dummy, 0, _cx + 10 + (_i * 40), _cy + 440 + _jy, 2, 2, 0, c_white, a * 0.8);
+        for (var _i = 0; _i < 16; _i++)
+        {
+            var _x = (_cx - 110) + ((((_i * 51) - sx) mod 816) + 816) mod 816;
+            var _y = (_cy - 62) + dyb + kbr_pk_bg_jump(_i, 0);
+            var _g = kbr_pk_bg_stick(_i, 0);
+            draw_sprite_ext(spr_pk_pink_bg_dummy, 0, _x, _y, 2, 2, 0, c_white, a);
+            draw_sprite_ext(spr_pk_pink_bg_dummy_glowstick, 0, _x + 8, (_y - 20) + _g[1], 2, 2, _g[0] + 20, c_white, a);
+        }
+    }
+    // her spotlight, at her feet (Chapter 5: her x + 28, y + 82)
+    if (lit > 0.01 && instance_exists(obj_pk_pink))
+    {
+        var _p = instance_find(obj_pk_pink, 0);
+        if (_p.visible)
+            draw_sprite_ext(spr_pk_pink_spotlight_pink, 0, _p.x + 28, _p.y + 82, 2, 2, 0, c_white, a * lit);
+    }
+    // the front row: 8 big heads 121 apart, turned toward the middle of the stage (Chapter 5: the frame by the fifth of the view
+    // each is in), from the view's bottom + 140
+    if (dyf < -0.5)
+    {
+        for (var _i = 0; _i < 8; _i++)
+        {
+            var _x = (_cx - 221) + ((((_i * 121) - sx) mod 968) + 968) mod 968;
+            var _y = (_cy + 620) + dyf + kbr_pk_bg_jump(_i, 1);
+            draw_sprite_ext(spr_pk_pink_fg_dummy, clamp(4 - floor((_x - _cx) / 128), 0, 4), _x, _y, 2, 2, 0, c_white, a);
+        }
     }
     return 1;
 }
 
 // ---------- the host's bots in her attacks ----------
-// A bot dodges with free moves; inside her lanes, grid or rolling box a SOUL only moves along them: each step the bot's SOUL is put
-// on the nearest lane / node of the purple SOUL's layout (Chapter 5's obj_purplecontrols: 3 lanes 56 apart and free along them,
-// a 4 x 4 grid 40 apart, a "+" of 5 nodes 56 apart), then the normal dodging and hits apply. In the tunnel and the maze (rings,
+// A bot dodges with free moves; inside her lanes, grid or rolling box a SOUL only moves along them: each step the bot's SOUL keeps
+// to the purple SOUL's layout (Chapter 5's obj_purplecontrols: 3 lanes 56 apart and free along them, a 4 x 4 grid 40 apart, a "+"
+// of 5 nodes 56 apart) and goes to the next lane / node when its move goes there, as a key press does (1.0.1), then the normal
+// dodging and hits apply. In the tunnel and the maze (rings,
 // a graph) the bots play by the odds instead - as on Flowery's boards: now and then a ring's zap or a maze's box reaches the
 // bot, which gets through as often as it plays well.
+// DRBR 1.0.1: Pink's layout for a bot's planning (kfo_bot_think): her purple SOUL's mode while the bot keeps to it (1 lanes, 2 grid,
+// 3 "+"; 0 not in it), and the lanes / nodes it can go to now - [[dx, dy], ...] from its SOUL (none while it slides to one)
+function kbr_pk_bot_lanes(_s)
+{
+    if (!instance_exists(obj_pk_purple) || !variable_struct_exists(_s, "pk_m"))
+        return 0;
+    var _p = instance_find(obj_pk_purple, 0);
+    if ((_p.mode != 1 && _p.mode != 2 && _p.mode != 3) || _s.pk_m != _p.mode || _s.pk_id != _p)
+        return 0;
+    return _p.mode;
+}
+
+function kbr_pk_bot_nodes(_s)
+{
+    var _m = kbr_pk_bot_lanes(_s);
+    if (_m == 0)
+        return [];
+    if (_s.pk_sl)
+        return [];
+    var _o = [];
+    switch (_m)
+    {
+        case 1:
+            if (_s.pk_ny > -1)
+                array_push(_o, [0, -56]);
+            if (_s.pk_ny < 1)
+                array_push(_o, [0, 56]);
+            break;
+        case 2:
+            if (_s.pk_nx > 0)
+                array_push(_o, [-40, 0]);
+            if (_s.pk_nx < 3)
+                array_push(_o, [40, 0]);
+            if (_s.pk_ny > 0)
+                array_push(_o, [0, -40]);
+            if (_s.pk_ny < 3)
+                array_push(_o, [0, 40]);
+            break;
+        case 3:
+            if (_s.pk_nx == 0 && _s.pk_ny == 0)
+            {
+                array_push(_o, [56, 0]);
+                array_push(_o, [-56, 0]);
+                array_push(_o, [0, 56]);
+                array_push(_o, [0, -56]);
+            }
+            else
+                array_push(_o, [-_s.pk_nx * 56, -_s.pk_ny * 56]);
+            break;
+    }
+    return _o;
+}
+
 function kbr_pk_bot_snap(_s)
 {
     if (!instance_exists(obj_pk_purple))
         return 0;
     var _p = instance_find(obj_pk_purple, 0);
-    var _dx = _s.x - _p.x;
-    var _dy = _s.y - _p.y;
-    switch (_p.mode)
+    var _m = _p.mode;
+    if (_m != 1 && _m != 2 && _m != 3)
+        return 0;
+    // DRBR 1.0.1: a bot changes lane / node as a player does with a key press - when its move goes that way (3 px of it, about
+    // a frame) and it is on its lane / node, and then slides there at Chapter 5's laneswap speed (20 px a frame). Before, every
+    // move was rounded back onto the bot's own lane / node, so a bot never left it: every piece there hit it, whatever its skill.
+    if (!variable_struct_exists(_s, "pk_m") || _s.pk_m != _m || _s.pk_id != _p)
     {
-        case 1:
-            _s.y = _p.y + (clamp(round(_dy / 56), -1, 1) * 56);
-            _s.x = _p.x + clamp(_dx, -63, 63);
-            break;
-        case 2:
-            _s.x = _p.x + ((clamp(round((_dx / 40) + 1.5), 0, 3) - 1.5) * 40);
-            _s.y = _p.y + ((clamp(round((_dy / 40) + 1.5), 0, 3) - 1.5) * 40);
-            break;
-        case 3:
-            if (abs(_dx) >= abs(_dy))
-            {
-                _s.x = _p.x + (clamp(round(_dx / 56), -1, 1) * 56);
-                _s.y = _p.y;
-            }
-            else
-            {
-                _s.x = _p.x;
-                _s.y = _p.y + (clamp(round(_dy / 56), -1, 1) * 56);
-            }
-            break;
+        // (a new layout: the node nearest to the bot)
+        _s.pk_m = _m;
+        _s.pk_id = _p;
+        var _dx0 = _s.x - _p.x;
+        var _dy0 = _s.y - _p.y;
+        if (_m == 1)
+        {
+            _s.pk_nx = 0;
+            _s.pk_ny = clamp(round(_dy0 / 56), -1, 1);
+        }
+        else if (_m == 2)
+        {
+            _s.pk_nx = clamp(round((_dx0 / 40) + 1.5), 0, 3);
+            _s.pk_ny = clamp(round((_dy0 / 40) + 1.5), 0, 3);
+        }
+        else if (abs(_dx0) >= abs(_dy0))
+        {
+            _s.pk_nx = clamp(round(_dx0 / 56), -1, 1);
+            _s.pk_ny = 0;
+        }
+        else
+        {
+            _s.pk_nx = 0;
+            _s.pk_ny = clamp(round(_dy0 / 56), -1, 1);
+        }
+        _s.pk_ax = 0;
+        _s.pk_ay = 0;
+        _s.pk_sl = false;
     }
+    // the node the bot is on or going to (pk_sl: still sliding there from the last change)
+    var _tx = (_m == 1) ? _s.x : (_p.x + ((_m == 2) ? ((_s.pk_nx - 1.5) * 40) : (_s.pk_nx * 56)));
+    var _ty = _p.y + ((_m == 2) ? ((_s.pk_ny - 1.5) * 40) : (_s.pk_ny * 56));
+    var _on = !_s.pk_sl;
+    // the bot's wish (its move this frame): it adds up while it keeps the same way, and starts over when it stops or turns
+    _s.pk_ax = ((sign(_s.ix) == sign(_s.pk_ax)) ? _s.pk_ax : 0) + _s.ix;
+    _s.pk_ay = ((sign(_s.iy) == sign(_s.pk_ay)) ? _s.pk_ay : 0) + _s.iy;
+    var _wx = (_s.pk_ax >= 3) ? 1 : ((_s.pk_ax <= -3) ? -1 : 0);
+    var _wy = (_s.pk_ay >= 3) ? 1 : ((_s.pk_ay <= -3) ? -1 : 0);
+    if (_on && (_wx != 0 || _wy != 0))
+    {
+        var _ox = _s.pk_nx;
+        var _oy = _s.pk_ny;
+        switch (_m)
+        {
+            case 1:
+                // her 3 lanes (free along them)
+                _s.pk_ny = clamp(_s.pk_ny + _wy, -1, 1);
+                break;
+            case 2:
+                // the 4 x 4 grid: one way at a time, the one it wants most
+                if (_wx != 0 && (_wy == 0 || abs(_s.pk_ax) >= abs(_s.pk_ay)))
+                    _s.pk_nx = clamp(_s.pk_nx + _wx, 0, 3);
+                else
+                    _s.pk_ny = clamp(_s.pk_ny + _wy, 0, 3);
+                break;
+            case 3:
+                // the "+": from the middle out along one way, from an arm back to the middle
+                if (_s.pk_nx == 0 && _s.pk_ny == 0)
+                {
+                    if (_wx != 0 && (_wy == 0 || abs(_s.pk_ax) >= abs(_s.pk_ay)))
+                        _s.pk_nx = _wx;
+                    else
+                        _s.pk_ny = _wy;
+                }
+                else if ((_s.pk_nx != 0 && _wx != _s.pk_nx) || (_s.pk_ny != 0 && _wy != _s.pk_ny))
+                {
+                    _s.pk_nx = 0;
+                    _s.pk_ny = 0;
+                }
+                break;
+        }
+        if (_s.pk_nx != _ox || _s.pk_ny != _oy)
+        {
+            _s.pk_ax = 0;
+            _s.pk_ay = 0;
+            _s.pk_sl = true;
+            _tx = (_m == 1) ? _s.x : (_p.x + ((_m == 2) ? ((_s.pk_nx - 1.5) * 40) : (_s.pk_nx * 56)));
+            _ty = _p.y + ((_m == 2) ? ((_s.pk_ny - 1.5) * 40) : (_s.pk_ny * 56));
+        }
+    }
+    if (_m == 1)
+        _s.x = _p.x + clamp(_s.x - _p.x, -63, 63);
+    else
+        _s.x += clamp(_tx - _s.x, -20, 20);
+    _s.y += clamp(_ty - _s.y, -20, 20);
+    if (_s.pk_sl && abs(_ty - _s.y) <= 0.5 && (_m == 1 || abs(_tx - _s.x) <= 0.5))
+        _s.pk_sl = false;
     return 1;
 }
 
+// Her tunnel and maze (modes 7, 8) are played by the odds (a bot's place there is not the host's: the tunnel turns and the
+// maze opens as the HOST plays): every 45-65 frames a zap or a box reaches the bot, which gets through as often as it plays
+// well. DRBR 1.0.1: the bot plays them where everyone sees it (before, its SOUL sat in the middle) - in the tunnel it goes in
+// and out along her rings, in the maze it walks the maze's paths node to node - and it is decided a little ahead whether it
+// gets through: one that does moves away just before, one that does not stays where the hit comes (kbr_pk_bot_roam).
 function kbr_pk_bot_odds(_h, _b, _c, _box, _e)
 {
     if (!instance_exists(obj_pk_purple))
@@ -588,18 +827,25 @@ function kbr_pk_bot_odds(_h, _b, _c, _box, _e)
     if (_p.mode != 7 && _p.mode != 8)
         return false;
     var _s = _b.bt;
-    _s.x = _p.x;
-    _s.y = _p.y + ((_p.mode == 7) ? 40 : 0);
     if (_s.inv > 0)
         _s.inv--;
     if (!variable_struct_exists(_s, "pkw"))
+    {
         _s.pkw = 30 + irandom(30);
+        _s.pkr = -1;
+    }
     _s.pkw--;
+    // (decided 12 frames ahead, so a pass shows: the bot moves off)
+    var _pass = clamp((_c.prec / 100) * (1 - (_c.miss / 100)) * (1 - (_c.react / 90)), 0.02, 0.995);
+    if (_s.pkw == 12 || (_s.pkw < 12 && _s.pkr < 0))
+        _s.pkr = (random(1) < _pass) ? 1 : 0;
+    kbr_pk_bot_roam(_s, _p, (_s.pkw <= 12 && _s.pkr == 1));
     if (_s.pkw > 0)
         return true;
     _s.pkw = 45 + irandom(20);
-    var _pass = clamp((_c.prec / 100) * (1 - (_c.miss / 100)) * (1 - (_c.react / 90)), 0.02, 0.995);
-    if (random(1) < _pass || _s.inv > 0)
+    var _ok = (_s.pkr == 1);
+    _s.pkr = -1;
+    if (_ok || _s.inv > 0)
     {
         _b.g = min(100, _b.g + ((2.5 / 5) * (_e.grz / 100)));
         return true;
@@ -614,6 +860,108 @@ function kbr_pk_bot_odds(_h, _b, _c, _box, _e)
     if (_b.hp <= 0)
         kfo_host_out_report(_b.pid, round(kfo_host_tick_now()), "out", -1);
     return true;
+}
+
+// a bot's SOUL in her tunnel / maze (_dodge: get away from where it is now - a hazard it passes is coming)
+function kbr_pk_bot_roam(_s, _p, _dodge)
+{
+    var _tx = _s.x;
+    var _ty = _s.y;
+    if (_p.mode == 7)
+    {
+        // the tunnel: on one of her rings (the ones the SOUL can stand on), on the line her SOUL is on (heart_angle); now and
+        // then, and to get out of the way, to the next ring in or out
+        var _lim = 0;
+        with (obj_growtangle)
+            _lim = 35 * image_xscale;
+        if (_lim <= 0)
+            _lim = 131;
+        var _ok = [];
+        for (var _i = 0; _i < 8; _i++)
+        {
+            if (_p.tunnel_radius[_i] > 6 && _p.tunnel_radius[_i] <= _lim)
+                array_push(_ok, _i);
+        }
+        if (array_length(_ok) == 0)
+            return 0;
+        if (!variable_struct_exists(_s, "pkt") || _s.pkt < 0 || _p.tunnel_radius[_s.pkt] <= 6 || _p.tunnel_radius[_s.pkt] > _lim)
+            _s.pkt = _ok[array_length(_ok) - 1];
+        if (!variable_struct_exists(_s, "pkm"))
+            _s.pkm = 0;
+        if (_s.pkm > 0)
+            _s.pkm--;
+        if ((_dodge && _s.pkm <= 0) || irandom(90) == 0)
+        {
+            // the ring next to it (in or out, whichever there is)
+            var _j = -1;
+            for (var _i = 0; _i < array_length(_ok); _i++)
+            {
+                if (_ok[_i] == _s.pkt)
+                    _j = _i;
+            }
+            if (array_length(_ok) > 1)
+            {
+                var _n = (_j <= 0) ? 1 : ((_j >= array_length(_ok) - 1) ? (_j - 1) : (_j + choose(-1, 1)));
+                _s.pkt = _ok[clamp(_n, 0, array_length(_ok) - 1)];
+                _s.pkm = 20;
+            }
+        }
+        var _r = _p.tunnel_radius[_s.pkt];
+        _tx = _p.x + 1 + lengthdir_x(_r, _p.heart_angle);
+        _ty = _p.y + 1 + lengthdir_y(_r, _p.heart_angle);
+    }
+    else
+    {
+        // the maze: along its paths, node to node (a node's children: 0 right, 1 up, 2 left, 3 down); back the way it came at
+        // a dead end
+        if (!variable_struct_exists(_s, "pkn") || !instance_exists(_s.pkn))
+        {
+            _s.pkn = (instance_exists(_p.node_id)) ? _p.node_id : instance_nearest(_s.x, _s.y, obj_pk_node);
+            _s.pkh = [];
+        }
+        if (_s.pkn == noone || !instance_exists(_s.pkn))
+            return 0;
+        _tx = _s.pkn.x;
+        _ty = _s.pkn.y;
+        if (point_distance(_s.x, _s.y, _tx, _ty) < 2 || (_dodge && point_distance(_s.x, _s.y, _tx, _ty) < 6))
+        {
+            var _kids = [];
+            for (var _i = 0; _i < 4; _i++)
+            {
+                if (instance_exists(_s.pkn.child[_i]) && _s.pkn.draw_connection[_i])
+                    array_push(_kids, _s.pkn.child[_i]);
+            }
+            if (array_length(_kids) > 0 && (_dodge || irandom(20) == 0))
+            {
+                array_push(_s.pkh, _s.pkn);
+                if (array_length(_s.pkh) > 12)
+                    array_delete(_s.pkh, 0, 1);
+                _s.pkn = _kids[irandom(array_length(_kids) - 1)];
+            }
+            else if (array_length(_kids) == 0 && array_length(_s.pkh) > 0 && (_dodge || irandom(20) == 0))
+            {
+                var _back = _s.pkh[array_length(_s.pkh) - 1];
+                array_delete(_s.pkh, array_length(_s.pkh) - 1, 1);
+                if (instance_exists(_back))
+                    _s.pkn = _back;
+            }
+            _tx = _s.pkn.x;
+            _ty = _s.pkn.y;
+        }
+    }
+    // (as fast as her SOUL moves there)
+    var _d = point_distance(_s.x, _s.y, _tx, _ty);
+    if (_d <= 8)
+    {
+        _s.x = _tx;
+        _s.y = _ty;
+    }
+    else
+    {
+        _s.x += ((_tx - _s.x) / _d) * 8;
+        _s.y += ((_ty - _s.y) / _d) * 8;
+    }
+    return 1;
 }
 
 // ---------- her SENDS (ids 51-56, the PINK family) ----------

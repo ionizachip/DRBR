@@ -187,48 +187,24 @@ function kfo_ui_inv_change(_id, _ok)
 }
 
 // the right side: the friend, what an invite does, the room's code
-function kfo_ui_prev_inv(xx, yy)
+// the INVITE page under its rows (DRBR 1.0.1: in the menu's size; a friend's state is on its row, what Z does in the top bar):
+// why there is no friends list, and the room's code at the bottom
+function kfo_ui_prev_inv(xx, yy, _nr)
 {
-    var _u = global.knight_ui;
     var _o = kfo_get();
-    var _bx = xx + 330;
-    var _by = yy + 104;
-    draw_set_color(c_black);
-    draw_rectangle(_bx, _by, _bx + 236, _by + 200, false);
-    var _rows = kfo_ui_inv_rows();
-    var _id = _rows[clamp(_u.pg_row, 0, array_length(_rows) - 1)];
-    var _f = kfo_ui_inv_friend(_id);
-    draw_set_color(c_white);
+    var _y = yy + 100 + (_nr * 30) + 10;
     if (!kfo_friends_ok())
     {
-        knight_txt_small(_bx + 8, _by + 6, "THE FRIENDS LIST NEEDS BUILD 49'S");
-        knight_txt_small(_bx + 8, _by + 22, kdr_on() ? "KF_STEAM.DLL (DRBR LAUNCHER > REPAIR)." : "KF_STEAM.DLL (RUN PLAY_KNIGHT_HUB.BAT).");
         draw_set_color(c_ltgray);
-        knight_txt_small(_bx + 8, _by + 46, "STEAM OVERLAY STILL WORKS.");
+        knight_para_fit(xx + 96, _y, "No friends list: KF_STEAM.DLL is missing" + (kdr_on() ? " (DRBR Launcher > REPAIR)." : " (run PLAY_KNIGHT_HUB.BAT).") + " The Steam overlay still works.", 460, 3);
     }
-    else if (is_struct(_f))
+    else if (array_length(_o.fr) == 0)
     {
-        draw_set_color(c_yellow);
-        knight_txt_small(_bx + 8, _by + 6, knight_fit_small(_f.n, 220));
-        var _st = kfo_friend_state(_f);
-        draw_set_color((_st == "IN GAME") ? c_lime : ((_st == "OFFLINE") ? c_gray : c_white));
-        knight_txt_small(_bx + 8, _by + 24, _st);
-        var _ago = kfo_ui_inv_sent_ago(_f);
-        if (_ago >= 0)
-        {
-            draw_set_color(c_aqua);
-            knight_txt_small(_bx + 8, _by + 42, "INVITED " + string(floor(_ago / 1000)) + " S AGO");
-        }
+        draw_set_color(c_ltgray);
+        knight_txt(xx + 96, _y, "NO FRIENDS IN THE LIST YET");
     }
-    else
-    {
-        draw_set_color(c_white);
-        knight_txt_small(_bx + 8, _by + 6, string(array_length(_o.fr)) + " FRIENDS");
-    }
-    draw_set_color(c_ltgray);
-    var _t = ["Z SENDS A STEAM INVITE. THEY GET", "STEAM'S NOTIFICATION; WITH DRBR", "OPEN, AN INVITE BOX TOO.", "IT ALSO LETS THEM INTO A PRIVATE", "ROOM.", "", "ROOM CODE: " + _o.code];
-    for (var _i = 0; _i < array_length(_t); _i++)
-        knight_txt_small(_bx + 8, _by + 70 + (_i * 16), _t[_i]);
+    draw_set_color(c_gray);
+    knight_txt(xx + 96, yy + 376, "ROOM CODE: " + _o.code);
     draw_set_color(c_white);
     return 1;
 }
@@ -313,7 +289,7 @@ function kfo_inv_draw()
     draw_rectangle(xx + 320 - (_w / 2), yy + 4, xx + 320 + (_w / 2), yy + 20, true);
     draw_set_halign(fa_center);
     draw_set_color(c_yellow);
-    draw_text(xx + 320, yy + 7, knight_fit_small(_t, _w - 12));
+    draw_text(xx + 320, yy + 7, knight_fit_tiny(_t, _w - 12));
     draw_set_halign(fa_left);
     draw_set_color(c_white);
     return 1;

@@ -1,5 +1,6 @@
 """Runtime support used by compiled closures: frames, field access, calls."""
 from .errors import GMError, GMThrow
+from time import perf_counter as _pc
 from .values import (GMArray, GMStruct, GMInstance, GMFunc, GMMethod, BuiltinRef, GMEnum, GlobalRef,
                      MISS, FIRST_INSTANCE_ID, NOONE, typeof, gml_str, GLOBAL_REF)
 
@@ -320,7 +321,41 @@ def ds_set(f, kind, c, idx, v):
 
 # ------------------------------------------------------------------ calls
 
+# profiling (off unless a test sets rt.PROF = {}): {name: [calls, inclusive seconds, exclusive seconds]}; builtins as "B:name"
+PROF = None
+_PSTACK = []
+
+
+def prof_enter():
+    _PSTACK.append(0.0)
+    return _pc()
+
+
+def prof_leave(name, t0):
+    dt = _pc() - t0
+    child = _PSTACK.pop() if _PSTACK else 0.0
+    e = PROF.get(name)
+    if e is None:
+        e = PROF[name] = [0, 0.0, 0.0]
+    e[0] += 1
+    e[1] += dt
+    e[2] += dt - child
+    if _PSTACK:
+        _PSTACK[-1] += dt
+
+
 def call_func(sim, fn, args, so, other, ev=None):
+    if PROF is not None:
+        t0 = prof_enter()
+        try:
+            return _call_func(sim, fn, args, so, other, ev)
+        finally:
+            if PROF is not None:
+                prof_leave(fn.name, t0)
+    return _call_func(sim, fn, args, so, other, ev)
+
+
+def _call_func(sim, fn, args, so, other, ev=None):
     fr = Frame(sim, so, other, args, ev, fn)
     loc = fr.loc
     na = len(args)

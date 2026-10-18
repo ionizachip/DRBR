@@ -66,6 +66,7 @@ namespace Drbr
         public readonly List<string> Notes = new List<string>();
         public bool LauncherPending;     // a new launcher was staged; DRBR Updater swaps it once the launcher closes
         public string PendingLauncher;
+        public string PendingLauncherSha;
     }
 
     public sealed class InstallEngine
@@ -187,6 +188,10 @@ namespace Drbr
             }
             string running;
             if (Proc.DrbrGameRunning(P, out running)) throw new DrbrException("game_running", "DRBR is running (" + running + "). Close the game first.");
+            // the Setup (install / reinstall) replaces DRBR Launcher.exe: not while it is open (an update or a repair runs in
+            // the launcher itself, which swaps its own new copy in through DRBR Updater)
+            if ((o.Operation == "install" || o.Operation == "reinstall") && Proc.DrbrLauncherRunning(P, out running))
+                throw new DrbrException("launcher_running", "DRBR Launcher is open (" + running + "). Close DRBR Launcher, then install again.");
 
             // space: the copy of the game, the patched data.win, the vanilla copy, the music, the package cache
             string srcMus = Directory.Exists(Path.Combine(o.GameDir, "mus")) ? Path.Combine(o.GameDir, "mus") : Path.Combine(o.GameDir, "chapter3_windows", "mus");
@@ -294,20 +299,40 @@ namespace Drbr
                     else oldPayload = null;
                     Directory.Move(stagedPayload, P.PayloadDir);
                 }
-                // the programs (a running launcher cannot replace itself: its new copy waits for DRBR Updater)
+                // the programs. A running program cannot be deleted or overwritten on Windows (deleting it is "access
+                // denied", overwriting it "in use"): the running launcher's new copy waits for DRBR Updater, which swaps it
+                // once the launcher has closed. A doc that cannot be replaced is noted; anything else fails the update.
                 foreach (PayloadFile f in m.Files)
                 {
                     if (f.Kind != "app" && f.Kind != "tool" && f.Kind != "doc") continue;
                     string dst = Fs.Under(P.Root, f.Dest);
                     if (File.Exists(dst) && Hash.Same(Hash.Sha256File(dst), f.Sha256)) continue;
-                    try { Fs.CopyVerified(Path.Combine(P.PayloadDir, f.File), dst, f.Sha256); }
-                    catch (IOException)
+                    string src = Path.Combine(P.PayloadDir, f.File);
+                    bool launcher = SamePath(dst, P.LauncherExe);
+                    try
                     {
-                        string pend = Path.Combine(P.StagingDir, "pending", Path.GetFileName(dst));
-                        Fs.CopyVerified(Path.Combine(P.PayloadDir, f.File), pend, f.Sha256);
-                        res.LauncherPending = true;
-                        res.PendingLauncher = pend;
-                        res.Notes.Add(Path.GetFileName(dst) + " is in use: its new version is installed when the launcher restarts.");
+                        if (launcher && Environment.GetEnvironmentVariable("DRBR_TEST_LAUNCHER_IN_USE") == "1")
+                            throw new UnauthorizedAccessException("Access to the path '" + dst + "' is denied. (test: the launcher is running)");
+                        Fs.CopyVerified(src, dst, f.Sha256);
+                    }
+                    catch (Exception e) when (e is IOException || e is UnauthorizedAccessException)
+                    {
+                        try { if (File.Exists(dst + ".part")) File.Delete(dst + ".part"); } catch { }
+                        if (launcher)
+                        {
+                            Log.Info("DRBR Launcher.exe is in use (" + e.Message + "): its new version waits for DRBR Updater.");
+                            Fs.CopyVerified(src, P.PendingLauncher, f.Sha256);
+                            res.LauncherPending = true;
+                            res.PendingLauncher = P.PendingLauncher;
+                            res.PendingLauncherSha = f.Sha256;
+                            res.Notes.Add("DRBR Launcher is in use: its new version goes in when the launcher closes.");
+                        }
+                        else if (f.Kind == "doc")
+                        {
+                            Log.Warn(f.Dest + " could not be replaced: " + e.Message);
+                            res.Notes.Add(f.Dest + " could not be replaced (" + e.Message + ").");
+                        }
+                        else throw;
                     }
                 }
                 // the save profile's own records + the profile migrations

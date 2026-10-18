@@ -948,11 +948,15 @@ function kfo_set_from_text(_t)
 }
 
 // ---------- the player's own presets (3 slots in knightfights_online.ini) ----------
+// (DRBR 1.0.1: whether each slot is filled is kept once read - the room settings page asked every frame, opening the file)
+global.kfo_custom_c = [undefined, undefined, undefined, undefined];
 function kfo_custom_save(_slot, _s)
 {
     ossafe_ini_open(kfo_ini_file());
     ini_write_string("custom", "slot" + string(_slot), json_stringify(kfo_set_clean(_s)));
     ossafe_ini_close();
+    if (variable_global_exists("kfo_custom_c") && is_array(global.kfo_custom_c) && _slot >= 0 && _slot < array_length(global.kfo_custom_c))
+        global.kfo_custom_c[_slot] = true;
     return true;
 }
 
@@ -973,9 +977,16 @@ function kfo_custom_load(_slot)
 
 function kfo_custom_exists(_slot)
 {
+    if (!variable_global_exists("kfo_custom_c") || !is_array(global.kfo_custom_c))
+        global.kfo_custom_c = [undefined, undefined, undefined, undefined];
+    var _ok = (_slot >= 0 && _slot < array_length(global.kfo_custom_c));
+    if (_ok && !is_undefined(global.kfo_custom_c[_slot]))
+        return global.kfo_custom_c[_slot];
     ossafe_ini_open(kfo_ini_file());
     var _t = ini_read_string("custom", "slot" + string(_slot), "");
     ossafe_ini_close();
+    if (_ok)
+        global.kfo_custom_c[_slot] = (_t != "");
     return _t != "";
 }
 

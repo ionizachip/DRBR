@@ -47,6 +47,7 @@ namespace Drbr
         public string Released = "";
         public string Notes = "";
         public string BaseUrl = "";
+        public string PackageName = "DRBR.zip";   // the release's one file (DRBR.zip): the files are read from inside it
         public readonly List<SupportedBuild> SupportedGameBuilds = new List<SupportedBuild>();
         public long DrbrDataWinSize;
         public string DrbrDataWinSha256;
@@ -76,6 +77,9 @@ namespace Drbr
             m.Released = o.Str("released", "");
             m.Notes = o.Str("notes", "");
             m.BaseUrl = o.Str("base_url", "");
+            m.PackageName = o.Str("package", "DRBR.zip");
+            if (m.PackageName.Length == 0 || m.PackageName.IndexOfAny(new[] { '/', '\\', ':' }) >= 0 || m.PackageName.Contains(".."))
+                throw new DrbrException("manifest_file", "The release manifest names a package DRBR refuses: " + m.PackageName);
             foreach (object x in o.Arr("supported_game_builds"))
             {
                 JsonObject b = x as JsonObject;

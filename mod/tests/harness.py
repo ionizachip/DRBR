@@ -95,6 +95,9 @@ def make_sim(seed=1,load_vanilla=('scr_flag_set','scr_ini_chapter')):
         sim.define_const('IMAGE_LOGO',0)
         _rt_numbers(sim)
     sim.load_file(M+'gml_GlobalScript_knight_core.gml',entry='gml_GlobalScript_knight_core')
+    # 1.0.1: the KF Song Pack's own script (kf_song_path ...) - the game has it; the song checks reach it
+    if os.path.exists(M+'gml_GlobalScript_scr_kf_song.gml'):
+        sim.load_file(M+'gml_GlobalScript_scr_kf_song.gml',entry='gml_GlobalScript_scr_kf_song')
     for n in ('kaizo_set_music',):
         pass
     import glob
@@ -116,9 +119,11 @@ def make_sim(seed=1,load_vanilla=('scr_flag_set','scr_ini_chapter')):
         if o not in sim.objects: sim.define_object(o,index=98000+_i)
     # update 10: and every object of Chapter 3 itself (idx/objparents.tsv) - the bosses' clean-up names the game's own helpers
     # (with (obj_move_to_point) ...), which the real game always has; names only (no instances, no parents)
+    # (DRBR 1.0.1: numbered from 60000 - from 110000 they were in the instances' range (100000 up), so the emulator took
+    # obj_actor for an instance: instance_number(obj_actor) was 0 with stand-ins made - t_kmenu's 3 failures)
     for _i,_ln in enumerate(open('/home/claude/work/idx/objparents.tsv',encoding='utf8')):
         _p=_ln.rstrip('\n').split('\t')
-        if len(_p)>=2 and _p[1] and _p[1] not in sim.objects: sim.define_object(_p[1],index=110000+_i)
+        if len(_p)>=2 and _p[1] and _p[1] not in sim.objects: sim.define_object(_p[1],index=60000+_i)
     for a in _ba:
         try: sim.define_asset(a)
         except Exception: pass

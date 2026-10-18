@@ -428,7 +428,7 @@ function kbr_sn_line(_txt, _n)
 function kbr_sn_draw_extra()
 {
     if (say_t > 0)
-        kbr_enc_balloon(x - 10, y + 40, say, min(1, say_t / 10));
+        kbr_enc_say(x - 10, y - 20, x + 165, y + 172, say, min(1, say_t / 10));
     return 1;
 }
 

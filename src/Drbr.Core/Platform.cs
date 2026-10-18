@@ -28,6 +28,28 @@ namespace Drbr
             return false;
         }
 
+        /// <summary>A DRBR Launcher.exe of this DRBR folder running in another process (the Setup must not replace it under
+        /// a running launcher: Windows refuses, and an old launcher could not finish the swap itself).</summary>
+        public static bool DrbrLauncherRunning(DrbrPaths p, out string detail)
+        {
+            detail = "";
+            Process[] ps;
+            try { ps = Process.GetProcessesByName("DRBR Launcher"); } catch { return false; }
+            int me = Process.GetCurrentProcess().Id;
+            foreach (Process x in ps)
+            {
+                if (x.Id == me) continue;
+                string path = null;
+                try { path = x.MainModule.FileName; } catch { }
+                if (path != null && string.Equals(Path.GetFullPath(path), Path.GetFullPath(p.LauncherExe), StringComparison.OrdinalIgnoreCase))
+                {
+                    detail = "pid " + x.Id;
+                    return true;
+                }
+            }
+            return false;
+        }
+
         public static Process StartGame(DrbrPaths p, string extraArgs = "")
         {
             // as Knight Hub's PLAY_KNIGHT_HUB.bat started it (the working folder is the game folder, the data file relative)

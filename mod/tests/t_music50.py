@@ -92,6 +92,8 @@ def run(key):
         shutil.copy(PACK + f, d)
     for f in ('inst.ogg', 'vocals.ogg'):
         open(os.path.join(d, f), 'wb').write(b'OggS')
+    # (1.0.1: the game looks for files again at most every 3 seconds - knight_cache_get; here they are new at once)
+    sim.run('knight_music_cache_clear();')
     ri = [i for i, e in enumerate(S) if e[1] == '@random'][0]
     res['ri'] = ri
     # a fresh player: every song in RANDOM
@@ -118,6 +120,8 @@ def run(key):
                                          'array_push(global.knight_songs, { name: "NEW", file: "kh_new_test.ogg", by: "x", src: "", sid: "kh_new_test.ogg", cl: [] }); global.L3 = knight_song_on(array_length(global.knight_songs) - 1); array_pop(global.knight_songs);' % (ri, ri + 1, ri + 2)))
     res['list'] = [sim.py(sim.eval('global.L1')), sim.eval('global.L2'), sim.eval('global.L3')] if ok_ else ('err', err)
     # the online songs: KNIGHTMARE stage, then the FINAL TWO (it wins), each once
+    # (DRBR 1.0.1: only with MUSIC on DEFAULT - a song of your own, RANDOM too, plays on through the big moments: checked below)
+    sim.run('global.krun.cfg.song = 0;')
     ok_, err = auto(sim, lambda: sim.run('global.kfo = { M: { situ: "" } }; global.knight_mus_q = []; global.knight_kf = undefined;'
                                          'with (obj_astream) instance_destroy(); var _a = instance_create(0, 0, obj_astream); _a.mystream = 77; _a.songname = "knight.ogg"; global.batmusic = [77, 78];'
                                          'global.Q = [];'
@@ -128,6 +132,10 @@ def run(key):
                                          'var _d = instance_create(0, 0, obj_astream); _d.mystream = 81; _d.songname = "kh_close_to_inevitability.ogg"; global.batmusic = [81, 82];'
                                          'var _c1 = array_length(global.knight_mus_q); kfo_mus_situ("nm"); kfo_mus_situ("lms"); array_push(global.Q, array_length(global.knight_mus_q) - _c1);'))
     res['situ'] = sim.py(sim.eval('global.Q')) if ok_ else ('err', err)
+    # 1.0.1: a song of your own (here RANDOM) is not replaced by the big moments' songs
+    ok_, err = auto(sim, lambda: sim.run('global.krun.cfg.song = %d; global.kfo = { M: { situ: "" } }; global.knight_mus_q = []; var _q0 = array_length(global.knight_mus_q);'
+                                         'kfo_mus_situ("nm"); kfo_mus_situ("lms"); global.Q2 = [array_length(global.knight_mus_q) - _q0, kbr_mus_own()]; global.krun.cfg.song = 0;' % ri))
+    res['own'] = sim.py(sim.eval('global.Q2')) if ok_ else ('err', err)
     # an online MUSIC setting saved as a number by an older build (24: RANDOM then) is read as its song
     res['v49'] = [sim.eval('global.knight_songs_v49[24]'), sim.eval('knight_song_find_exact(global.knight_songs_v49[24])'), sim.eval('global.knight_songs_v49[12]'), sim.eval('global.knight_songs[knight_song_find_exact(global.knight_songs_v49[12])].file')]
     # CREDITS > MUSIC
@@ -170,6 +178,7 @@ for key in (sys.argv[1:] or ['base']):
     li = res['list']
     ok(li != 'err' and li[0] == ['NO SONGS SELECTED', -10, -11] and li[1] == 44 and li[2] in (True, 1), 'the song list says NO SONGS SELECTED, has ENABLE ALL / DISABLE ALL rows; ENABLE ALL brings all back; a song added later starts on %r' % (li,))
     ok(res['situ'] == ['kh_forget_me_not.ogg', 0, 'kh_close_to_inevitability.ogg', 0], 'online: KNIGHTMARE stage -> FORGET ME NOT V3, once; FINAL TWO -> Close To Inevitability, once, and the stage does not take it back %r' % (res['situ'],))
+    ok(res['own'] == [0, True], 'online (1.0.1): a song of your own (RANDOM) plays on - no big-moment song replaces it %r' % (res['own'],))
     v = res['v49']
     ok(v[0] == '@random' and v[1] == res['ri'] and v[2] == v[3], 'an online MUSIC number from an older build is read as its song (old 24 = RANDOM) %r' % v)
     ok(res['cr'] != 'err' and res['cr'][0] == 'MUSIC' and res['cr'][1] == 44 and res['cr'][3] > 1, 'CREDITS > MUSIC: all 44 songs one by one %r' % (res['cr'],))

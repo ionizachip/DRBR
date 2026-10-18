@@ -102,16 +102,26 @@ function kfo_bot_track()
     var _F = _T.f;
     var _l = [];
     var _m = _T.m;
+    // DRBR 1.0.1: what each kind of bullet is, worked out once per object (kfo_bot_kind - its name was looked at for every
+    // bullet, every frame), and the frame's own facts once (kfo_bot_precise asked them for every bullet)
+    if (!variable_global_exists("kfo_bt_kind") || !is_struct(global.kfo_bt_kind))
+        global.kfo_bt_kind = {};
+    var _KD = global.kfo_bt_kind;
+    var _small = instance_exists(obj_heart) && instance_find(obj_heart, 0).sprite_index == spr_dodgeheart_smaller_2px;
+    var _roar = undefined;
     // (obj_collidebullet: what can hurt a SOUL - see kfo_bot_hit_by)
     with (obj_collidebullet)
     {
-        if (string_pos("growtangle", object_get_name(object_index)) > 0)
+        var _ok = string(object_index);
+        var _kd = variable_struct_exists(_KD, _ok) ? variable_struct_get(_KD, _ok) : undefined;
+        if (is_undefined(_kd))
+        {
+            _kd = kfo_bot_kind(object_index);
+            variable_struct_set(_KD, _ok, _kd);
+        }
+        if (_kd < 0)
             continue;
         if (bbox_right < bbox_left)
-            continue;
-        // DRBR: Spamton NEO's RECREW walls are played by the odds (kbr_sn_bot_walls): never tracked nor dodged (a wall of
-        // dozens of cells cost every bot's planning for nothing)
-        if (kbr_sn_bot_skip(id))
             continue;
         var _k = string(real(id));
         var _e = variable_struct_exists(_m, _k) ? variable_struct_get(_m, _k) : undefined;
@@ -164,9 +174,18 @@ function kfo_bot_track()
         // not active yet (a warning, a sword still rising): it may turn on - looked at, but it counts half
         _e.w = (variable_instance_exists(id, "active") && active != 1) ? 0.5 : 1;
         // build 52: the stars hit only on a small test round the SOUL's middle (kfo_bot_precise): the size PERFECT plans with
-        _e.pr = kfo_bot_precise(id);
+        if (_kd == 1)
+            _e.pr = _small ? 0 : 2;
+        else if (_kd == 2)
+        {
+            if (is_undefined(_roar))
+                _roar = (kfo_bot_roaring() != noone);
+            _e.pr = _roar ? (_small ? 0 : 2) : (_small ? 1 : 5);
+        }
+        else
+            _e.pr = (_kd == 3) ? 3 : -1;
         // build 52: a vortex sword's exact path (its own Step, frame by frame): kfo_bot_vortex_path
-        _e.vp = kfo_bot_vortex_path(id);
+        _e.vp = (_kd == 4) ? kfo_bot_vortex_path(id) : -1;
         _e.l = bbox_left;
         _e.t = bbox_top;
         _e.r = bbox_right;
@@ -187,7 +206,8 @@ function kfo_bot_track()
                 _e.r1 = max(point_distance(0, 0, -_ox, -_oy), point_distance(0, 0, _w - _ox, -_oy), point_distance(0, 0, -_ox, _hh2 - _oy), point_distance(0, 0, _w - _ox, _hh2 - _oy));
             }
         }
-        _e.rad = max(point_distance(x, y, bbox_left, bbox_top), point_distance(x, y, bbox_right, bbox_top), point_distance(x, y, bbox_left, bbox_bottom), point_distance(x, y, bbox_right, bbox_bottom));
+        // (its box's farthest corner from its origin: the farther side each way - the same as the largest of the four corners)
+        _e.rad = point_distance(0, 0, max(abs(x - bbox_left), abs(bbox_right - x)), max(abs(y - bbox_top), abs(bbox_bottom - y)));
         // build 50: a full-screen slash of a Roaring (Kaizo's Roaring DELTA): while it warns it is a short marker where it
         // was made, but it strikes along the whole line the player sees drawn (roaring2_x1,y1 - x2,y2) - the bots look at that
         // line
@@ -233,6 +253,27 @@ function kfo_bot_track()
         }
     }
     return array_length(_l);
+}
+
+// DRBR 1.0.1: what a bullet object is to the bots (kfo_bot_track keeps the answer per object): -1 never tracked (the battle box;
+// Spamton NEO's RECREW walls, played by the odds - kbr_sn_bot_walls), 1 a Roaring's star, 2 a pointing starchild, 3 a pointing
+// star or split slash (kfo_bot_precise's small hit tests), 4 a vortex sword (kfo_bot_vortex_path), 0 any other
+function kfo_bot_kind(_oi)
+{
+    var _n = object_get_name(_oi);
+    if (string_pos("growtangle", _n) > 0)
+        return -1;
+    if (_oi == obj_sn_wallcell || _oi == obj_sn_wallbomb)
+        return -1;
+    if (_n == "obj_knight_roaring_star")
+        return 1;
+    if (_n == "obj_knight_pointing_starchild" || _n == "obj_knight_pointing_starchild_Copy")
+        return 2;
+    if (_n == "obj_knight_pointing_star" || _n == "obj_knight_pointing_star_Copy" || _n == "obj_roaringknight_splitslash" || _n == "obj_roaringknight_splitslash_Copy")
+        return 3;
+    if (_n == "obj_sword_vortex")
+        return 4;
+    return 0;
 }
 
 // build 52: the attacks' tells - lines that will strike, worked out from the attack objects' own numbers (the same ones their
@@ -385,40 +426,59 @@ function kfo_bot_hit_half()
     return [4, 4];
 }
 
-// how bad it is for SOUL centre path (_x0, _y0) + (_dx, _dy) a frame (clamped to the box) for bot _b with settings _c:
-// a hit sooner costs more; near misses and the box's edges / corners cost a little
-function kfo_bot_cost(_b, _c, _box, _x0, _y0, _dx, _dy, _hw, _hh, _l, _bound, _k, _dx2, _dy2)
+// DRBR 1.0.1: where every bullet the bot looks at will be, frame by frame, worked out ONCE per think - before, each of the 17
+// moves (and each of PERFECT's ~400 two-move plans) worked out every bullet's whole path again. The plans and their costs are
+// exactly the same as before; only the work is shared. For each frame looked at (every one at first, then wider apart): its
+// frame _t, how much a near miss then counts (nf), and one entry per bullet that can matter then:
+//   [1, x1, y1, x2, y2, segw, hmax, hitc, vx, vy, ll]            a line (a full-screen slash, a tell about to strike)
+//   [2, l, t, r, b, hw, hh, act, sm, hitc, mx, my, inst]        a bullet's box, moved by (mx, my) (act: it can hit then)
+//   [3, cx, cy, rr, hm, hw, hh, sm, hitc, ang, xs, ys, inst]     a turning / growing one: its centre and reach
+// (hw, hh: the SOUL's half sizes for that bullet then; sm: a near miss costs PERFECT a little; hitc: what a hit costs). After
+// the first 6 frames (where every bullet counts, the nearest miss) a bullet the SOUL cannot reach then - every move goes at
+// most _spd a frame from (_x0, _y0), plus a Roaring's pull - is left out: it could change nothing.
+function kfo_bot_tab(_b, _c, _box, _l, _hw0, _hh0, _x0, _y0, _spd)
 {
     var _H = max(1, _c.pred);
-    var _cost = 0;
-    var _near = 999;
     // build 49: a PERFECT bot (no delay, no mistakes, exact) also keeps its distance from every bullet over the whole
     // look-ahead, not only the next frames
     var _smart = (_c.prec >= 100 && _c.miss <= 0 && _c.react <= 0);
     var _n = array_length(_l);
     // build 52: PERFECT's path includes a Roaring's pull (every frame toward the knight: kfo_bot_think works it out)
-    var _sux = (_smart && variable_global_exists("kfo_bot_suck")) ? global.kfo_bot_suck[0] : 0;
-    var _suy = (_smart && variable_global_exists("kfo_bot_suck")) ? global.kfo_bot_suck[1] : 0;
-    var _hw0 = _hw;
-    var _hh0 = _hh;
+    var _P = { smart: _smart, H: _H, s: [], sux: 0, suy: 0, hok: false, hx: 0, hy: 0, ox: 0, oy: 0 };
+    _P.sux = (_smart && variable_global_exists("kfo_bot_suck")) ? global.kfo_bot_suck[0] : 0;
+    _P.suy = (_smart && variable_global_exists("kfo_bot_suck")) ? global.kfo_bot_suck[1] : 0;
+    // build 49: PERFECT stays off the host's own SOUL (the attacks that aim, aim at it in the host's game)
+    if (_smart && instance_exists(obj_heart))
+    {
+        var _hs = instance_find(obj_heart, 0);
+        _P.hok = true;
+        _P.hx = (_hs.bbox_left + _hs.bbox_right) / 2;
+        _P.hy = (_hs.bbox_top + _hs.bbox_bottom) / 2;
+    }
+    // the bot's own spot of the box
+    _P.ox = lerp(_box[0], _box[2], _b.bt.ax);
+    _P.oy = lerp(_box[1], _box[3], _b.bt.ay);
     // the frames looked at: every one at first, then wider apart
     for (var _t = 1; _t <= _H; _t += ((_t < 8) ? 1 : ((_t < 16) ? 2 : 3)))
     {
-        // a plan of two moves: (_dx, _dy) for _k frames, then (_dx2, _dy2)
-        var _px = clamp((_t <= _k) ? (_x0 + (_dx * _t)) : (_x0 + (_dx * _k) + (_dx2 * (_t - _k))), _box[0], _box[2]);
-        var _py = clamp((_t <= _k) ? (_y0 + (_dy * _t)) : (_y0 + (_dy * _k) + (_dy2 * (_t - _k))), _box[1], _box[3]);
-        if (_sux != 0 || _suy != 0)
-        {
-            _px = clamp(_px + (_sux * _t), _box[0], _box[2]);
-            _py = clamp(_py + (_suy * _t), _box[1], _box[3]);
-        }
+        var _row = [];
+        // the bot's hit test runs right after its move, against the bullets where they are then: after _t moves of the
+        // bot, the bullets have moved _t - 1 times
+        var _tt = _t - 1;
+        // where the SOUL can be then (a box round its start, inside the battle box)
+        var _rx = (_spd * _t) + (abs(_P.sux) * _t) + 1;
+        var _ry = (_spd * _t) + (abs(_P.suy) * _t) + 1;
+        var _ax0 = max(_box[0], _x0 - _rx);
+        var _ax1 = min(_box[2], _x0 + _rx);
+        var _ay0 = max(_box[1], _y0 - _ry);
+        var _ay1 = min(_box[3], _y0 + _ry);
         for (var _i = 0; _i < _n; _i++)
         {
             var _e = _l[_i];
             // build 52: PERFECT plans with each bullet's real hit size: a star's small test (its own), every other bullet the
             // SOUL's box with half a pixel to spare from the second frame on (the farther ahead, the less sure)
-            _hw = _hw0;
-            _hh = _hh0;
+            var _hw = _hw0;
+            var _hh = _hh0;
             if (_smart)
             {
                 if (variable_struct_exists(_e, "pr") && _e.pr >= 0)
@@ -432,22 +492,21 @@ function kfo_bot_cost(_b, _c, _box, _x0, _y0, _dx, _dy, _hw, _hh, _l, _bound, _k
                     _hh = _hh0 + 0.5;
                 }
             }
-            // the bot's hit test runs right after its move, against the bullets where they are then: after _t moves of the
-            // bot, the bullets have moved _t - 1 times
-            var _tt = _t - 1;
             // build 50: a full-screen line (see kfo_bot_track): how far the SOUL is from it
             if (is_array(_e.seg))
             {
                 // build 52: a tell (kfo_bot_tells): the line strikes from frame "wait" for "life" frames
                 if (variable_struct_exists(_e, "life") && (_tt < _e.wait || _tt > _e.wait + _e.life))
                     continue;
-                var _sg = max(0, kfo_seg_dist(_px, _py, _e.seg[0], _e.seg[1], _e.seg[2], _e.seg[3]) - _e.segw - max(_hw, _hh));
-                if (_t <= 6)
-                    _near = min(_near, _sg);
-                if (_sg <= 0)
-                    _cost += 1000 * ((_H + 2) - _t) * _e.w;
+                var _svx = _e.seg[2] - _e.seg[0];
+                var _svy = _e.seg[3] - _e.seg[1];
+                array_push(_row, [1, _e.seg[0], _e.seg[1], _e.seg[2], _e.seg[3], _e.segw, max(_hw, _hh), 1000 * ((_H + 2) - _t) * _e.w, _svx, _svy, (_svx * _svx) + (_svy * _svy)]);
                 continue;
             }
+            var _act = (_e.wait <= _tt);
+            // (not able to hit yet: it only counts as a near miss in the first 6 frames)
+            if (!_act && _t > 6)
+                continue;
             var _mx = (_e.wait > _tt) ? 0 : (_e.vx * (_tt - _e.wait));
             var _my = (_e.wait > _tt) ? 0 : (_e.vy * (_tt - _e.wait));
             // build 52: PERFECT follows a vortex sword's exact path (kfo_bot_vortex_path), an arc (a steady turn: the sum of its
@@ -488,65 +547,175 @@ function kfo_bot_cost(_b, _c, _box, _x0, _y0, _dx, _dy, _hw, _hh, _l, _bound, _k
                 _mx += _e.ax * _af;
                 _my += _e.ay * _af;
             }
-            var _turn = (_e.dyn && _e.wait <= _tt);
-            var _gap = 0;
-            // (growth looked at 12 frames ahead at most)
-            var _gt = min(_tt, 12);
-            var _pxs = _e.xs + (_e.vxs * _gt);
-            var _pys = _e.ys + (_e.vys * _gt);
-            if (_turn)
-                _gap = max(0, point_distance(_px, _py, _e.x + _mx, _e.y + _my) - max(_e.rad, _e.r1 * max(abs(_pxs), abs(_pys))) - max(_hw, _hh) * 1.42);
+            var _sm = (_smart && _e.wait <= _tt);
+            // (out of reach after the first 6 frames: a near miss for PERFECT within 12 px, else only a hit, matters)
+            var _lim = _sm ? 12.001 : 0.001;
+            if (_e.dyn && _e.wait <= _tt)
+            {
+                // (growth looked at 12 frames ahead at most)
+                var _gt = min(_tt, 12);
+                var _pxs = _e.xs + (_e.vxs * _gt);
+                var _pys = _e.ys + (_e.vys * _gt);
+                var _cx = _e.x + _mx;
+                var _cy = _e.y + _my;
+                var _rr = max(_e.rad, _e.r1 * max(abs(_pxs), abs(_pys)));
+                var _hm = max(_hw, _hh) * 1.42;
+                if (_t > 6 && point_distance(clamp(_cx, _ax0, _ax1), clamp(_cy, _ay0, _ay1), _cx, _cy) - _rr - _hm > _lim)
+                    continue;
+                array_push(_row, [3, _cx, _cy, _rr, _hm, _hw, _hh, _sm, 1000 * ((_H + 2) - _t) * _e.w, is_undefined(_pang) ? (_e.a + (_e.va * _tt)) : _pang, _pxs, _pys, _e.i]);
+            }
             else
             {
-                var _gx = max((_e.l + _mx) - (_px + _hw), (_px - _hw) - (_e.r + _mx), 0);
-                var _gy = max((_e.t + _my) - (_py + _hh), (_py - _hh) - (_e.b + _my), 0);
-                _gap = max(_gx, _gy);
+                var _bl = _e.l + _mx;
+                var _bt = _e.t + _my;
+                var _br = _e.r + _mx;
+                var _bb = _e.b + _my;
+                if (_t > 6 && max(_bl - (_ax1 + _hw), (_ax0 - _hw) - _br, _bt - (_ay1 + _hh), (_ay0 - _hh) - _bb, 0) > _lim)
+                    continue;
+                array_push(_row, [2, _bl, _bt, _br, _bb, _hw, _hh, _act, _sm, 1000 * ((_H + 2) - _t) * _e.w, _mx, _my, _e.i]);
             }
-            if (_t <= 6)
-                _near = min(_near, _gap);
-            else if (_smart && _gap < 12 && _e.wait <= _tt)
-                _cost += (8 / (1 + _gap)) * (((_H + 2) - _t) / (_H + 2));
-            if (_gap > 0 || _e.wait > _tt)
-                continue;
-            // the boxes meet: the engine's precise shape (the bullet as it is now against the SOUL's box moved back by the
-            // bullet's own motion - the same as the bullet moved on)
-            if (instance_exists(_e.i))
+        }
+        array_push(_P.s, [_t, ((_H + 2) - _t) / (_H + 2), _row]);
+    }
+    return _P;
+}
+
+// how bad it is for SOUL centre path (_x0, _y0) + (_dx, _dy) a frame (clamped to the box) for the bot of table _P
+// (kfo_bot_tab): a hit sooner costs more; near misses and the box's edges / corners cost a little. A plan of two moves:
+// (_dx, _dy) for _k frames, then (_dx2, _dy2). From the table's frame _si0 on, with _cost0 / _near0 so far (a shared start:
+// kfo_bot_cost_pre). Over _bound it stops (every part of the cost only adds).
+function kfo_bot_cost(_P, _box, _x0, _y0, _dx, _dy, _bound, _k, _dx2, _dy2, _si0, _cost0, _near0)
+{
+    var _cost = _cost0;
+    var _near = _near0;
+    var _sux = _P.sux;
+    var _suy = _P.suy;
+    var _S = _P.s;
+    var _ns = array_length(_S);
+    for (var _si = _si0; _si < _ns; _si++)
+    {
+        var _sm = _S[_si];
+        var _t = _sm[0];
+        var _px = clamp((_t <= _k) ? (_x0 + (_dx * _t)) : (_x0 + (_dx * _k) + (_dx2 * (_t - _k))), _box[0], _box[2]);
+        var _py = clamp((_t <= _k) ? (_y0 + (_dy * _t)) : (_y0 + (_dy * _k) + (_dy2 * (_t - _k))), _box[1], _box[3]);
+        if (_sux != 0 || _suy != 0)
+        {
+            _px = clamp(_px + (_sux * _t), _box[0], _box[2]);
+            _py = clamp(_py + (_suy * _t), _box[1], _box[3]);
+        }
+        var _row = _sm[2];
+        var _nf = _sm[1];
+        var _n = array_length(_row);
+        var _first = (_t <= 6);
+        for (var _i = 0; _i < _n; _i++)
+        {
+            var _q = _row[_i];
+            var _kd = _q[0];
+            if (_kd == 2)
             {
-                var _miss = true;
-                if (_turn)
+                var _hw = _q[5];
+                var _hh = _q[6];
+                if (!_first && !_q[8])
+                {
+                    // (only a hit matters here: the boxes apart on any side is enough)
+                    if (!_q[7] || _q[1] - (_px + _hw) > 0 || (_px - _hw) - _q[3] > 0 || _q[2] - (_py + _hh) > 0 || (_py - _hh) - _q[4] > 0)
+                        continue;
+                }
+                else
+                {
+                    var _gap = 0;
+                    var _v = _q[1] - (_px + _hw);
+                    if (_v > _gap)
+                        _gap = _v;
+                    _v = (_px - _hw) - _q[3];
+                    if (_v > _gap)
+                        _gap = _v;
+                    _v = _q[2] - (_py + _hh);
+                    if (_v > _gap)
+                        _gap = _v;
+                    _v = (_py - _hh) - _q[4];
+                    if (_v > _gap)
+                        _gap = _v;
+                    if (_first)
+                    {
+                        if (_gap < _near)
+                            _near = _gap;
+                    }
+                    else if (_gap < 12)
+                        _cost += (8 / (1 + _gap)) * _nf;
+                    if (_gap > 0 || !_q[7])
+                        continue;
+                }
+                // the boxes meet: the engine's precise shape (the bullet as it is now against the SOUL's box moved back by the
+                // bullet's own motion - the same as the bullet moved on)
+                if (instance_exists(_q[12]))
+                {
+                    if (collision_rectangle((_px - _hw) - _q[10], (_py - _hh) - _q[11], (_px + _hw) - _q[10], (_py + _hh) - _q[11], _q[12], true, false) == noone)
+                        continue;
+                }
+                _cost += _q[9];
+            }
+            else if (_kd == 3)
+            {
+                var _gap3 = max(0, point_distance(_px, _py, _q[1], _q[2]) - _q[3] - _q[4]);
+                if (_first)
+                {
+                    if (_gap3 < _near)
+                        _near = _gap3;
+                }
+                else if (_q[7] && _gap3 < 12)
+                    _cost += (8 / (1 + _gap3)) * _nf;
+                if (_gap3 > 0)
+                    continue;
+                if (instance_exists(_q[12]))
                 {
                     // a turning one: put it where and how it will be turned, ask the engine, put it back
-                    var _i0 = _e.i;
+                    var _i0 = _q[12];
                     var _sx = _i0.x;
                     var _sy = _i0.y;
                     var _sa = _i0.image_angle;
                     var _sxs = _i0.image_xscale;
                     var _sys = _i0.image_yscale;
-                    _i0.x = _e.x + _mx;
-                    _i0.y = _e.y + _my;
-                    _i0.image_angle = is_undefined(_pang) ? (_e.a + (_e.va * _tt)) : _pang;
-                    _i0.image_xscale = _pxs;
-                    _i0.image_yscale = _pys;
-                    _miss = (collision_rectangle(_px - _hw, _py - _hh, _px + _hw, _py + _hh, _i0, true, false) == noone);
+                    _i0.x = _q[1];
+                    _i0.y = _q[2];
+                    _i0.image_angle = _q[9];
+                    _i0.image_xscale = _q[10];
+                    _i0.image_yscale = _q[11];
+                    var _miss = (collision_rectangle(_px - _q[5], _py - _q[6], _px + _q[5], _py + _q[6], _i0, true, false) == noone);
                     _i0.x = _sx;
                     _i0.y = _sy;
                     _i0.image_angle = _sa;
                     _i0.image_xscale = _sxs;
                     _i0.image_yscale = _sys;
+                    if (_miss)
+                        continue;
                 }
-                else
-                    _miss = (collision_rectangle((_px - _hw) - _mx, (_py - _hh) - _my, (_px + _hw) - _mx, (_py + _hh) - _my, _e.i, true, false) == noone);
-                if (_miss)
-                    continue;
+                _cost += _q[8];
             }
-            _cost += 1000 * ((_H + 2) - _t) * _e.w;
+            else
+            {
+                // a line (kfo_seg_dist, worked out here)
+                var _u = (_q[10] <= 0) ? 0 : clamp((((_px - _q[1]) * _q[8]) + ((_py - _q[2]) * _q[9])) / _q[10], 0, 1);
+                var _sg = max(0, point_distance(_px, _py, _q[1] + (_u * _q[8]), _q[2] + (_u * _q[9])) - _q[5] - _q[6]);
+                if (_first)
+                {
+                    if (_sg < _near)
+                        _near = _sg;
+                }
+                if (_sg <= 0)
+                    _cost += _q[7];
+            }
         }
         // already worse than the best move found: no need to look further (every part of the cost only adds)
         if (_cost > _bound)
             return _cost;
     }
-    _hw = _hw0;
-    _hh = _hh0;
+    return kfo_bot_cost_end(_P, _box, _x0, _y0, _dx, _dy, _k, _dx2, _dy2, _cost, _near);
+}
+
+// the end of a plan's cost: the near misses, the walls, the host's SOUL (PERFECT), the bot's own spot
+function kfo_bot_cost_end(_P, _box, _x0, _y0, _dx, _dy, _k, _dx2, _dy2, _cost, _near)
+{
     var _fx = clamp((3 <= _k) ? (_x0 + (_dx * 3)) : (_x0 + (_dx * _k) + (_dx2 * (3 - _k))), _box[0], _box[2]);
     var _fy = clamp((3 <= _k) ? (_y0 + (_dy * 3)) : (_y0 + (_dy * _k) + (_dy2 * (3 - _k))), _box[1], _box[3]);
     if (_near < 999)
@@ -563,18 +732,155 @@ function kfo_bot_cost(_b, _c, _box, _x0, _y0, _dx, _dy, _hw, _hh, _l, _bound, _k
         _cost += 30;
     // build 49: PERFECT stays off the host's own SOUL - the attacks that aim (tracking swords, slashes) aim at that SOUL in
     // the host's game, where the bots are, so the space around it is where aimed slashes land
-    if (_smart && instance_exists(obj_heart))
+    if (_P.hok)
     {
-        var _hs = instance_find(obj_heart, 0);
-        var _hd = point_distance(_fx, _fy, (_hs.bbox_left + _hs.bbox_right) / 2, (_hs.bbox_top + _hs.bbox_bottom) / 2);
+        var _hd = point_distance(_fx, _fy, _P.hx, _P.hy);
         if (_hd < 56)
             _cost += (56 - _hd) * 0.6;
     }
     // the bot's own spot of the box (each its own, so they do not all crowd one place), very lightly
-    var _sx = lerp(_box[0], _box[2], _b.bt.ax);
-    var _sy = lerp(_box[1], _box[3], _b.bt.ay);
-    _cost += point_distance(_fx, _fy, _sx, _sy) / 300;
+    _cost += point_distance(_fx, _fy, _P.ox, _P.oy) / 300;
     return _cost;
+}
+
+// the shared start of PERFECT's two-move plans: the first move (_dx, _dy) for the table's frames up to _k - the cost after each
+// of those frames (it only grows) and the nearest miss, so the 17 second moves each start where it ends. It stops once the
+// cost passes _bound (the plans after it have a bound no higher). (The frame's work: the same code as kfo_bot_cost's.)
+function kfo_bot_cost_pre(_P, _box, _x0, _y0, _dx, _dy, _k, _bound)
+{
+    var _pc = [];
+    var _near = 999;
+    var _cost = 0;
+    var _sux = _P.sux;
+    var _suy = _P.suy;
+    var _S = _P.s;
+    var _ns = array_length(_S);
+    var _si = 0;
+    var _over = false;
+    for (_si = 0; _si < _ns; _si++)
+    {
+        var _sm = _S[_si];
+        var _t = _sm[0];
+        if (_t > _k)
+            break;
+        var _px = clamp(_x0 + (_dx * _t), _box[0], _box[2]);
+        var _py = clamp(_y0 + (_dy * _t), _box[1], _box[3]);
+        if (_sux != 0 || _suy != 0)
+        {
+            _px = clamp(_px + (_sux * _t), _box[0], _box[2]);
+            _py = clamp(_py + (_suy * _t), _box[1], _box[3]);
+        }
+        var _row = _sm[2];
+        var _nf = _sm[1];
+        var _n = array_length(_row);
+        var _first = (_t <= 6);
+        for (var _i = 0; _i < _n; _i++)
+        {
+            var _q = _row[_i];
+            var _kd = _q[0];
+            if (_kd == 2)
+            {
+                var _hw = _q[5];
+                var _hh = _q[6];
+                if (!_first && !_q[8])
+                {
+                    // (only a hit matters here: the boxes apart on any side is enough)
+                    if (!_q[7] || _q[1] - (_px + _hw) > 0 || (_px - _hw) - _q[3] > 0 || _q[2] - (_py + _hh) > 0 || (_py - _hh) - _q[4] > 0)
+                        continue;
+                }
+                else
+                {
+                    var _gap = 0;
+                    var _v = _q[1] - (_px + _hw);
+                    if (_v > _gap)
+                        _gap = _v;
+                    _v = (_px - _hw) - _q[3];
+                    if (_v > _gap)
+                        _gap = _v;
+                    _v = _q[2] - (_py + _hh);
+                    if (_v > _gap)
+                        _gap = _v;
+                    _v = (_py - _hh) - _q[4];
+                    if (_v > _gap)
+                        _gap = _v;
+                    if (_first)
+                    {
+                        if (_gap < _near)
+                            _near = _gap;
+                    }
+                    else if (_gap < 12)
+                        _cost += (8 / (1 + _gap)) * _nf;
+                    if (_gap > 0 || !_q[7])
+                        continue;
+                }
+                // the boxes meet: the engine's precise shape (the bullet as it is now against the SOUL's box moved back by the
+                // bullet's own motion - the same as the bullet moved on)
+                if (instance_exists(_q[12]))
+                {
+                    if (collision_rectangle((_px - _hw) - _q[10], (_py - _hh) - _q[11], (_px + _hw) - _q[10], (_py + _hh) - _q[11], _q[12], true, false) == noone)
+                        continue;
+                }
+                _cost += _q[9];
+            }
+            else if (_kd == 3)
+            {
+                var _gap3 = max(0, point_distance(_px, _py, _q[1], _q[2]) - _q[3] - _q[4]);
+                if (_first)
+                {
+                    if (_gap3 < _near)
+                        _near = _gap3;
+                }
+                else if (_q[7] && _gap3 < 12)
+                    _cost += (8 / (1 + _gap3)) * _nf;
+                if (_gap3 > 0)
+                    continue;
+                if (instance_exists(_q[12]))
+                {
+                    // a turning one: put it where and how it will be turned, ask the engine, put it back
+                    var _i0 = _q[12];
+                    var _sx = _i0.x;
+                    var _sy = _i0.y;
+                    var _sa = _i0.image_angle;
+                    var _sxs = _i0.image_xscale;
+                    var _sys = _i0.image_yscale;
+                    _i0.x = _q[1];
+                    _i0.y = _q[2];
+                    _i0.image_angle = _q[9];
+                    _i0.image_xscale = _q[10];
+                    _i0.image_yscale = _q[11];
+                    var _miss = (collision_rectangle(_px - _q[5], _py - _q[6], _px + _q[5], _py + _q[6], _i0, true, false) == noone);
+                    _i0.x = _sx;
+                    _i0.y = _sy;
+                    _i0.image_angle = _sa;
+                    _i0.image_xscale = _sxs;
+                    _i0.image_yscale = _sys;
+                    if (_miss)
+                        continue;
+                }
+                _cost += _q[8];
+            }
+            else
+            {
+                // a line (kfo_seg_dist, worked out here)
+                var _u = (_q[10] <= 0) ? 0 : clamp((((_px - _q[1]) * _q[8]) + ((_py - _q[2]) * _q[9])) / _q[10], 0, 1);
+                var _sg = max(0, point_distance(_px, _py, _q[1] + (_u * _q[8]), _q[2] + (_u * _q[9])) - _q[5] - _q[6]);
+                if (_first)
+                {
+                    if (_sg < _near)
+                        _near = _sg;
+                }
+                if (_sg <= 0)
+                    _cost += _q[7];
+            }
+        }
+        array_push(_pc, _cost);
+        if (_cost > _bound)
+        {
+            _over = true;
+            break;
+        }
+    }
+    return { pc: _pc, near: _near, si: _si, over: _over };
 }
 
 // the distance from point (_px, _py) to the segment (_x1, _y1) - (_x2, _y2)
@@ -588,8 +894,11 @@ function kfo_seg_dist(_px, _py, _x1, _y1, _x2, _y2)
 }
 
 // the move of bot _b this frame
-function kfo_bot_think(_b, _c, _box, _e)
+function kfo_bot_think(_b, _c, _box, _e, _dl)
 {
+    // DRBR 1.0.1: _dl - the time (get_timer) this bot's planning must end by: PERFECT's wider plans stop there
+    if (is_undefined(_dl))
+        _dl = get_timer() + 2500;
     var _s = _b.bt;
     // build 50: in a Roaring a bot holds its breath as a player does (Hold Breath costs nothing: +2 in a Roaring)
     var _spd = max(1, _e.spd - ((_s.slow_t > 0) ? 1 : 0) + ((kfo_bot_roaring() != noone) ? kbr_breath_bonus(true) : 0) + kbr_jv_speed_bonus() + kbr_sn_bot_speed());
@@ -675,6 +984,13 @@ function kfo_bot_think(_b, _c, _box, _e)
             array_push(_r2, _rel[_ord[_i][1]]);
         _rel = _r2;
     }
+    // DRBR 1.0.1: in Pink's lanes / grid / "+" the SOUL keeps to her layout (kbr_pk_bot_snap): it plans only moves along a lane
+    // (or staying), and the lanes / nodes it can go to next at Chapter 5's lane-swap speed (20 px a frame)
+    var _pkm = kbr_pk_bot_lanes(_s);
+    var _pkn = (_pkm > 0) ? kbr_pk_bot_nodes(_s) : [];
+    var _flax = variable_struct_exists(_s, "flax") && _s.flax;
+    // DRBR 1.0.1: every bullet's path, worked out once for all the moves below (kfo_bot_tab)
+    var _P = kfo_bot_tab(_b, _c, _box, _rel, _hb[0], _hb[1], _s.x, _s.y, (_pkm > 0) ? max(_spd, 20) : _spd);
     // the move it is making first (the best bound to start from), then the others
     var _ks = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16];
     if (variable_struct_exists(_s, "lk") && _s.lk > 0)
@@ -690,7 +1006,13 @@ function kfo_bot_think(_b, _c, _box, _e)
         // the slow walk: a dummy never uses it
         if (_k > 8 && _c.pre == 0)
             continue;
-        var _cost = kfo_bot_cost(_b, _c, _box, _s.x, _s.y, _m[0], _m[1], _hb[0], _hb[1], _rel, _best + 0.5, 999, 0, 0);
+        // (Pink's layout: along a lane only; on her grid and "+" a SOUL only goes from node to node - below. Flowery's board,
+        // DRBR 1.0.1: the orange SOUL only moves up and down - kbr_fl_bot_tick)
+        if (_pkm > 0 && _k != 0 && (_pkm != 1 || abs(_m[1]) > 0.01))
+            continue;
+        if (_flax && _k != 0 && abs(_m[0]) > 0.01)
+            continue;
+        var _cost = kfo_bot_cost(_P, _box, _s.x, _s.y, _m[0], _m[1], _best + 0.5, 999, 0, 0, 0, 0, 999);
         // the slow walk costs a hair more (it is only picked when it is safer)
         if (_k > 8)
             _cost += 0.5;
@@ -703,11 +1025,32 @@ function kfo_bot_think(_b, _c, _box, _e)
             _by = _m[1];
         }
     }
+    // DRBR 1.0.1: Pink's layout - to the next lane / node (then along the lane, or staying)
+    for (var _i = 0; _i < array_length(_pkn); _i++)
+    {
+        var _o = _pkn[_i];
+        var _kn = max(1, ceil(max(abs(_o[0]), abs(_o[1])) / 20));
+        var _hs = (_pkm == 1) ? [0, _spd, -_spd] : [0];
+        for (var _h = 0; _h < array_length(_hs); _h++)
+        {
+            var _cost = kfo_bot_cost(_P, _box, _s.x, _s.y, _o[0] / _kn, _o[1] / _kn, _best + 0.5, _kn, _hs[_h], 0, 0, 0, 999) + 0.25;
+            var _mx = (_pkm == 1) ? _hs[_h] : (sign(_o[0]) * max(3, _spd));
+            var _my = sign(_o[1]) * max(3, _spd);
+            array_push(_moves, [_cost, _mx, _my, 0]);
+            if (_cost < _best)
+            {
+                _best = _cost;
+                _bk = 0;
+                _bx = _mx;
+                _by = _my;
+            }
+        }
+    }
     // build 49: PERFECT plans two moves ahead when a single move is not safe (build 52: wider - the 6 best first moves, slow
     // walk too, each followed after 2, 4, 8 or 12 frames by any of the 17 moves). It only makes the first move now and plans
-    // again next frame.
+    // again next frame. (Not in Pink's layout: its moves there are the lanes / nodes above.)
     var _wide = (_best >= 1000);
-    if (_smart && _wide)
+    if (_smart && _wide && _pkm == 0 && !_flax)
     {
         var _top = [];
         for (var _i = 0; _i < array_length(_moves); _i++)
@@ -725,20 +1068,41 @@ function kfo_bot_think(_b, _c, _box, _e)
         }
         var _kk2 = _wide ? [4, 8, 2, 12] : [4, 8];
         var _nd = _wide ? 17 : 9;
-        // (2.5 ms at most for this bot's wider plans in the game: the most likely first moves are looked at first)
-        var _tq0 = get_timer();
-        for (var _a = 0; _a < min(_wide ? 6 : 3, array_length(_top)); _a++)
+        // (the most likely first moves are looked at first; DRBR 1.0.1: they stop when this bot's time is up - _dl - keeping the
+        // best plan found so far: before, the first 4 first moves were always looked at, whatever the time - a long frame)
+        var _dd2 = [];
+        for (var _d = 0; _d < _nd; _d++)
         {
-            if (_a >= 4 && get_timer() - _tq0 > 2500)
-                break;
+            var _sp2 = (_d <= 8) ? _spd : (_spd / 2);
+            array_push(_dd2, [(_d == 0) ? 0 : lengthdir_x(_sp2, ((_d - 1) mod 8) * 45), (_d == 0) ? 0 : lengthdir_y(_sp2, ((_d - 1) mod 8) * 45)]);
+        }
+        var _late = false;
+        for (var _a = 0; _a < min(_wide ? 6 : 3, array_length(_top)) && !_late; _a++)
+        {
             for (var _q = 0; _q < array_length(_kk2); _q++)
             {
+                if ((_a > 0 || _q > 0) && get_timer() > _dl)
+                {
+                    _late = true;
+                    break;
+                }
+                // the first move's frames up to the switch are the same for all its second moves: worked out once
+                var _pre = kfo_bot_cost_pre(_P, _box, _s.x, _s.y, _top[_a][1], _top[_a][2], _kk2[_q], _best - 0.01);
+                var _np = array_length(_pre.pc);
                 for (var _d = 0; _d < _nd; _d++)
                 {
-                    var _sp2 = (_d <= 8) ? _spd : (_spd / 2);
-                    var _d2x = (_d == 0) ? 0 : lengthdir_x(_sp2, ((_d - 1) mod 8) * 45);
-                    var _d2y = (_d == 0) ? 0 : lengthdir_y(_sp2, ((_d - 1) mod 8) * 45);
-                    var _c2 = kfo_bot_cost(_b, _c, _box, _s.x, _s.y, _top[_a][1], _top[_a][2], _hb[0], _hb[1], _rel, _best - 0.01, _kk2[_q], _d2x, _d2y);
+                    var _bd = _best - 0.01;
+                    var _c2 = 0;
+                    if (_np > 0 && _pre.pc[_np - 1] > _bd)
+                    {
+                        // (over the bound within the shared frames: the cost where it went over, as the plan would stop)
+                        var _j = 0;
+                        while (_pre.pc[_j] <= _bd)
+                            _j++;
+                        _c2 = _pre.pc[_j];
+                    }
+                    else
+                        _c2 = kfo_bot_cost(_P, _box, _s.x, _s.y, _top[_a][1], _top[_a][2], _bd, _kk2[_q], _dd2[_d][0], _dd2[_d][1], _pre.si, (_np > 0) ? _pre.pc[_np - 1] : 0, _pre.near);
                     if (_c2 < _best)
                     {
                         _best = _c2;
@@ -1075,8 +1439,9 @@ function kfo_host_bots_tick()
     var _box = kfo_bot_box();
     var _running = kbr_on() && is_struct(global.kfo.M) && global.kfo.M.R.ph == "run";
     var _tracked = false;
-    // the bots' thinking shares 6 ms of a frame at most (seven PERFECT bots in a screen full of bullets): one that runs out
-    // of time keeps its move and thinks first next frame (who goes first rotates)
+    // the bots' thinking shares 4 ms of a frame at most (seven PERFECT bots in a screen full of bullets): one that runs out
+    // of time keeps its move and thinks first next frame (who goes first rotates). DRBR 1.0.1: 4 ms (was 6), and a PERFECT
+    // bot's wider plans end with the frame's share (they ran over it before) - its planning costs half what it did.
     var _t0 = get_timer();
     if (!variable_struct_exists(_h, "bot_rr"))
         _h.bot_rr = 0;
@@ -1177,9 +1542,9 @@ function kfo_host_bots_tick()
                 }
                 if (((_s.alive_f mod max(1, _c.every)) == 0 || _s.owe) && _c.pre != -2)
                 {
-                    if (get_timer() - _t0 < 6000)
+                    if (get_timer() - _t0 < 4000)
                     {
-                        kfo_bot_think(_b, _c, _box, _e);
+                        kfo_bot_think(_b, _c, _box, _e, min(get_timer() + 2500, _t0 + 4500));
                         _s.owe = false;
                         kfo_bot_emergency(_h, _b, _c);
                     }
@@ -1200,12 +1565,16 @@ function kfo_host_bots_tick()
                 }
                 // DRBR: Pink's purple SOUL - on her lanes / grid / rolling box's nodes (online_pink53.gml)
                 kbr_pk_bot_snap(_s);
-                // DRBR: Gerson's green attacks - every SOUL sits on the box's middle behind its shield (the spears: kbr_hj_bots_spear)
+                // DRBR: Gerson's green attacks - every SOUL sits on the box's middle behind its shield (the spears: kbr_hj_bots_spear),
+                // and the bot turns its shield toward the spears (1.0.1: kbr_hj_bot_face)
                 if (kbr_hj_bots_green(_box))
                 {
                     _s.x = lerp(_s.x, (_box[0] + _box[2]) / 2, 0.2);
                     _s.y = lerp(_s.y, (_box[1] + _box[3]) / 2, 0.2);
+                    kbr_hj_bot_face(_b, _c, _s);
                 }
+                else
+                    _s.gd = -1;
                 // hits (its own invincibility frames, the same damage table as everyone's)
                 if (_s.inv > 0)
                     _s.inv--;
@@ -1265,9 +1634,11 @@ function kfo_host_bots_tick()
             if ((_s.alive_f mod 10) == 0)
                 kfo_bot_skills(_h, _b, _c);
         }
-        // its position for everyone: like a player's, relative to the battle's camera
+        // its position for everyone: like a player's, relative to the battle's camera (DRBR 1.0.1: and its green shield's
+        // direction, -1 without one - a watcher's shield turns with it)
         _b.x = _s.x - 10 - kbr_ox();
         _b.y = _s.y - 10 - kbr_oy();
+        _b.gd = (_running && variable_struct_exists(_s, "gd")) ? _s.gd : -1;
         _b.t_p = current_time;
     }
     return 0;
