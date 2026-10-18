@@ -3025,7 +3025,7 @@ TESTS (on the final 1.0.2 code and the real DRBR.zip)
                     screen shatter calling random() with two arguments, which the game's runner accepts and the emulator
                     does not) - no SOUL without its controller, no error of the game; on 1.0.2's code the reporter's settings
                     again (8000 frames, and 6183 to the match's end): no error.
-   PASS (EMULATED)  the full emulator regression on the final code (logs102), 50 of its 51 suites finished, all passing:
+   PASS (EMULATED)  the full emulator regression on the final code (logs102), all 51 suites passing:
                     t_ui 83/83, t_uilayout 17281/17281, t_kmenu 17/17, t_qol41 133/133, t_presets 23/23, t_loadouts
                     1911/1911, t_botmodes101 19/19, t_bossbots53 32/32, t_gerson53 244/244, t_gerson53 mixed 244/244,
                     t_pink53 456/456, t_flowery53 156/156, t_spamton53 375/375, t_jevil52 112/112, t_jevil52 mixed 10/10,
@@ -3035,8 +3035,7 @@ TESTS (on the final 1.0.2 code and the real DRBR.zip)
                     t_view47 88/88, t_room47 35/35, t_keys47 150/150, t_chat48 42/42, t_tut51 74/74, t_hud50 117/117,
                     t_hud51 38/38, t_feed51 21/21, t_bots49 37/37, the sends (t_jevil52_send 38/38, t_gerson53_send 44/44,
                     t_pink53_send 47/47, t_flowery53_send 46/46, t_spamton53_send 45/45), and the new / 1.0.2 suites above.
-   NOT RUN          t_lineup (Tag Team / Remix): still running when the release was handed over; its result is not part
-                    of this report.
+                    And t_lineup (Tag Team / Remix) 1634/1634 - it finished just after the release was handed over.
    PASS (STATIC)    the built data.win (game build 51.12): runner check 5178 functions / 91 variables, 0 missing; round
                     trip 1524/1524; unresolved names 0, name collisions 0, accessors on expressions 0, raw asset numbers 0;
                     the patch applied to the vanilla data.win gives the DRBR data.win (227,563,748 bytes); t_validate53 on
