@@ -1017,9 +1017,14 @@ function knight_infhp()
 }
 
 // HP a hit or a drain takes: none with INFINITE HP
+// DRBR 1.0.3: online, none for a hit the room's rules took nothing from (kbr_dmg_taken answered 0 - you are OUT and watching,
+// a SHIELD took it, HOW TO PLAY, the last 1 HP of an OUT): Chapter 3's damage scripts make every hit at least 1 after that
+// answer, so an OUT player's hidden SOUL lost its last HP to a later hit and the party-down check took them out of the match
 function knight_infhp_cut(_d)
 {
     if (knight_infhp())
+        return 0;
+    if (kbr_nohurt_take())
         return 0;
     return _d;
 }

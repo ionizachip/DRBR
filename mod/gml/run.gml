@@ -867,8 +867,12 @@ function knight_defeat_begin()
     if (_r.state == "lost" || _r.state == "done" || _r.state == "won" || _r.state == "rushwait" || _r.state == "finished")
         return 0;
     // build 43: online, a fallen party is OUT of the match
+    // DRBR 1.0.3: OUT as from any hit - you watch the rest of the round (kfo_on_party_down); a player already OUT and watching
+    // stays watching. It used to end the run here (the OUT card, "Back to the room") while the round went on.
     if (kfo_cfg_online(_r.cfg))
     {
+        if (kfo_on_party_down("your party fell outside the room's hits (the game's party-down check)"))
+            return 0;
         kfo_on_defeat("the game's own party-down check (GAME OVER)");
         return 0;
     }

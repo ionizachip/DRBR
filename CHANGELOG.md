@@ -1,5 +1,35 @@
 # Changelog
 
+## 1.0.3
+
+### In the game
+
+- **Going OUT is always the GAME OVER, then watching.** Whatever takes your last HP while the round runs (a hit, a piece
+  that takes HP by itself, the party falling another way), your SOUL breaks, the GAME OVER shows over the battle, and you
+  watch the rest of the round. 1.0.2 could show the OUT box ("Back to the room") in the middle of a round: a hit on your
+  hidden SOUL after you were already OUT still took your last HP, also while you were typing in the chat.
+- **Watching shows the player you watch.** Their character stands where your hero was (their skin), the HP panel is theirs
+  (head, character name, HP, colour and shield), the TP bar is their gauge, and the watching card shows their skill slots
+  with the skills' pictures. Their character blinks when they are hit. **<** / **>** switches all of it to another player.
+- **END ROUND for the host.** BACKSPACE in a match has END ROUND (it asks again): the round ends for everyone and the most
+  HP wins, as when the time runs out. The room's page has an END ROUND row while a match runs too.
+- **The bosses' sends are in the sender's SOUL colour.** Every piece of a Jevil, Gerson, Spamton NEO, Pink or Flowery
+  send, and the boss's phantom beside your box, is drawn in the sender's colour over its own art, keeping its lines and
+  shading. The boss's own pieces never are, so a send is always told apart.
+- **A boss's send fits your box.** Pieces that were made for the boss's own battle are scaled to the box (Gerson's bells
+  stand at its sides, the BIG SHOT beam is half as wide, Pink's warning crosses stay inside).
+- **Bots shoot and show their skills.** On Spamton NEO's yellow SOUL every bot fires its shots and BIG SHOTs, and everyone
+  sees them. A skill a bot (or a player) uses is shown over their SOUL: its name, a ring, and for an attack a diamond
+  flying to its target. Bots wear their own skins, also in the cold place.
+- **Flowery's tower is back** behind his battle (it was drawn far off the left of the screen).
+- **Jevil's Devilsknife plays Chapter 1's own "METAMORPHOSIS!"** (the build's sound of that name was another, longer
+  clip) and his own laugh. All 16 of his attacks were checked at the real arena camera.
+
+### Compatibility
+
+- 1.0.2 and 1.0.3 can play in the same room (multiplayer build 51). A 1.0.2 game does not show the new things (bots'
+  shots, skill marks, the watched player's side); it ignores those messages.
+
 ## 1.0.2
 
 ### In the game

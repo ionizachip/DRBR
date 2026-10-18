@@ -139,6 +139,19 @@ def main():
         F[n], k = re.subn(r'global\.flag\[1914\]', 'kbr_pk_dial()', F[n])
         nd += k
     assert nd >= 20, ('bomb dial', nd)
+    # ---- DRBR 1.0.3: a SENT mega bomb's warning cross and its explosions stop at the box it lands in (kbr_pk_lim: the screen for
+    # her own) - the MEGA BOMB skill's cross ran across the whole screen
+    bd = 'gml_Object_obj_pk_bigbomb_Draw_0.gml'
+    F[bd] = sub(F[bd], 'd_rectangle(camera_get_view_x(view_camera[0]), y - _thick, camera_get_view_x(view_camera[0]) + 640, y + _thick, 0);', 'd_rectangle(kbr_pk_lim(0), y - _thick, kbr_pk_lim(2), y + _thick, 0);', 1, 'bomb cross h')
+    F[bd] = sub(F[bd], 'd_rectangle(x - _thick, camera_get_view_y(view_camera[0]), x + _thick, camera_get_view_y(view_camera[0]) + 480, 0);', 'd_rectangle(x - _thick, kbr_pk_lim(1), x + _thick, kbr_pk_lim(3), 0);', 1, 'bomb cross v')
+    bs = 'gml_Object_obj_pk_bigbomb_Step_0.gml'
+    F[bs] = sub(F[bs], 'until (_xx < camera_get_view_x(view_camera[0]) || _xx > (camera_get_view_x(view_camera[0]) + 640) || _yy < camera_get_view_y(view_camera[0]) || _yy > (camera_get_view_y(view_camera[0]) + 480));', 'until (_xx < kbr_pk_lim(0) || _xx > kbr_pk_lim(2) || _yy < kbr_pk_lim(1) || _yy > kbr_pk_lim(3));', 1, 'bomb chain')
+    # (the fuse bombs' the same: their warning lines and explosion rows)
+    fd = 'gml_Object_obj_pk_bomb_Draw_0.gml'
+    F[fd] = sub(F[fd], 'd_rectangle(camera_get_view_x(view_camera[0]), y - _thick, camera_get_view_x(view_camera[0]) + 640, y + _thick, 0);', 'd_rectangle(kbr_pk_lim(0), y - _thick, kbr_pk_lim(2), y + _thick, 0);', 1, 'fuse cross h')
+    F[fd] = sub(F[fd], 'd_rectangle(x - _thick, camera_get_view_y(view_camera[0]), x + _thick, camera_get_view_y(view_camera[0]) + 480, 0);', 'd_rectangle(x - _thick, kbr_pk_lim(1), x + _thick, kbr_pk_lim(3), 0);', 1, 'fuse cross v')
+    fs = 'gml_Object_obj_pk_bomb_Step_0.gml'
+    F[fs] = sub(F[fs], 'until (_xx < camera_get_view_x(view_camera[0]) || _xx > (camera_get_view_x(view_camera[0]) + 640) || _yy < camera_get_view_y(view_camera[0]) || _yy > (camera_get_view_y(view_camera[0]) + 480));', 'until (_xx < kbr_pk_lim(0) || _xx > kbr_pk_lim(2) || _yy < kbr_pk_lim(1) || _yy > kbr_pk_lim(3));', 1, 'fuse chain')
     # ---- the fuse sprites Chapter 5 names by their NUMBER (5129, 7112): by name
     for n in ('gml_Object_obj_pk_bomb_Draw_0.gml', 'gml_Object_obj_pk_bigbomb_Draw_0.gml'):
         F[n] = sub(F[n], '_burnsprite = 7112;', '_burnsprite = spr_pk_fusebomb_burning_fast;', 1, n)

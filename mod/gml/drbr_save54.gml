@@ -282,7 +282,7 @@ function kdr_log_start(_err)
     ini_write_real("start", "template_version", variable_global_exists("kdr_tver") ? global.kdr_tver : 0);
     ini_write_string("start", "profile", kdr_cfg_get("profile", ""));
     ini_write_string("start", "start_mode", kdr_cfg_get("start_mode", "template"));
-    ini_write_string("start", "build", "51.12");
+    ini_write_string("start", "build", "51.13");
     ini_write_string("start", "when", date_datetime_string(date_current_datetime()));
     ini_close();
 }

@@ -99,13 +99,13 @@ class Recorder:
             R.st['fog'] = int(col) if en else None; return 0
         s.mock('gpu_set_fog', fog)
         def spr_st(sim, sp, im, x, y, w, h):
-            R.ops.append(('spr', R.name_of(sp), im, x, y, 1, 1, 0, 16777215, R.st['alpha'], (w, h), None)); return 0
+            R.ops.append(('spr', R.name_of(sp), im, x, y, 1, 1, 0, R.fogc(16777215), R.st['alpha'], (w, h), None)); return 0
         def spr_st_ext(sim, sp, im, x, y, w, h, col, al):
-            R.ops.append(('spr', R.name_of(sp), im, x, y, 1, 1, 0, col, al, (w, h), None)); return 0
+            R.ops.append(('spr', R.name_of(sp), im, x, y, 1, 1, 0, R.fogc(col), al, (w, h), None)); return 0
         def spr_part(sim, sp, im, l, t, w, h, x, y):
-            R.ops.append(('spr', R.name_of(sp), im, x, y, 1, 1, 0, 16777215, R.st['alpha'], None, (l, t, w, h))); return 0
+            R.ops.append(('spr', R.name_of(sp), im, x, y, 1, 1, 0, R.fogc(16777215), R.st['alpha'], None, (l, t, w, h))); return 0
         def spr_part_ext(sim, sp, im, l, t, w, h, x, y, xs, ys, col, al):
-            R.ops.append(('spr', R.name_of(sp), im, x, y, xs, ys, 0, col, al, None, (l, t, w, h))); return 0
+            R.ops.append(('spr', R.name_of(sp), im, x, y, xs, ys, 0, R.fogc(col), al, None, (l, t, w, h))); return 0
         s.mock('draw_sprite', spr)
         s.mock('draw_sprite_ext', spr_ext)
         s.mock('draw_sprite_stretched', spr_st)

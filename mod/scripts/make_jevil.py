@@ -12,7 +12,8 @@ What it writes (idempotent, every build):
       * the laser scythe's own hit ("everyone loses 30% HP") -> a normal hit (the room's damage table, like every bullet);
       * Jevil's body no longer fades the party out (the online look hides / draws the hero itself);
       * obj_jv_dbc: Chapter 1's obj_dbulletcontroller with only Jevil's 17 types (Chapter 3 has its own obj_dbulletcontroller).
-  - build/assets.json: the sprites (renamed spr_jv_*), the sounds Chapter 3 lacks (Jevil's voice), the object shells (their
+  - build/assets.json: the sprites (renamed spr_jv_*), the sounds Chapter 3 lacks (Jevil's voice) and his own clips where the
+    built game has another under the same name (OWN_SND: snd_jv_joker_*), the object shells (their
     sprite / mask / parent / depth from Chapter 1), all from the source "c1".
 Usage: python3 make_jevil.py"""
 import os, re, json, sys, glob
@@ -40,6 +41,11 @@ EXTRA_SPR = ['spr_joker_main', 'spr_joker_dance', 'spr_joker_tired', 'spr_joker_
              'spr_jokerbody', 'spr_jokerhead', 'spr_joker_scythebody', 'spr_joker_scythebody_mask', 'spr_jokerscythe_big', 'spr_carouselbg']
 EXTRA_SND = ['snd_joker_chaos', 'snd_joker_anything', 'snd_joker_byebye', 'snd_joker_neochaos', 'snd_joker_oh', 'snd_joker_laugh0',
              'snd_joker_laugh1', 'snd_joker_ha0', 'snd_joker_ha1', 'snd_joker_metamorphosis']
+# DRBR 1.0.3: voice clips of his whose NAME the built game already has for another clip - his own Chapter 1 clip is imported
+# under a name of its own, and his code (here and the templates) plays that one. snd_joker_metamorphosis in the build is the
+# Cyan Knight mod's (417 KB, not Chapter 1's 134 KB "METAMORPHOSIS!": the report "uses the wrong voiceline"); snd_joker_laugh0
+# is Chapter 3's own .ogg, not Chapter 1's clip (both measured by hashing every sound: sndhash.csx)
+OWN_SND = {'snd_joker_metamorphosis': 'snd_jv_joker_metamorphosis', 'snd_joker_laugh0': 'snd_jv_joker_laugh0'}
 
 
 def table(p):
@@ -238,6 +244,9 @@ def main():
     for n in list(files):
         if re.match(r'gml_Object_obj_jv_(?!joker|body|bg)\w+_(Step|Draw)_\d+\.gml$', n) and re.search(r'\bobj_heart\.', files[n]):
             files[n] = 'if (!instance_exists(obj_heart))\n    exit;\n' + files[n]
+    for n in list(files):
+        for s0, s1 in OWN_SND.items():
+            files[n] = re.sub(r'\b%s\b' % s0, s1, files[n])
     for n, t in files.items():
         left = re.findall(r'\bobj_(?:joker|carouselbullet|spadering|suitbomb|centerscythe|laserscythe|bigscythe|heartbomb_blast|clubsbullet_dark|dbullet_vert|regularbullet_permanent|jokerbg)\w*', t)
         assert not left, (n, left)
@@ -246,7 +255,7 @@ def main():
     snds = set(EXTRA_SND)
     for t in files.values():
         snds |= set(re.findall(r'\b(snd_\w+)\b', t))
-    snds = sorted(s for s in snds if s in A1['snd'] and s not in A3['snd'])
+    snds = sorted(s for s in snds if s in A1['snd'] and (s not in A3['snd'] or s in OWN_SND))
     # the manifest
     A = json.load(open(ASSETS))
     M = A['manifest']
@@ -257,7 +266,11 @@ def main():
         ren[s] = jv_spr(s)
         M['sprites'].append({'name': s, 'new': jv_spr(s), 'src': 'c1', 'users': ['c1'], 'keep': False, 'added': True, 'dx': 0, 'dy': 0})
     for s in snds:
-        M['sounds'].append({'name': s, 'new': s, 'src': 'c1', 'users': ['c1'], 'keep': False, 'added': True})
+        M['sounds'].append({'name': s, 'new': OWN_SND.get(s, s), 'src': 'c1', 'users': ['c1'], 'keep': False, 'added': True})
+    for s0, s1 in OWN_SND.items():
+        assert s0 in snds, s0
+        for t in files.values():
+            assert not re.search(r'\b%s\b' % s0, t), s0
     for a, b in OBJ.items():
         ren[a] = b
         M['objects'].append({'name': a, 'new': b, 'src': 'c1', 'users': ['c1'], 'keep': False, 'added': True})

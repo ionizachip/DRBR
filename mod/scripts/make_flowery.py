@@ -20,7 +20,8 @@ Changed where Chapter 3 / the shared timeline differ (section 7.2):
   - the SOUL's clean-up no longer destroys every obj_marker / obj_afterimage in the room (only the board's);
   - a Jarona copy made at cameray() + 500 (Chapter 5's camera is at 0, 0) -> camerax() + 500;
   - 1.0.2: every Step / Draw that reads the board's controller, the orange SOUL or the box starts with kbr_fl_broken(): with one
-    of them gone, the board ends in that game as the cut ends it (1.0.1 could stop in the orange SOUL's Draw).
+    of them gone, the board ends in that game as the cut ends it (1.0.1 could stop in the orange SOUL's Draw);
+  - 1.0.3: the tower is drawn at the screen's middle (camera + 320), not at the room's x 320 (Chapter 5's camera is at 0, 0).
 Usage: python3 make_flowery.py"""
 import os, re, sys
 sys.path.insert(0, '/home/claude/scripts')
@@ -153,6 +154,12 @@ def main():
     tw = sub1(tw, 'depth_shader = 11;', 'depth_shader = shd_fl_fakedepth_tower;', fname='towery')
     assert shd(19) == 'shd_depthmap' and shd(8) == 'shd_tower' and shd(11) == 'shd_fakedepth_tower', (shd(19), shd(8), shd(11))
     F['gml_Object_obj_fl_towery_Create_0.gml'] = tw
+    # DRBR 1.0.3: the tower is drawn at the SCREEN's middle (fixed_position) - Chapter 5 put it at x 320 of the room (its camera
+    # is at 0, 0). The arena's camera is at x 2063 and more: the tower was drawn ~1800 px left of the screen, its leaves and
+    # petals (which follow the tower's own x) floated round nothing - the report "flowery's background is bugged out"
+    td = F['gml_Object_obj_fl_towery_Draw_0.gml']
+    td = sub1(td, 'var _mid = fixed_position ? 320 : x;', 'var _mid = fixed_position ? (camera_get_view_x(view_camera[0]) + 320) : x;', fname='towery Draw')
+    F['gml_Object_obj_fl_towery_Draw_0.gml'] = td
     dd = F['gml_Object_obj_fl_towerdeco_Draw_0.gml']
     assert shd(30) == 'shd_brightness_to_alpha' and shd(38) == 'shd_overlay_blend', (shd(30), shd(38))
     dd = sub1(dd, 'shader_replace_simple_set_hook(30);', 'shader_replace_simple_set_hook(shd_fl_brightness_to_alpha);', fname='deco Draw')

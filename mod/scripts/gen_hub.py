@@ -136,7 +136,8 @@ assert '@@' not in core, 'a template placeholder was left'
 open(OUT + 'gml_GlobalScript_knight_core.gml', 'w').write(core)
 objs = {'menu': 'obj_knight_menu', 'prompt': 'obj_knight_prompt', 'ctrl': 'obj_knight_ctrl', 'ghost_kris': 'obj_knight_ghost_kris', 'ghost_susie': 'obj_knight_ghost_susie',
         'ghost_ralsei': 'obj_knight_ghost_ralsei', 'firespell': 'obj_firespell', 'firehex': 'obj_firespell_hexagon', 'twin': 'obj_knight_twin', 'twinbullet': 'obj_knight_twin_bullet', 'bench': 'obj_knight_bench',
-        'heart': 'obj_heart', 'herocc': 'obj_knight_herocc', 'omega': 'obj_knight_omega', 'skinart': 'obj_knight_skinart'}
+        'heart': 'obj_heart', 'herocc': 'obj_knight_herocc', 'omega': 'obj_knight_omega', 'skinart': 'obj_knight_skinart',
+        'saov': 'obj_knight_saov'}
 n = 0
 for f in sorted(os.listdir(T + 'events')):
     short, ev = f[:-4].rsplit('_', 2)[0], '_'.join(f[:-4].rsplit('_', 2)[1:])
@@ -236,3 +237,6 @@ det_rewrite.main()
 # build 50: the players' attack skills are the Knights' real attack objects - wrapped (det_sent.py)
 det_sent.main()
 br_patch.main()
+# DRBR 1.0.3: a boss's send in the sender's SOUL colour - the bosses' Draw events draw through kbr_ov_* (sent_tint.py; last)
+import sent_tint
+sent_tint.main()

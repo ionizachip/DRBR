@@ -215,6 +215,34 @@ def hooks(check):
             open(M + f, 'w', encoding='utf8').write(t)
     out += flowery_hooks(check)
     out += skin_hooks(check)
+    out += watch_hooks(check)
+    return out
+
+
+def watch_hooks(check):
+    """DRBR 1.0.3: the HP panel while you watch someone - your box is theirs: its HP numbers, their colour at a quarter, the
+    red at 0 and the bar read their HP through kbr_cb_hp / kbr_cb_mhp (online_skin52.gml; the game's own HP everywhere else).
+    Reads build/merged (after skin_hooks)."""
+    out = []
+    f = 'gml_GlobalScript_scr_charbox.gml'
+    t = open(M + f, encoding='utf8').read()
+    if 'kbr_cb_hp(' in t:
+        return out
+    pairs = [
+        ('if ((global.hp[c + 1] / global.maxhp[c + 1]) <= 0.25)', 'if ((kbr_cb_hp(c + 1) / kbr_cb_mhp(c + 1)) <= 0.25)'),
+        ('if (global.hp[c + 1] <= 0)', 'if (kbr_cb_hp(c + 1) <= 0)'),
+        ('string_hash_to_newline(global.hp[c + 1])', 'string_hash_to_newline(kbr_cb_hp(c + 1))'),
+        ('string_hash_to_newline(global.maxhp[c + 1])', 'string_hash_to_newline(kbr_cb_mhp(c + 1))'),
+        ('if (global.hp[c + 1] > 0 && global.maxhp[c + 1] > 0)', 'if (kbr_cb_hp(c + 1) > 0 && kbr_cb_mhp(c + 1) > 0)'),
+        ('ceil((global.hp[c + 1] / global.maxhp[c + 1]) * 75)', 'ceil((kbr_cb_hp(c + 1) / kbr_cb_mhp(c + 1)) * 75)'),
+    ]
+    for a, b in pairs:
+        n = t.count(a)
+        assert n >= 5, 'watch hook %r: %d' % (a, n)
+        t = t.replace(a, b)
+    out.append(f)
+    if not check:
+        open(M + f, 'w', encoding='utf8').write(t)
     return out
 
 

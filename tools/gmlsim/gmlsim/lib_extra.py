@@ -178,7 +178,7 @@ layer_tile_alpha layer_tilemap_get_id layer_force_draw_depth layer_script_begin 
 camera_set_view_border camera_get_view_border_x camera_get_view_border_y camera_set_view_speed
 camera_get_view_speed_x camera_get_view_speed_y camera_set_view_angle camera_set_view_target
 camera_get_view_target
-gpu_get_blendmode shader_current texture_prefetch texture_is_ready texturegroup_get_textures
+gpu_get_blendmode texture_prefetch texture_is_ready texturegroup_get_textures
 sprite_prefetch sprite_set_bbox sprite_add surface_getpixel surface_get_target
 audio_emitter_exists audio_emitter_create audio_group_is_loaded audio_play_sound_on audio_create_stream
 audio_destroy_stream
@@ -234,3 +234,14 @@ def clipboard_get_text(sim):
 @builtin()
 def clipboard_has_text(sim):
     return bool(getattr(sim, 'clipboard', ''))
+
+
+# DRBR 1.0.3: the GPU state queries as the runner answers them with nothing set: no shader (-1), fog off
+@builtin()
+def shader_current(sim):
+    return -1
+
+
+@builtin()
+def gpu_get_fog(sim):
+    return GMArray([False, 0, 0, 1])

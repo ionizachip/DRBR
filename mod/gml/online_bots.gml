@@ -1394,6 +1394,7 @@ function kfo_bot_green(_h, _b, _sid)
         case 25: _s.det_t = 450; break;
     }
     kfo_host_feed("* " + _b.n + " used " + kbr_skill_fname(_sid) + ".", c_white);
+    kfo_host_su(_b, _sid, []);
     return 1;
 }
 
@@ -1613,6 +1614,8 @@ function kfo_host_bots_tick()
                 // DRBR: Spamton NEO's RECREW walls, by the odds (online_spamton53.gml)
                 if (kbr_sn_bot_walls(_b, _c, _e))
                     continue;
+                // DRBR 1.0.3: and it shoots on his YELLOW SOUL (shown in every game)
+                kbr_sn_bot_fire(_b, _c, _s);
             }
             // the gauge, like a player's (about one point a second, CHARGE RATE; OUTNUMBERED BONUS)
             if ((_s.alive_f mod 30) == 0)

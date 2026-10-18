@@ -292,7 +292,8 @@ function kbr_jv_attack()
 // DRBR 1.0.2: the Devilsknife attacks (his body turns into the scythe: _morph) and the finale have Chapter 1's own clip -
 // "METAMORPHOSIS!" from his body as it turns, "BYE-BYE!" from the finale's bullets - and nothing on top of it (a laugh or
 // "CHAOS, CHAOS!" played over it: your report "uses the wrong voiceline"); a Devilsknife whose body is already the scythe
-// says it here instead
+// says it here instead. DRBR 1.0.3: and it IS Chapter 1's clip - the build's snd_joker_metamorphosis is the Cyan Knight mod's
+// (another voice line); his are snd_jv_joker_metamorphosis and snd_jv_joker_laugh0 (make_jevil.py OWN_SND)
 function kbr_jv_say(_d, _ai, _morph)
 {
     var _first = true;
@@ -313,13 +314,13 @@ function kbr_jv_say(_d, _ai, _morph)
     if (_ai == 15 || (_d.cond[_ai] == 5 && !is_undefined(_morph) && _morph))
         _snd = -1;
     else if (_d.cond[_ai] == 5)
-        _snd = snd_joker_metamorphosis;
+        _snd = snd_jv_joker_metamorphosis;
     else if (_ai == 0 || string_pos("CHAOS", say) > 0)
         _snd = snd_joker_chaos;
     else if (string_pos("ANYTHING", say) > 0)
         _snd = snd_joker_anything;
     else
-        _snd = choose(snd_joker_laugh0, snd_joker_ha0, snd_joker_ha1);
+        _snd = choose(snd_jv_joker_laugh0, snd_joker_ha0, snd_joker_ha1);
     if (_snd >= 0)
         snd_play(_snd);
     return 1;

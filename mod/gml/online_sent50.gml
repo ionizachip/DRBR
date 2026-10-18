@@ -266,6 +266,12 @@ function kbr_sa_tag(_G)
     kbrcol = _G.col;
     kbrb = -1;
     kbrtb = -1;
+    // DRBR 1.0.3: a boss's send (Jevil, Spamton NEO, Gerson, Pink, Flowery): its pictures get the sender's colour drawn over
+    // them (kbr_ov_*), not the knights' light mix
+    var _ft = kbr_skill_fams();
+    kbrov = (_G.sid > 0 && _G.sid < array_length(_ft) && _ft[_G.sid] > KBR_FAM_KNIGHT) ? 1 : 0;
+    // (a dark SOUL colour lifted as a name in it is - kfo_col_text - so a send in black or navy stays easy to see)
+    kbrovc = kfo_col_text(_G.col);
     return 1;
 }
 
@@ -759,15 +765,21 @@ function kbr_sa_begin()
     return 1;
 }
 
-// End Step: tinted in the sender's colour (the sprite's own colours stay: a mix, not a fill)
+// End Step: tinted in the sender's colour (the sprite's own colours stay: a mix, not a fill). DRBR 1.0.3: the knights' sends;
+// a boss's send is coloured as it is drawn instead (kbr_ov_*, below)
 function kbr_sa_end()
 {
     global.kbr_cur = 0;
     if (global.kbr_san <= 0 || array_length(global.kbr_sa) == 0)
+    {
+        if (instance_exists(obj_knight_saov))
+            instance_destroy(obj_knight_saov);
         return 0;
+    }
+    kbr_sa_fit_all();
     with (obj_bulletparent)
     {
-        if (variable_instance_exists(id, "kbrcol") && variable_instance_exists(id, "kbrx") && kbrx > 0)
+        if (variable_instance_exists(id, "kbrcol") && variable_instance_exists(id, "kbrx") && kbrx > 0 && !(variable_instance_exists(id, "kbrov") && kbrov))
         {
             kbrb = image_blend;
             image_blend = merge_color(image_blend, kbrcol, KBR_SENT_TINT);
@@ -776,11 +788,227 @@ function kbr_sa_end()
     }
     with (obj_bulletgenparent)
     {
-        if (variable_instance_exists(id, "kbrcol") && variable_instance_exists(id, "kbrx") && kbrx > 0)
+        if (variable_instance_exists(id, "kbrcol") && variable_instance_exists(id, "kbrx") && kbrx > 0 && !(variable_instance_exists(id, "kbrov") && kbrov))
         {
             kbrb = image_blend;
             image_blend = merge_color(image_blend, kbrcol, KBR_SENT_TINT);
             kbrtb = image_blend;
+        }
+    }
+    kbr_ov_drawers();
+    return 1;
+}
+
+// ---------- DRBR 1.0.3: a boss's send in the sender's SOUL colour ----------
+// Your request: "make the sent attacks from the other bosses be tinted your soul color ... and actually look nice when in attack
+// ... like the actual graphic of the thing being sent". The knights' sends always were (their pieces are mostly white, mixed
+// with the sender's colour), but a boss's pieces are his own coloured art: the same light mix hardly showed on them. Now every
+// picture a piece of a boss's send draws is drawn once more right over itself, as a silhouette in the sender's colour at
+// KBR_OV_A of its alpha (the game's own gpu fog, as its hit flashes): the art turns that colour and keeps its own lines and
+// shading. Pieces with a Draw of their own: the generator routes the draw calls in the bosses' Draw events through kbr_ov_*
+// (gen_hub.py); pieces drawn the default way (the game's obj_regularbullet / obj_collidebullet / obj_afterimage, a boss's
+// pieces with no Draw): a drawer just above their depth (obj_knight_saov) draws it for them. Not over a piece's own flash
+// (fog), glow (another blend mode) or shader. The boss's own bullets never get it: a send is always told apart.
+#macro KBR_OV_A 0.5
+
+// whether the picture just drawn gets the colour drawn over it: self is a piece of a boss's send, and nothing special (a fog
+// flash, a glow, a shader) is drawing
+function kbr_ov_on()
+{
+    if (!variable_instance_exists(id, "kbrov") || !kbrov)
+        return false;
+    if (shader_current() != -1 || gpu_get_blendmode() != bm_normal)
+        return false;
+    var _f = gpu_get_fog();
+    return !(is_array(_f) && array_length(_f) > 0 && _f[0]);
+}
+
+function kbr_ov_dse(_s, _i, _x, _y, _xs, _ys, _r, _c, _a)
+{
+    draw_sprite_ext(_s, _i, _x, _y, _xs, _ys, _r, _c, _a);
+    if (kbr_ov_on())
+    {
+        gpu_set_fog(true, kbrovc, 0, 0);
+        draw_sprite_ext(_s, _i, _x, _y, _xs, _ys, _r, c_white, clamp(_a, 0, 1) * KBR_OV_A);
+        gpu_set_fog(false, c_black, 0, 0);
+    }
+    return 0;
+}
+
+function kbr_ov_ds(_s, _i, _x, _y)
+{
+    draw_sprite(_s, _i, _x, _y);
+    if (kbr_ov_on())
+    {
+        gpu_set_fog(true, kbrovc, 0, 0);
+        draw_sprite_ext(_s, _i, _x, _y, 1, 1, 0, c_white, draw_get_alpha() * KBR_OV_A);
+        gpu_set_fog(false, c_black, 0, 0);
+    }
+    return 0;
+}
+
+function kbr_ov_dself()
+{
+    draw_self();
+    if (kbr_ov_on() && sprite_index >= 0)
+    {
+        gpu_set_fog(true, kbrovc, 0, 0);
+        draw_sprite_ext(sprite_index, image_index, x, y, image_xscale, image_yscale, image_angle, c_white, clamp(image_alpha, 0, 1) * KBR_OV_A);
+        gpu_set_fog(false, c_black, 0, 0);
+    }
+    return 0;
+}
+
+function kbr_ov_dspe(_s, _i, _l, _t, _w, _h, _x, _y, _xs, _ys, _c, _a)
+{
+    draw_sprite_part_ext(_s, _i, _l, _t, _w, _h, _x, _y, _xs, _ys, _c, _a);
+    if (kbr_ov_on())
+    {
+        gpu_set_fog(true, kbrovc, 0, 0);
+        draw_sprite_part_ext(_s, _i, _l, _t, _w, _h, _x, _y, _xs, _ys, c_white, clamp(_a, 0, 1) * KBR_OV_A);
+        gpu_set_fog(false, c_black, 0, 0);
+    }
+    return 0;
+}
+
+function kbr_ov_dsp(_s, _i, _l, _t, _w, _h, _x, _y)
+{
+    draw_sprite_part(_s, _i, _l, _t, _w, _h, _x, _y);
+    if (kbr_ov_on())
+    {
+        gpu_set_fog(true, kbrovc, 0, 0);
+        draw_sprite_part_ext(_s, _i, _l, _t, _w, _h, _x, _y, 1, 1, c_white, draw_get_alpha() * KBR_OV_A);
+        gpu_set_fog(false, c_black, 0, 0);
+    }
+    return 0;
+}
+
+// the shapes and words a piece draws (their colour): the sender's colour mixed in the same way
+function kbr_ov_col(_c)
+{
+    draw_set_color((variable_instance_exists(id, "kbrov") && kbrov) ? merge_color(_c, kbrovc, KBR_OV_A) : _c);
+    return 0;
+}
+
+// the pieces drawn the default way: the game's own bullet objects, and a boss's own piece whose Draw never ran (the generator
+// marks every boss Draw: kbrovd)
+function kbr_ov_dd()
+{
+    if (variable_instance_exists(id, "kbrovd"))
+        return false;
+    if (!variable_instance_exists(id, "kbrovb"))
+    {
+        var _n = object_get_name(object_index);
+        kbrovb = (object_index == obj_regularbullet || object_index == obj_collidebullet || object_index == obj_afterimage || object_index == obj_bulletparent
+            || string_pos("obj_jv_", _n) == 1 || string_pos("obj_hj_", _n) == 1 || string_pos("obj_sn_", _n) == 1 || string_pos("obj_pk_", _n) == 1
+            || string_pos("obj_fl_", _n) == 1);
+    }
+    return kbrovb;
+}
+
+// End Step: one drawer just above every depth such pieces are at (made / moved / removed as they come and go)
+function kbr_ov_drawers()
+{
+    var _deps = {};
+    var _n = 0;
+    with (all)
+    {
+        if (variable_instance_exists(id, "kbrov") && kbrov && visible && sprite_index >= 0 && kbr_ov_dd())
+        {
+            var _k = string(depth);
+            if (!variable_struct_exists(_deps, _k) && _n < 8)
+            {
+                variable_struct_set(_deps, _k, depth);
+                _n++;
+            }
+        }
+    }
+    with (obj_knight_saov)
+    {
+        var _k = string(dep);
+        if (variable_struct_exists(_deps, _k))
+            variable_struct_remove(_deps, _k);
+        else
+            instance_destroy();
+    }
+    var _ks = variable_struct_get_names(_deps);
+    for (var _i = 0; _i < array_length(_ks); _i++)
+    {
+        var _d = variable_struct_get(_deps, _ks[_i]);
+        with (instance_create_depth(0, 0, _d - 1, obj_knight_saov))
+            dep = _d;
+    }
+    return _n;
+}
+
+// obj_knight_saov's Draw (just after the pieces at its depth): the colour over each default-drawn piece of a boss's send there
+function kbr_ov_drawer()
+{
+    if (global.kbr_san <= 0 || !variable_instance_exists(id, "dep"))
+    {
+        instance_destroy();
+        return 0;
+    }
+    if (shader_current() != -1 || gpu_get_blendmode() != bm_normal)
+        return 0;
+    var _dep = dep;
+    var _on = false;
+    with (all)
+    {
+        if (depth == _dep && visible && variable_instance_exists(id, "kbrov") && kbrov && sprite_index >= 0 && image_alpha > 0 && kbr_ov_dd())
+        {
+            _on = true;
+            gpu_set_fog(true, kbrovc, 0, 0);
+            draw_sprite_ext(sprite_index, image_index, x, y, image_xscale, image_yscale, image_angle, c_white, clamp(image_alpha, 0, 1) * KBR_OV_A);
+        }
+    }
+    if (_on)
+        gpu_set_fog(false, c_black, 0, 0);
+    return 1;
+}
+
+// DRBR 1.0.3: a boss's send fits the box it lands in (your report: sent skills "need to visibly fit in the box, not be really
+// really large"). Its pieces are the boss's own, made for his own battle: at the end of a piece's first step with a picture,
+// one bigger than the box allows is scaled down once - its picture and its hitbox together (image_xscale / image_yscale; a
+// piece that sizes itself every step by its scale_multiplier - Pink's bombs - has that scaled too). A long thin piece (a beam,
+// a slash) keeps its length: its thickness is what is measured. The knights' sends are their own attacks' size: unchanged.
+#macro KBR_SA_FIT 1.35
+
+// a piece's own size factor for a send (kbrsz, set where a send makes it - the BIG SHOT laser), 1 for everything else
+function kbr_fitv()
+{
+    return (variable_instance_exists(id, "kbrsz") && is_numeric(kbrsz)) ? kbrsz : 1;
+}
+
+function kbr_sa_fit_all()
+{
+    if (!instance_exists(obj_growtangle))
+        return 0;
+    var _B = kbr_sa_box();
+    var _lim = max(32, min(_B[2], _B[3]) * KBR_SA_FIT);
+    with (all)
+    {
+        if (variable_instance_exists(id, "kbrc") && variable_instance_exists(id, "kbrx") && kbrx > 0 && !variable_instance_exists(id, "kbrfit")
+            && sprite_index >= 0 && visible && image_alpha > 0)
+        {
+            kbrfit = 1;
+            var _G = kbr_sa_find(kbrx);
+            if (is_struct(_G) && !_G.twin && _G.sid >= 26)
+            {
+                var _w = sprite_get_width(sprite_index) * abs(image_xscale);
+                var _h = sprite_get_height(sprite_index) * abs(image_yscale);
+                var _sz = max(_w, _h);
+                if (_sz > (3 * min(_w, _h)))
+                    _sz = min(_w, _h);
+                if (_sz > _lim)
+                {
+                    kbrfit = _lim / _sz;
+                    if (variable_instance_exists(id, "scale_multiplier") && is_numeric(scale_multiplier))
+                        scale_multiplier *= kbrfit;
+                    image_xscale *= kbrfit;
+                    image_yscale *= kbrfit;
+                }
+            }
         }
     }
     return 1;
@@ -892,7 +1120,7 @@ function kbr_sa_step(_G)
             if (_t == 0)
             {
                 kbr_sa_mk(_G, _B[0], _B[1], obj_jv_cscythe);
-                kbr_sa_sfx(snd_joker_metamorphosis, 1);
+                kbr_sa_sfx(snd_jv_joker_metamorphosis, 1);
                 kbr_sa_sfx(snd_spearappear, 1);
             }
             _G.end_t = 200;
@@ -1315,9 +1543,14 @@ function kbr_sa_draw()
                     draw_sprite_ext(_T.spr, _u div 4, _T.x, _T.y + (random_range(-1, 1) * (_u / 40)), _T.xs, abs(_T.xs), 0, merge_color(c_white, _G.col, 0.35), _al3);
                     break;
                 case "spr":
-                    // DRBR: a boss's phantom (its real sprite) beside the box while its send starts
+                    // DRBR: a boss's phantom (its real sprite) beside the box while its send starts - DRBR 1.0.3: in the sender's
+                    // colour as the send's pieces are (its picture, the colour drawn over it)
                     var _al2 = min(1, _u / 6) * min(1, (_T.d - _u) / 6) * 0.75;
-                    draw_sprite_ext(_T.spr, min(sprite_get_number(_T.spr) - 1, _u div 4), _T.x, _T.y, _T.xs, abs(_T.xs), 0, merge_color(c_white, _G.col, 0.55), _al2);
+                    var _fr2 = min(sprite_get_number(_T.spr) - 1, _u div 4);
+                    draw_sprite_ext(_T.spr, _fr2, _T.x, _T.y, _T.xs, abs(_T.xs), 0, c_white, _al2);
+                    gpu_set_fog(true, kfo_col_text(_G.col), 0, 0);
+                    draw_sprite_ext(_T.spr, _fr2, _T.x, _T.y, _T.xs, abs(_T.xs), 0, c_white, _al2 * KBR_OV_A);
+                    gpu_set_fog(false, c_black, 0, 0);
                     break;
                 case "ph":
                     // the sender's knight (its real sprite), fading in and out at its side of the box - in the sender's own colour

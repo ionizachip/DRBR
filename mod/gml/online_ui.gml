@@ -101,6 +101,9 @@ function kfo_ui_lobby_rows()
 {
     var _o = kfo_get();
     var _l = [kfo_is_host() ? "start" : "ready"];
+    // DRBR 1.0.3: END ROUND - the host ends the running round for everyone
+    if (kfo_is_host() && kfo_lobby_matching())
+        array_push(_l, "endround");
     if (kfo_lobby_matching() && !kfo_ui_me_playing())
         array_push(_l, "spectate", "join");
     array_push(_l, "name", "skin", "look", "keys", "options", "settings", "bosses");
@@ -717,6 +720,15 @@ function kfo_ui_step_lobby(_up, _down, _left, _right, _ok, _back, _alt)
         case "start":
             kfo_ui_start();
             break;
+        case "endround":
+            if (!kfo_host_can_end_round())
+            {
+                knight_ui_warn("No round is running.");
+                break;
+            }
+            knight_ui_modal("kfo_endround", "END THE ROUND?", ["It ends now for everyone: the players still standing are placed by HP (the most HP in % wins), as when the time runs out."],
+                [{ t: "Keep playing", a: "close" }, { t: "End the round", a: "kfo_endround" }]);
+            break;
         case "spectate":
             if (kfo_ui_lobby_why("spectate") != "")
             {
@@ -1161,6 +1173,19 @@ function kfo_ui_modal_do(_a)
         knight_ui_tell("Mod settings reset: other SOULs shown at 70%, default keys.");
         return true;
     }
+    if (_a == "kfo_endround")
+    {
+        knight_ui_modal_close();
+        if (kfo_host_end_round())
+        {
+            knight_ui_tell("The round is over: the results are out.");
+            snd_play(snd_select);
+        }
+        else
+            knight_ui_warn("No round is running.");
+        _u.lob_row = 0;
+        return true;
+    }
     if (_a == "kfo_leave")
     {
         knight_ui_modal_close();
@@ -1246,6 +1271,7 @@ function kfo_ui_desc()
         switch (_lr[clamp(_u.lob_row, 0, array_length(_lr) - 1)])
         {
             case "start": return kfo_prac_room() ? "Z or C: start the practice match.#X: back." : "Z or C: start the match.   X: back#(the room's READY CHECK decides who plays)";
+            case "endround": return "Z: end the running round for everyone#(it asks first; the most HP wins, as at TIME).";
             case "ready": return kfo_ui_after_match() ? "Z: vote for a rematch (the host starts it when#the votes are in). X: back." : "Z: ready for the next match.#X: back (not ready).";
             case "spectate": return (kfo_ui_lobby_why("spectate") == "") ? "Z: watch the match that is running (you play#the next one). It goes on as it is." : ("NOT NOW: " + kfo_ui_lobby_why("spectate"));
             case "join": return "NOT NOW: a match takes no new players once it#started. SPECTATE it, play the next one.";
@@ -1647,6 +1673,7 @@ function kfo_ui_draw_lobby(xx, yy)
         switch (_rows[_i])
         {
             case "start": _t = "START"; break;
+            case "endround": _t = "END ROUND"; break;
             case "ready": _t = (kfo_ui_after_match() ? "REMATCH: " : "READY: ") + ((!is_undefined(_me) && kfo_jn(_me, "rd", 0) == 1) ? "ON" : "OFF"); break;
             case "spectate": _t = "SPECTATE MATCH"; break;
             case "join": _t = "JOIN MATCH"; break;

@@ -18,6 +18,7 @@ expected number of times in total (patched + unpatched), or the step fails.
      whenever her max HP is lower - again after every sudden-death step).
   6. (build 47) scr_damage_maxhp's one-member branch (split slashes, the big quick slash) takes the online damage online
      (knight_direct_taken; offline it returns the number unchanged).
+  6b. (DRBR 1.0.3) scr_damage_proportional (Spamton NEO's finale bullets) the same: an online hit online.
   7. (build 47) the original Knight encounter (walking right past x 1840 in the cold place starts it, every knight's version)
      does not start while you are in an online / practice room outside a fight (kfo_ow_encounter_ok; offline always true).
 """
@@ -52,6 +53,12 @@ PATCHES = [
     ('gml_Object_obj_ch3_PTB02_Step_0.gml', r'if \(global\.maxhp\[4\] < 120\)', 'if (global.maxhp[4] < 120 && knight_enc_hp_rules())',
      r'if \(global\.maxhp\[4\] < 120 && knight_enc_hp_rules\(\)\)', 1),
     ('gml_GlobalScript_scr_damage_maxhp.gml', r'(?<!hpdiff = tdamage; )global\.hp\[chartarget\] -= knight_infhp_cut\(tdamage\);',
+     'tdamage = knight_direct_taken(tdamage); hpdiff = tdamage; global.hp[chartarget] -= knight_infhp_cut(tdamage);',
+     r'tdamage = knight_direct_taken\(tdamage\); hpdiff = tdamage; global\.hp\[chartarget\] -= knight_infhp_cut\(tdamage\);', 2),
+    # DRBR 1.0.3: scr_damage_proportional (Spamton NEO's finale bullets, obj_sn_bulletfin: a share of max HP, 25 at 1 HP) took HP
+    # with no online hit at all - no damage table, no SHIELD, no OUT: the party fell and the run ended in the middle of the
+    # round. Online it is an online hit (knight_direct_taken, as scr_damage_maxhp's); offline unchanged
+    ('gml_GlobalScript_scr_damage_proportional.gml', r'(?<!hpdiff = tdamage; )global\.hp\[chartarget\] -= knight_infhp_cut\(tdamage\);',
      'tdamage = knight_direct_taken(tdamage); hpdiff = tdamage; global.hp[chartarget] -= knight_infhp_cut(tdamage);',
      r'tdamage = knight_direct_taken\(tdamage\); hpdiff = tdamage; global\.hp\[chartarget\] -= knight_infhp_cut\(tdamage\);', 2),
     # build 47: the Knight's own damage cut for one attack (attack 2 at difficulty 1 / 3: 66%) is the original encounter's

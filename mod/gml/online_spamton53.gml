@@ -468,6 +468,75 @@ function kbr_sn_bot_speed()
     return (kbr_sn_on() && kbr_sn_attacking()) ? 1 : 0;
 }
 
+// DRBR 1.0.3: a bot shoots on the YELLOW SOUL too (your report: "bots aren't shooting"). What a bot's shots would hit is the
+// host's own game, so they are shown, not played: the host counts each bot's shots (as each player's game counts its own) and
+// the "ps" list carries the counts; every game draws the new ones flying from that SOUL (kbr_gshot_seen). A bot fires like a
+// player: up to three shots on the screen, a little faster the better it is, and now and then it holds for a BIG SHOT.
+function kbr_sn_bot_fire(_b, _c, _s)
+{
+    if (!variable_struct_exists(_b, "ys"))
+    {
+        _b.ys = 0;
+        _b.yb = 0;
+    }
+    if (!(kbr_sn_on() && kbr_sn_attacking()))
+    {
+        _s.ys_hold = 0;
+        return 0;
+    }
+    if (!variable_struct_exists(_s, "ys_cd"))
+    {
+        _s.ys_cd = irandom(12);
+        _s.ys_hold = 0;
+        _s.ys_age = [];
+    }
+    // its shots on the screen (one crosses the box in about 26 frames: 16 a frame)
+    for (var _i = array_length(_s.ys_age) - 1; _i >= 0; _i--)
+    {
+        _s.ys_age[_i]--;
+        if (_s.ys_age[_i] <= 0)
+            array_delete(_s.ys_age, _i, 1);
+    }
+    // a BIG SHOT: Z held for 40 frames, then let go
+    if (_s.ys_hold > 0)
+    {
+        _s.ys_hold++;
+        if (_s.ys_hold >= 42)
+        {
+            _s.ys_hold = 0;
+            _b.yb = (_b.yb + 1) mod 1000;
+            _s.ys_cd = 8;
+        }
+        return 1;
+    }
+    if (_s.ys_cd > 0)
+    {
+        _s.ys_cd--;
+        return 1;
+    }
+    if (random(100) < 0.3 + ((_c.aggr / 100) * 0.7))
+    {
+        _s.ys_hold = 1;
+        return 1;
+    }
+    if (array_length(_s.ys_age) < 3)
+    {
+        _b.ys = (_b.ys + 1) mod 1000;
+        array_push(_s.ys_age, 26);
+        _s.ys_cd = 4 + irandom(max(0, round((100 - _c.prec) / 10))) + ((_c.pre <= 1) ? 6 : 0);
+    }
+    return 1;
+}
+
+// this game's own shot counts for the others (the "p" message: -1 = not on the yellow SOUL)
+function kbr_sn_shots(_big)
+{
+    var _n = -1;
+    with (obj_sn_ysoul)
+        _n = (_big ? bigs : shots) mod 1000;
+    return _n;
+}
+
 // ---------- the cut (the attack's end in this game): his pieces go, the SOUL is red again, the box and he come back ----------
 function kbr_sn_cut(_all)
 {
@@ -906,6 +975,8 @@ function kbr_sn_sa_step(_G, _t, _g, _B, _S)
                     target = 3;
                     damage = 1;
                     depth = -20;
+                    // (DRBR 1.0.3: its orb and beam sized for the box: half his own)
+                    kbrsz = 0.5;
                 }
                 _G.b = _bl;
                 kbr_sa_sfx(snd_chargeshot_charge, 0.6);
@@ -1062,9 +1133,10 @@ function kbr_sn_same_ctrl(_o)
 // his phantom beside your box while he sends it (the knights' sends show their sender's knight the same way)
 function kbr_sn_sa_ghost(_G, _B, _d)
 {
-    var _T = kbr_sa_tel(_G, "spr", _B[0] + _B[2] + 70, _B[1] - _B[3] - 60, _d, 0);
+    // (DRBR 1.0.3: smaller and closer to the box)
+    var _T = kbr_sa_tel(_G, "spr", _B[0] + _B[2] + 44, _B[1] - _B[3] - 30, _d, 0);
     _T.spr = spr_sneo_example;
-    _T.xs = 1;
+    _T.xs = 0.6;
     return _T;
 }
 

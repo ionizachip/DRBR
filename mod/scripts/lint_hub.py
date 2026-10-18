@@ -16,7 +16,7 @@ for f in os.listdir(B):
 assets=set()
 for l in open('/home/claude/work/idx/merged.tsv',encoding='utf8'):assets.add(l.rstrip('\n').split('\t')[2])
 assets|={'obj_knight_menu','obj_knight_prompt','obj_knight_ctrl','obj_knight_ghost_kris','obj_knight_ghost_susie','obj_knight_ghost_ralsei','obj_knight_herocc','obj_knight_omega',
-          'obj_knight_twin','obj_knight_twin_bullet','obj_knight_bench','obj_knight_skinart'}
+          'obj_knight_twin','obj_knight_twin_bullet','obj_knight_bench','obj_knight_skinart','obj_knight_saov'}
 # assets the build adds: copied from the mods / Chapter 5 (manifest) and packed atlases
 import json
 _man=json.load(open('/home/claude/work/build/assets.json'))['manifest']

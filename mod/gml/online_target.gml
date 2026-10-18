@@ -440,6 +440,7 @@ function kfo_host_tg_send(_p, _id, _seq)
     }
     var _sd = 1 + irandom(2147483000);
     kfo_down(0, { k: "ska", mid: _h.mid, from: _p.pid, fname: _p.n, sid: _id, seq: _seq, sd: _sd, rf: 0, tg: _tg, tm: _tm, sh: _p.sh });
+    kfo_host_su(_p, _id, _tg);
     if (_n > 2)
         _names = string(_n) + " SOULs";
     // build 51: one short line per send (the sender's and the targets' games no longer add their own copies of it)

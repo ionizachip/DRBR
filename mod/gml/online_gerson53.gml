@@ -591,6 +591,25 @@ function kbr_hj_sa_step(_G, _t, _g, _B, _S)
             {
                 kbr_sa_mk(_G, _B[0], _B[1], obj_hj_bellctrl);
                 kbr_sa_sfx(snd_bell, 1);
+                // DRBR 1.0.3: the bells and his two phantoms at the box's sides (his own battle puts them 160 - 340 px out:
+                // as a send they stood over the screen's edges)
+                var _gx = _G.gx;
+                with (obj_hj_bell)
+                {
+                    if (variable_instance_exists(id, "kbrx") && kbrx == _gx)
+                    {
+                        x = _B[0] + (sign(x - _B[0]) * (_B[2] + 34));
+                        xstart = x;
+                    }
+                }
+                with (obj_hj_teleport)
+                {
+                    if (variable_instance_exists(id, "kbrx") && kbrx == _gx)
+                    {
+                        x = _B[0] + (sign(x - _B[0]) * (_B[2] + 74));
+                        xstart = x;
+                    }
+                }
             }
             _G.end_t = 150;
             // his bells ring on as long as the attack does (Chapter 4's turn ended them): the send stops them here, the notes
@@ -627,9 +646,10 @@ function kbr_hj_sa_stop(_G, _l)
 // his phantom beside your box while he throws (the knights' sends show their sender's knight the same way)
 function kbr_hj_sa_ghost(_G, _B, _spr, _d)
 {
-    var _T = kbr_sa_tel(_G, "spr", _B[0] + _B[2] + 95, _B[1] - 30, _d, 0);
+    // (DRBR 1.0.3: his own size, close to the box - at twice it he stood over half the screen)
+    var _T = kbr_sa_tel(_G, "spr", _B[0] + _B[2] + 50, _B[1] - 20, _d, 0);
     _T.spr = _spr;
-    _T.xs = 2;
+    _T.xs = 1;
     return _T;
 }
 

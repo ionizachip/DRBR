@@ -72,10 +72,13 @@ function kfo_host_bots(_n)
             array_delete(_h.pl, _i, 1);
     }
     var _names = ["LANCER", "ROUXLS", "BERDLY", "TENNA", "QUEEN", "SPAMTON", "JEVIL"];
+    // DRBR 1.0.3: each bot wears its own skin - its name's when there is one (BERDLY, SPAMTON), else one of the others
+    // (Susie, Ralsei, Noelle, Pink, Seth): they were the party's four in turn
+    var _skins = [2, 3, 6, 4, 13, 14, 8];
     var _room = _h.prac ? 7 : max(0, _h.set.maxp - kfo_host_humans());
     for (var _i = 0; _i < _n && _i < 7 && _i < _room; _i++)
     {
-        var _b = kfo_host_player_new(101 + _i, _names[_i], 1 + ((_i + 1) mod 4), 1);
+        var _b = kfo_host_player_new(101 + _i, _names[_i], kfo_skin_ok(_skins[_i]), 1);
         _b.rd = 1;
         // build 49: its own settings (kept by its place among the bots)
         _b.bd = kfo_host_botcfg(_i).pre;
@@ -243,7 +246,8 @@ function kfo_host_flush(_force)
             var _p = _h.pl[_i];
             if (_p.inm && _p.al && _p.t_p > 0 && current_time - _p.t_p < 1500)
                 array_push(_l, [_p.pid, round(_p.x * 10), round(_p.y * 10), _p.hx, variable_struct_exists(_p, "fd") ? _p.fd : 0, variable_struct_exists(_p, "ffa") ? _p.ffa : 0,
-                    variable_struct_exists(_p, "gd") ? _p.gd : -1]);   // tenths of a pixel (build 47); DRBR 1.0.1: the green shield's direction
+                    variable_struct_exists(_p, "gd") ? _p.gd : -1,
+                    variable_struct_exists(_p, "ys") ? _p.ys : -1, variable_struct_exists(_p, "yb") ? _p.yb : -1]);   // tenths of a pixel (build 47); DRBR 1.0.1: the green shield's direction; 1.0.3: the YELLOW SOUL's shot counts
         }
         if (array_length(_l) > 0)
             kfo_down_fast(0, { k: "ps", mid: _h.mid, l: _l });
@@ -259,6 +263,8 @@ function kfo_host_flush(_force)
             if (is_array(_p.ow) && current_time - _p.ow[5] < 3000)
                 array_push(_w, [_p.pid, _p.ow[0], _p.ow[1], _p.ow[2], _p.ow[3], _p.s, _p.ow[4], _p.rd, (array_length(_p.ow) > 6) ? _p.ow[6] : -1]);
         }
+        // DRBR 1.0.3: the room's bots walk behind the host (kfo_host_bots_ow)
+        kfo_host_bots_ow(_w);
         if (array_length(_w) > 0)
             kfo_down_fast(0, { k: "ows", l: _w });
     }
@@ -805,6 +811,9 @@ function kfo_host_on(_from, _m)
                 _p.ffa = clamp(floor(kfo_jn(_m, "fa", 0)), -400, 400);
                 // DRBR 1.0.1: Gerson's green shield - where it points (one of its 8 directions, -1: none)
                 _p.gd = kbr_hj_dir_ok(kfo_jn(_m, "gs", -1));
+                // DRBR 1.0.3: the YELLOW SOUL's shots (counts, -1 none: every game draws the new ones from this SOUL)
+                _p.ys = clamp(floor(kfo_jn(_m, "ys", -1)), -1, 999);
+                _p.yb = clamp(floor(kfo_jn(_m, "yb", -1)), -1, 999);
                 _p.t_p = current_time;
             }
             break;
@@ -855,6 +864,7 @@ function kfo_host_on(_from, _m)
                 if (_gid == 11 || _gid == 12 || _gid == 14 || _gid == 16)
                     _p.t_heal = current_time;
                 kfo_host_feed("* " + _p.n + " used " + kbr_skill_fname(_gid) + ".", c_white);
+                kfo_host_su(_p, _gid, []);
             }
             break;
         case "dg":
@@ -1221,7 +1231,68 @@ function kfo_host_skill(_p, _m)
         }
     }
     kfo_host_feed("* " + _p.n + " sent " + kbr_skill_name(_id) + ((_n == 0) ? ". Nobody to hit." : " to everyone."), c_yellow);
+    var _all = [];
+    for (var _i = 0; _i < array_length(_h.pl); _i++)
+    {
+        var _t = _h.pl[_i];
+        if (_t.inm && _t.al && _t.pid != _p.pid)
+            array_push(_all, _t.pid);
+    }
+    kfo_host_su(_p, _id, _all);
     return true;
+}
+
+// DRBR 1.0.3: every game is told who used a skill and at whom - players' and bots' alike (your report: bots weren't "visibly
+// using skills": a bot's skill showed only as a line of the feed). kbr_view_on_su draws it: the skill's name over that SOUL
+// and, for an attack, a small diamond with its picture flying to each target
+function kfo_host_su(_p, _sid, _tg)
+{
+    var _h = global.kfo.H;
+    if (!is_struct(_h) || _h.st != "match")
+        return 0;
+    kfo_down(0, { k: "su", mid: _h.mid, f: _p.pid, sid: _sid, tg: _tg });
+    return 1;
+}
+
+// DRBR 1.0.3: the room's bots in the cold place - they walk behind the host as Deltarune's party does, each where the host was a
+// moment before it, in its own skin (they were never drawn there: nothing showed which skin a bot wears)
+function kfo_host_bots_ow(_w)
+{
+    var _o = global.kfo;
+    var _h = _o.H;
+    var _me = kfo_host_player(_o.my);
+    if (is_undefined(_me) || !is_array(_me.ow) || current_time - _me.ow[5] >= 3000)
+        return 0;
+    if (!variable_struct_exists(_h, "owtr") || !is_array(_h.owtr))
+        _h.owtr = [];
+    var _l = _h.owtr;
+    var _cur = [_me.ow[0], _me.ow[1], _me.ow[2], _me.ow[4], (array_length(_me.ow) > 6) ? _me.ow[6] : -1];
+    var _n = array_length(_l);
+    if (_n == 0 || _l[_n - 1][0] != _cur[0] || _l[_n - 1][1] != _cur[1] || _l[_n - 1][3] != _cur[3])
+    {
+        // (another room: the line starts again there)
+        if (_n > 0 && _l[_n - 1][3] != _cur[3])
+            _h.owtr = [];
+        array_push(_h.owtr, _cur);
+        if (array_length(_h.owtr) > 48)
+            array_delete(_h.owtr, 0, 1);
+    }
+    _l = _h.owtr;
+    _n = array_length(_l);
+    var _k = 0;
+    for (var _i = 0; _i < array_length(_h.pl); _i++)
+    {
+        var _b = _h.pl[_i];
+        if (!_b.bot)
+            continue;
+        _k++;
+        // (in a match it is in the battle, not here)
+        if (_b.inm)
+            continue;
+        var _q = _l[max(0, _n - 1 - (_k * 4))];
+        array_push(_w, [_b.pid, _q[0], _q[1], _q[2], _me.ow[3], _b.s, _q[3], _b.rd, _me.ow[3] ? _q[4] : -1]);
+    }
+    return 1;
 }
 
 // Reflection sent a skill back to its sender
@@ -1375,6 +1446,32 @@ function kfo_host_check_end()
 // the time limit ran out: the most HP (in percent) wins; ties share the place
 function kfo_host_timeup()
 {
+    kfo_host_feed("* TIME! The most HP wins.", c_white);
+    kfo_host_rank_by_hp();
+    kfo_host_end();
+}
+
+// DRBR 1.0.3: END ROUND - the host ends the running round for everyone (the room's END ROUND row, or the host's GIVE UP box):
+// whoever is still standing is placed by HP (in percent), as when the time runs out, and every game shows the results
+function kfo_host_can_end_round()
+{
+    var _h = global.kfo.H;
+    return kfo_is_host() && is_struct(_h) && _h.st == "match";
+}
+
+function kfo_host_end_round()
+{
+    if (!kfo_host_can_end_round())
+        return false;
+    kfo_host_feed("* " + global.kfo.name + " (the host) ended the round. The most HP wins.", c_white);
+    kfo_host_rank_by_hp();
+    kfo_host_end();
+    return true;
+}
+
+// the ones still standing placed by HP (in percent; ties share the place) - only the first stays standing
+function kfo_host_rank_by_hp()
+{
     var _h = global.kfo.H;
     var _left = [];
     for (var _i = 0; _i < array_length(_h.pl); _i++)
@@ -1394,7 +1491,6 @@ function kfo_host_timeup()
         }
         _left[_j + 1] = _x;
     }
-    kfo_host_feed("* TIME! The most HP wins.", c_white);
     var _place = 1;
     for (var _i = 0; _i < array_length(_left); _i++)
     {
@@ -1405,7 +1501,7 @@ function kfo_host_timeup()
         if (_place > 1)
             _left[_i].al = 0;
     }
-    kfo_host_end();
+    return array_length(_left);
 }
 
 function kfo_host_end()

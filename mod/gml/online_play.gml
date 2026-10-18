@@ -67,6 +67,11 @@ function kfo_client_on(_m)
             if (kfo_mid_ok(_m))
                 kbr_on_ska(_m);
             break;
+        // DRBR 1.0.3: someone used a skill (shown at their SOUL)
+        case "su":
+            if (kfo_mid_ok(_m))
+                kbr_view_on_su(_m);
+            break;
         case "lsh":
             if (kfo_mid_ok(_m))
                 kbr_on_lsh(_m);
@@ -720,6 +725,31 @@ function kfo_turn_end()
     return 0;
 }
 
+// DRBR 1.0.3: the party fell some other way than a hit the room took (a piece that takes HP itself; a hidden SOUL touched while
+// watching): in a running match this is an OUT like any other - the SOUL breaks, the GAME OVER over the battle, then you watch
+// the rest of the round; already OUT, you just keep watching. HP goes back to 1 (hidden) so the battle never sees the party
+// down. False when this game is not in a running match (kfo_on_defeat then ends the run as before).
+function kfo_on_party_down(_why)
+{
+    var _M = kfo_match();
+    if (is_undefined(_M) || _M.ended || !_M.me || !kfo_run_on() || global.krun.state != "battle")
+        return false;
+    for (var _s = 0; _s < 3; _s++)
+    {
+        var _ch = global.char[_s];
+        if (_ch > 0 && global.hp[_ch] < 1)
+        {
+            global.hp[_ch] = 1;
+            scr_revive(_s);
+        }
+    }
+    if (!_M.out)
+        kbr_local_death(_why);
+    else
+        kh_dbg_write(["(OUT already: a hit on the hidden SOUL took the last HP - ignored, still watching)"]);
+    return true;
+}
+
 // the battle ended anyway (the party fell some other way, or the Knight did): this player is out of the match
 function kfo_on_defeat(_why)
 {
@@ -844,6 +874,22 @@ function kfo_act(_a)
         _o.reopen = true;
         return "";
     }
+    // DRBR 1.0.3: END ROUND (the host's GIVE UP box: asked again, then the round ends for everyone)
+    if (_a == "onl_endround_ask")
+    {
+        knight_run_teardown();
+        global.interact = 0;
+        kfo_endround_prompt();
+        return "";
+    }
+    if (_a == "onl_endround")
+    {
+        knight_run_teardown();
+        global.interact = 0;
+        if (!kfo_host_end_round())
+            kbr_log("* The round is already over.", c_ltgray);
+        return "";
+    }
     if (_a == "kfo_quit")
     {
         if (!is_undefined(_M) && !_M.out && !_M.ended && _M.me)
@@ -890,8 +936,22 @@ function kfo_leave_request()
         _l = ["You stop watching and go back to the room."];
         _t = "BACK TO THE ROOM?";
     }
-    var _p = knight_prompt_new(_t, _l, [{ t: "Stay", a: "resume", cancel: true }, { t: "Leave", a: "kfo_quit" }]);
+    var _opts = [{ t: "Stay", a: "resume", cancel: true }, { t: "Leave", a: "kfo_quit" }];
+    // DRBR 1.0.3: the host can end the round for everyone here (it asks again first)
+    if (kfo_host_can_end_round() && !_M.ended)
+    {
+        array_push(_l, "HOST: END ROUND ends it for everyone.");
+        array_push(_opts, { t: "END ROUND", a: "onl_endround_ask" });
+    }
+    var _p = knight_prompt_new(_t, _l, _opts);
     return _p;
+}
+
+// DRBR 1.0.3: END ROUND, asked again (the host's GIVE UP box; the room's END ROUND row asks with its own box)
+function kfo_endround_prompt()
+{
+    return knight_prompt_new("END THE ROUND?", ["The round ends now for everyone.", "The players still standing are placed by HP", "(the most HP in % wins), as when the time runs out."],
+        [{ t: "Keep playing", a: "resume", cancel: true }, { t: "End the round", a: "onl_endround" }]);
 }
 
 // ---------- OUT / results / lost ----------

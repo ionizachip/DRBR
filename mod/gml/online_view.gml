@@ -680,6 +680,200 @@ function kbr_view_tick(_M)
     }
     if (variable_struct_exists(_vw, "ko"))
         kbr_ko_tick(_M);
+    // DRBR 1.0.3: the skills the others used (kbr_view_on_su) and the YELLOW SOUL shots of the others (kbr_gshot_seen)
+    if (variable_struct_exists(_vw, "su"))
+    {
+        for (var _i = array_length(_vw.su) - 1; _i >= 0; _i--)
+        {
+            _vw.su[_i].t++;
+            if (_vw.su[_i].t > 48)
+                array_delete(_vw.su, _i, 1);
+        }
+    }
+    if (variable_struct_exists(_vw, "gs"))
+    {
+        for (var _i = array_length(_vw.gs) - 1; _i >= 0; _i--)
+        {
+            var _g = _vw.gs[_i];
+            if (_g.big)
+            {
+                // Chapter 2's BIG SHOT: it grows into its shape and speeds up (friction -0.2 x 2)
+                _g.sp += 0.4;
+                _g.xs = min(1, _g.xs + 0.2);
+                _g.ys = max(1, _g.ys - 0.2);
+                _g.a = min(1, _g.a + 0.2);
+            }
+            _g.x += _g.sp;
+            if (_g.x > 700)
+                array_delete(_vw.gs, _i, 1);
+        }
+    }
+    return 1;
+}
+
+// DRBR 1.0.3: a skill someone used (the host's "su": who, which, at whom): shown at their SOUL in kbr_draw_su
+function kbr_view_on_su(_m)
+{
+    var _M = kbr_match();
+    if (is_undefined(_M))
+        return 0;
+    if (!variable_struct_exists(_M, "vw"))
+        _M.vw = kbr_vw_new();
+    if (!variable_struct_exists(_M.vw, "su"))
+        _M.vw.su = [];
+    var _sid = kfo_jn(_m, "sid", 0);
+    if (!is_numeric(_sid) || _sid != floor(_sid) || _sid < 1 || _sid >= kbr_skill_count())
+        return 0;
+    var _tg = kfo_ja(_m, "tg");
+    var _l = [];
+    for (var _i = 0; _i < array_length(_tg) && _i < 8; _i++)
+    {
+        if (is_numeric(_tg[_i]))
+            array_push(_l, _tg[_i]);
+    }
+    array_push(_M.vw.su, { f: kfo_jn(_m, "f", -1), sid: _sid, tg: _l, t: 0 });
+    if (array_length(_M.vw.su) > 24)
+        array_delete(_M.vw.su, 0, 1);
+    return 1;
+}
+
+// DRBR 1.0.3: the YELLOW SOUL's shots of another SOUL (a player's game counts its own, the host counts its bots'; the "ps" list
+// carries the counts): each new one flies from that SOUL here, as theirs does in their game (what it hits is theirs - here it
+// is only seen). _x, _y: their SOUL's corner, relative to the battle's camera
+function kbr_gshot_seen(_M, _p, _pid, _ys, _yb, _x, _y)
+{
+    if (!is_numeric(_pid) || _pid == global.kfo.my)
+        return 0;
+    var _n = 0;
+    var _nb = 0;
+    if (_ys >= 0 && variable_struct_exists(_p, "ys0") && _p.ys0 >= 0)
+        _n = (_ys - _p.ys0 + 1000) mod 1000;
+    if (_yb >= 0 && variable_struct_exists(_p, "yb0") && _p.yb0 >= 0)
+        _nb = (_yb - _p.yb0 + 1000) mod 1000;
+    _p.ys0 = _ys;
+    _p.yb0 = _yb;
+    // (a count that went back - a new attack's SOUL - or a long gap: nothing to show)
+    if (_n > 6)
+        _n = 0;
+    if (_nb > 2)
+        _nb = 0;
+    if ((_n + _nb) == 0 || !kbr_on())
+        return 0;
+    if (!variable_struct_exists(_M, "vw"))
+        _M.vw = kbr_vw_new();
+    if (!variable_struct_exists(_M.vw, "gs"))
+        _M.vw.gs = [];
+    var _st = kbr_st_player(_M, _pid);
+    var _col = is_undefined(_st) ? c_yellow : kbr_soul_col(_st, _pid);
+    for (var _i = 0; _i < min(_n, 3); _i++)
+        array_push(_M.vw.gs, { x: (_x + 10) - (_i * 16), y: _y + 10, sp: 16, big: false, xs: 1, ys: 1, a: 1, col: _col });
+    if (_nb > 0)
+        array_push(_M.vw.gs, { x: _x + 10, y: _y + 10, sp: 8, big: true, xs: 0.1, ys: 2, a: 0.5, col: _col });
+    while (array_length(_M.vw.gs) > 40)
+        array_delete(_M.vw.gs, 0, 1);
+    return 1;
+}
+
+// the others' shots (under the bullets, with their SOULs): the game's own yellow shot and BIG SHOT, a little of their colour
+function kbr_draw_gshots(_M, _op)
+{
+    if (!variable_struct_exists(_M.vw, "gs"))
+        return 0;
+    var _a0 = clamp(_op, 0.35, 1) * 0.85;
+    var _ox = kbr_ox();
+    var _oy = kbr_oy();
+    for (var _i = 0; _i < array_length(_M.vw.gs); _i++)
+    {
+        var _g = _M.vw.gs[_i];
+        var _cl = merge_color(c_white, _g.col, 0.3);
+        if (_g.big)
+            draw_sprite_ext(spr_yheart_bigshot, 0, _g.x + _ox, _g.y + _oy, _g.xs, _g.ys, 0, _cl, _g.a * _a0);
+        else
+            draw_sprite_ext(spr_yheart_shot, 0, _g.x + _ox, _g.y + _oy, 1, 1, 0, _cl, _a0);
+    }
+    return 1;
+}
+
+// where a player's SOUL is drawn now (its middle): yours, or theirs as drawn this frame (undefined: not shown)
+function kbr_su_pos(_M, _pid, _mx, _my)
+{
+    if (_pid == global.kfo.my)
+        return (_mx > -9000) ? [_mx + 8, _my + 8] : undefined;
+    var _k = string(_pid);
+    if (!variable_struct_exists(_M.vw.rv, _k))
+        return undefined;
+    var _r = variable_struct_get(_M.vw.rv, _k);
+    if (_r.seen <= 0 || current_time - _r.seen > 500 || _r.x < -9000)
+        return undefined;
+    return [_r.x + 8, _r.y + 8];
+}
+
+// DRBR 1.0.3: the skills the others used, at their SOULs: a ring bursts round the SOUL, the skill's name rises over it (red: an
+// attack, green: on themselves) and an attack's diamond, with its picture, flies to each of its targets (you too)
+function kbr_draw_su(_M, _mx, _my)
+{
+    if (!variable_struct_exists(_M.vw, "su") || array_length(_M.vw.su) == 0)
+        return 0;
+    var _simple = kfo_view().simple;
+    draw_set_font(fnt_small);
+    draw_set_halign(fa_center);
+    for (var _i = 0; _i < array_length(_M.vw.su); _i++)
+    {
+        var _e = _M.vw.su[_i];
+        // (your own: your HUD shows it)
+        if (_e.f == global.kfo.my)
+            continue;
+        var _src = kbr_su_pos(_M, _e.f, _mx, _my);
+        if (is_undefined(_src))
+            continue;
+        var _red = kbr_skill_red(_e.sid);
+        var _col = _red ? make_color_rgb(255, 96, 96) : make_color_rgb(96, 255, 128);
+        var _t = _e.t;
+        if (_t < 14 && !_simple)
+        {
+            draw_set_alpha((1 - (_t / 14)) * 0.9);
+            draw_set_color(_col);
+            draw_circle(_src[0], _src[1], 6 + (_t * 1.6), true);
+            draw_circle(_src[0], _src[1], 7 + (_t * 1.6), true);
+        }
+        var _a = (_t < 34) ? 1 : clamp((48 - _t) / 14, 0, 1);
+        var _inf = kbr_skill_info(_e.sid);
+        var _nm = _inf[1];
+        var _ty = _src[1] - 22 - min(8, _t * 0.4);
+        draw_set_alpha(_a);
+        draw_set_color(c_black);
+        draw_text(_src[0] + 1, _ty + 1, _nm);
+        draw_set_color(_col);
+        draw_text(_src[0], _ty, _nm);
+        if (_red && _t >= 2 && _t <= 26)
+        {
+            for (var _j = 0; _j < array_length(_e.tg); _j++)
+            {
+                var _dst = kbr_su_pos(_M, _e.tg[_j], _mx, _my);
+                if (is_undefined(_dst) || _e.tg[_j] == _e.f)
+                    continue;
+                if (_t <= 18)
+                {
+                    var _k = (_t - 2) / 16;
+                    var _x = lerp(_src[0], _dst[0], _k);
+                    var _y = lerp(_src[1], _dst[1], _k) - (sin(_k * pi) * 24);
+                    draw_set_alpha(1);
+                    kbr_diamond(_x, _y, 9, _col, false, false);
+                    if (!_simple)
+                        kbr_skill_icon(_e.sid, _x, _y, 1, 0.55);
+                }
+                else if (!_simple)
+                {
+                    draw_set_alpha(1 - ((_t - 18) / 8));
+                    draw_set_color(_col);
+                    draw_circle(_dst[0], _dst[1], 6 + ((_t - 18) * 2), true);
+                }
+            }
+        }
+    }
+    draw_set_alpha(1);
+    draw_set_halign(fa_left);
+    draw_set_color(c_white);
     return 1;
 }
 
@@ -815,6 +1009,12 @@ function kbr_draw_souls()
             array_push(_drawn, [_x, _y]);
             array_push(_labels, [_x, _y, _p, _pid, _col, _a, _foc]);
         }
+    }
+    // DRBR 1.0.3: the others' YELLOW SOUL shots and the skills they used
+    if (_show)
+    {
+        kbr_draw_gshots(_M, _op);
+        kbr_draw_su(_M, _mx, _my);
     }
     kbr_view_labels(_M, _labels, _V, _spec);
     // build 48: the SOULs that broke (the crack, then the shards)
@@ -1059,16 +1259,18 @@ function kbr_spec_key(_ch)
 // every step while watching: the hidden SOUL, who is followed, the watching keys
 function kbr_spectate_tick()
 {
-    // build 48: the keys are the chat's while you type
-    if (kfo_chat_typing())
-        return 0;
-    var _M = kbr_match();
+    // the hidden SOUL is untouchable every step - DRBR 1.0.3: typing in the chat too (this used to come after the chat's
+    // return: a watcher typing could be hit, and the party-down check took them out of the match)
     global.inv = 9999;
     with (obj_heart)
     {
         visible = false;
         canmove = 0;
     }
+    // build 48: the keys are the chat's while you type
+    if (kfo_chat_typing())
+        return 0;
+    var _M = kbr_match();
     if (!variable_struct_exists(_M, "vw"))
         _M.vw = kbr_vw_new();
     var _vw = _M.vw;
@@ -1216,7 +1418,7 @@ function kbr_hud_spec(xx, yy, _M)
     var _y = yy + 8;
     var _w = 224;
     var _full = (_V.shud == 0);
-    var _h = _full ? 92 : 44;
+    var _h = _full ? 104 : 44;
     draw_set_font(fnt_small);
     draw_set_alpha(0.75);
     draw_set_color(c_black);
@@ -1263,21 +1465,30 @@ function kbr_hud_spec(xx, yy, _M)
     if (_g > 0)
         draw_rectangle(_x + 24, _y + 30, _x + 24 + max(1, round(1.2 * _g)), _y + 36, false);
     kbr_hud_text(_x + 150, _y + 27, string(floor(_g)), c_orange);
-    // the skill slots (the picked one in [ ]) and the hold slot; what is switched on
+    // the skill slots and the hold slot as they have them (DRBR 1.0.3: their diamonds with the skills' pictures, the picked one
+    // framed, its name beside them - it was a line of short names); what is switched on
     var _q = kfo_ja(_p, "q");
     var _qs = kfo_jn(_p, "qs", -1);
-    var _sl = "";
-    for (var _i = 0; _i < array_length(_q) && _i < 4; _i++)
-    {
-        if (!is_numeric(_q[_i]))
-            continue;
-        var _nm = kbr_skill_short(_q[_i]);
-        _sl += ((_i == _qs) ? ("[" + _nm + "]") : _nm) + " ";
-    }
     var _qh = kfo_jn(_p, "qh", -1);
-    if (_qh > 0)
-        _sl += " HOLD " + kbr_skill_short(_qh);
-    kbr_hud_text(_x + 2, _y + 40, kbr_fit("SKILLS " + ((_sl == "") ? "-" : _sl), _w - 6), c_white);
+    var _dy = _y + 50;
+    var _pk = "";
+    for (var _i = 0; _i <= 4; _i++)
+    {
+        var _hold = (_i == 4);
+        var _sid = _hold ? _qh : ((_i < array_length(_q) && is_numeric(_q[_i])) ? _q[_i] : -1);
+        var _dx = _x + 12 + (_i * 21) + (_hold ? 8 : 0);
+        var _has = (_sid > 0);
+        var _pick = (!_hold && _i == _qs && _has);
+        kbr_diamond(_dx, _dy, 9, _has ? (kbr_skill_red(_sid) ? make_color_rgb(235, 60, 60) : make_color_rgb(70, 220, 100)) : make_color_rgb(60, 60, 60), _pick, !_has);
+        if (_has)
+            kbr_skill_icon(_sid, _dx, _dy, 1, 0.5);
+        if (_pick)
+            _pk = kbr_skill_fname(_sid);
+    }
+    // (the fifth, a little apart, is the HOLD slot - as in your own row)
+    draw_set_font(fnt_small);
+    if (_pk != "")
+        kbr_hud_text(_x + 124, _dy - 6, kbr_fit(_pk, _w - 128), c_yellow);
     var _sk = kfo_jn(_p, "sk", 0);
     var _on = "";
     if ((_sk & 1) != 0)
@@ -1289,7 +1500,7 @@ function kbr_hud_spec(xx, yy, _M)
     if ((_sk & 8) != 0)
         _on += "BREATH ";
     var _lat = kfo_jn(_p, "lat", -1);
-    kbr_hud_text(_x + 2, _y + 53, kbr_fit(((_on == "") ? "" : _on) + ((kfo_jn(_p, "bot", 0) == 1) ? "BOT" : ((_lat >= 0) ? ("PING " + kbr_ping_text(_lat)) : "")), _w - 6), c_aqua);
+    kbr_hud_text(_x + 2, _y + 64, kbr_fit(((_on == "") ? "" : _on) + ((kfo_jn(_p, "bot", 0) == 1) ? "BOT" : ((_lat >= 0) ? ("PING " + kbr_ping_text(_lat)) : "")), _w - 6), c_aqua);
     // the room
     var _an = 0;
     var _out = 0;
@@ -1301,9 +1512,9 @@ function kbr_hud_spec(xx, yy, _M)
         else
             _out++;
     }
-    kbr_hud_text(_x + 2, _y + 66, kbr_fit(string(_an) + " ALIVE  " + string(_out) + " OUT  " + string(kfo_jn(_M.st, "sc", 0)) + " WATCHING", _w - 6), c_white);
+    kbr_hud_text(_x + 2, _y + 77, kbr_fit(string(_an) + " ALIVE  " + string(_out) + " OUT  " + string(kfo_jn(_M.st, "sc", 0)) + " WATCHING", _w - 6), c_white);
     var _sd = kbr_sd_text(_M);
-    kbr_hud_text(_x + 2, _y + 79, kbr_fit("CAMERA: " + _cam + ((_sd != "") ? ("   " + _sd) : ""), _w - 6), c_ltgray);
+    kbr_hud_text(_x + 2, _y + 90, kbr_fit("CAMERA: " + _cam + ((_sd != "") ? ("   " + _sd) : ""), _w - 6), c_ltgray);
     return 1;
 }
 
@@ -1361,7 +1572,9 @@ function kbr_hud_stats(xx, yy, _M)
         return 0;
     var _pl = kfo_rank(kfo_ja(_M.st, "pl"));
     var _x0 = xx + 70;
-    var _y0 = yy + 70;
+    // (DRBR 1.0.3: under the watching card - FULL is taller now, with the skill diamonds)
+    var _sh = kfo_view().shud;
+    var _y0 = yy + ((_sh == 0) ? 122 : 70);
     var _h = 40 + (array_length(_pl) * 20);
     // an overlay while it is open: solid, over the lists under it (nothing shows through)
     draw_set_alpha(1);

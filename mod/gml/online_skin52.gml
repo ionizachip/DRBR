@@ -268,17 +268,18 @@ function kfo_skin_portrait_draw(_s, _cx, _cy, _w, _h)
 function kfo_skin_battle_draw(_s, _h, _hurt)
 {
     var _d = kfo_skin_def(_s);
-    if (_d.own || !instance_exists(_h))
+    if (!instance_exists(_h))
         return 0;
-    var _sp = kfo_skin_spr(_d.bt);
+    // DRBR 1.0.3: the game's own heroes too (watching someone: their character in your hero's place) - their battle idle
+    var _sp = _d.own ? kfo_skin_bt_spr(_s) : kfo_skin_spr(_d.bt);
     if (_sp < 0)
         return 0;
     var _k = abs(_h.image_xscale);
     if (_k <= 0)
         _k = 2;
-    var _fx = _d.bt_flip ? -1 : 1;
+    var _fx = (!_d.own && _d.bt_flip) ? -1 : 1;
     var _n = max(1, sprite_get_number(_sp));
-    var _fr = floor((current_time / (1000 / 30)) * _d.bt_spd) mod _n;
+    var _fr = floor((current_time / (1000 / 30)) * (_d.own ? 0.16 : _d.bt_spd)) mod _n;
     // the hero's feet and middle (its own picture's box), the look's picture's box
     var _hx = (_h.bbox_left + _h.bbox_right) / 2;
     var _hy = _h.bbox_bottom;
@@ -307,17 +308,45 @@ function kfo_skin_battle_draw(_s, _h, _hurt)
     return 1;
 }
 
+// DRBR 1.0.3: what stands in your hero's place - watching someone (OUT, or in the room but not in the match): THEIR character
+// (their skin: the game's own hero or an online-only look - your request: "whoever you're spectating it needs to show their
+// character and stuff"); else your own online-only look; -1: your hero itself
+function kbr_hero_look(_M)
+{
+    if (!variable_global_exists("kfo") || !is_struct(global.kfo))
+        return -1;
+    var _p = kbr_cb_watched_p(_M);
+    if (is_struct(_p))
+    {
+        var _ws = kfo_skin_ok(kfo_jn(_p, "s", 1));
+        return kfo_skin_ready(_ws) ? _ws : 1;
+    }
+    var _s = kfo_skin_ok(global.kfo.skin);
+    return (kfo_skin_cosmetic(_s) && kfo_skin_ready(_s)) ? _s : -1;
+}
+
 // every step of an online battle (kbr_step): a look's hero is hidden (its look is drawn in its place by the HUD)
 function kbr_skin_hero_tick(_M)
 {
-    var _s = kfo_skin_ok(global.kfo.skin);
-    if (!kfo_skin_cosmetic(_s) || !kfo_skin_ready(_s))
+    var _s = kbr_hero_look(_M);
+    var _hok = variable_global_exists("charinstance") && is_array(global.charinstance) && array_length(global.charinstance) > 0 && instance_exists(global.charinstance[0]);
+    if (_s < 0)
+    {
+        // (no look any more - the one watched gone from the standings for a moment: your hero shows again)
+        if (_hok && variable_global_exists("kbr_hero_hid") && global.kbr_hero_hid)
+        {
+            with (global.charinstance[0])
+                image_alpha = 1;
+        }
+        global.kbr_hero_hid = false;
         return 0;
-    if (variable_global_exists("charinstance") && is_array(global.charinstance) && array_length(global.charinstance) > 0 && instance_exists(global.charinstance[0]))
+    }
+    if (_hok)
     {
         var _h = global.charinstance[0];
         with (_h)
             image_alpha = 0;
+        global.kbr_hero_hid = true;
         // build 52: the look is drawn by its own object at the hero's depth - under the box, the bullets and the HUD, as the
         // game's own heroes are (it used to be drawn with the HUD, over everything)
         if (!instance_exists(obj_knight_skinart))
@@ -341,8 +370,8 @@ function kbr_skin_art_draw()
         instance_destroy();
         return 0;
     }
-    var _s = kfo_skin_ok(global.kfo.skin);
-    if (!kfo_skin_cosmetic(_s) || !kfo_skin_ready(_s))
+    var _s = kbr_hero_look(_M);
+    if (_s < 0)
         return 0;
     if (!variable_global_exists("charinstance") || !is_array(global.charinstance) || array_length(global.charinstance) == 0)
         return 0;
@@ -352,7 +381,11 @@ function kbr_skin_art_draw()
     // the hero hidden by the battle itself (a cut-in, the Roaring's own staging): the look hides too
     if (!_h.visible)
         return 0;
-    return kfo_skin_battle_draw(_s, _h, _M.out ? 0 : _M.hitfx);
+    var _hurt = _M.out ? 0 : _M.hitfx;
+    // (the one you watch: their hit's blink - the standings' lower HP, kbr_view_on_state)
+    if (kbr_spec_pid(_M) >= 0)
+        _hurt = variable_struct_exists(_M, "vw") ? max(0, kbr_rv(_M, kbr_spec_pid(_M)).hit - 18) : 0;
+    return kfo_skin_battle_draw(_s, _h, _hurt);
 }
 
 // ---------- the HP panel (scr_charbox, det_sent.py's hook): an online-only look's head and CHARACTER NAME ----------
@@ -364,6 +397,26 @@ function kbr_charbox(_c, _face, _hx, _hy, _nx, _ny)
     global.kbr_cbx = 0;
     if (!kbr_on() || (_c) != kbr_char() || !variable_global_exists("kfo") || !is_struct(global.kfo))
         return 0;
+    // DRBR 1.0.3: watching someone - your box is theirs: their character's head and name (the game's own art for the party,
+    // the lettering for the others)
+    var _wp = kbr_cb_watched(_c);
+    if (is_struct(_wp))
+    {
+        var _ws = kfo_skin_ok(kfo_jn(_wp, "s", 1));
+        var _wd = kfo_skin_def(_ws);
+        if (_wd.own && _wd.num <= 4)
+        {
+            draw_sprite(knight_char_head(_wd.num), 0, _hx, _hy);
+            draw_sprite(knight_char_bname(_wd.num), 0, _nx, _ny);
+        }
+        else
+        {
+            kfo_skin_head_draw(_ws, _hx - 2, _hy - 2);
+            knight_bn_text(_nx - 2, _ny - 2, string_upper(_wd.name), c_white, 58);
+        }
+        global.kbr_cbx = 1;
+        return 1;
+    }
     var _s = kfo_skin_ok(global.kfo.skin);
     if (!kfo_skin_cosmetic(_s) || !kfo_skin_ready(_s))
         return 0;
@@ -378,6 +431,17 @@ function kbr_charbox_col(_c, _col)
 {
     if (!kbr_on() || _c != kbr_char() || !variable_global_exists("kfo") || !is_struct(global.kfo))
         return _col;
+    // DRBR 1.0.3: watching someone - their character's colour (the party's own HP colours, a look's own)
+    var _wp = kbr_cb_watched(_c);
+    if (is_struct(_wp))
+    {
+        var _wd = kfo_skin_def(kfo_skin_ok(kfo_jn(_wp, "s", 1)));
+        if (_wd.own && _wd.num <= 4 && variable_instance_exists(id, "hpcolor"))
+            return hpcolor[_wd.num - 1];
+        if (_wd.own && _wd.num >= 5)
+            return knight_cc_hpcolor(_wd.num);
+        return _wd.col;
+    }
     var _s = kfo_skin_ok(global.kfo.skin);
     return kfo_skin_cosmetic(_s) ? kfo_skin_col(_s) : _col;
 }
@@ -453,4 +517,38 @@ function knight_bn_text(_x, _y, _t, _col, _maxw)
         _cx += _w[_p - 1] + 1;
     }
     return 1;
+}
+
+
+// ---------- DRBR 1.0.3: the HP panel while you watch (scr_charbox reads HP through these: det_sent.py watch_hooks) ----------
+// the standings entry of the one you watch (undefined when you are not watching)
+function kbr_cb_watched_p(_M)
+{
+    if (is_undefined(_M) || !kbr_on())
+        return undefined;
+    var _w = kbr_spec_pid(_M);
+    if (_w < 0)
+        return undefined;
+    return kbr_st_player(_M, _w);
+}
+
+// ... when HP box _c is yours (the box the one you watch takes)
+function kbr_cb_watched(_c)
+{
+    if (!kbr_on() || _c != kbr_char())
+        return undefined;
+    return kbr_cb_watched_p(kbr_match());
+}
+
+// HP box _c's HP and max HP: the one you watch's in your box, else the game's own
+function kbr_cb_hp(_c)
+{
+    var _p = kbr_cb_watched(_c);
+    return is_struct(_p) ? max(0, round(kfo_jn(_p, "hp", 0))) : global.hp[_c];
+}
+
+function kbr_cb_mhp(_c)
+{
+    var _p = kbr_cb_watched(_c);
+    return is_struct(_p) ? max(1, round(kfo_jn(_p, "mh", 1))) : global.maxhp[_c];
 }

@@ -330,7 +330,7 @@ if (STAGE == "all" || STAGE == "code")
     catch (Exception e) { L("CODE IMPORT FAIL: " + e.Message); }
     var ctrlObj = Data.GameObjects.ByName("obj_knight_ctrl");
     if (ctrlObj != null) { ctrlObj.Persistent = true; ctrlObj.Visible = true; L("ctrl object persistent+visible"); }
-    foreach (var nm in new[] { "obj_knight_menu", "obj_knight_prompt", "obj_knight_twin", "obj_knight_twin_bullet", "obj_knight_bench", "obj_knight_skinart" })
+    foreach (var nm in new[] { "obj_knight_menu", "obj_knight_prompt", "obj_knight_twin", "obj_knight_twin_bullet", "obj_knight_bench", "obj_knight_skinart", "obj_knight_saov" })
     {
         var ob = Data.GameObjects.ByName(nm);
         if (ob != null) { ob.Visible = true; }

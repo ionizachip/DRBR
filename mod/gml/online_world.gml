@@ -385,7 +385,8 @@ function kfo_world_draw()
         if (current_time - _p.t > 3000 || (_p.r >= 0 && _p.r != room))
             continue;
         var _mem = kfo_world_member(_pid);
-        if (is_undefined(_mem) || kfo_jn(_mem, "bot", 0) == 1)
+        // (DRBR 1.0.3: the room's bots too - the host sends them walking behind it, in their skins)
+        if (is_undefined(_mem))
             continue;
         var _x = kbr_ps_rx(_p);
         var _y = kbr_ps_ry(_p);
@@ -401,6 +402,8 @@ function kfo_world_draw()
         var _hid = is_struct(_o.lobby) ? kfo_jn(_o.lobby, "host", -1) : -1;
         if (_pid == _hid)
             _tag = " (HOST)";
+        if (kfo_jn(_mem, "bot", 0) == 1)
+            _tag = " (BOT)";
         // their name (MATCH VIEW > ROOM NAMES; NAME OPACITY), over the head of whatever skin they wear
         if (kfo_view().wnames)
         {

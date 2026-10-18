@@ -776,7 +776,7 @@ function kbr_hud_log(xx, yy, _M)
     if (_M.out || !_M.me)
     {
         var _sh = kfo_view().shud;
-        _y = yy + ((_sh == 0) ? 106 : ((_sh == 1) ? 58 : 8));
+        _y = yy + ((_sh == 0) ? 118 : ((_sh == 1) ? 58 : 8));
     }
     // build 51: 3 lines at most (older ones fainter), right of the TP bar and never over the box: cut to the space left of it
     var _x = xx + 8;
@@ -1131,7 +1131,7 @@ function kbr_hud_tab(xx, yy, _M)
     draw_rectangle(_x0, _y0, _x0 + 400, _y0 + _h, true);
     draw_set_font(fnt_small);
     kbr_hud_text(_x0 + 10, _y0 + _h - 28, kbr_fit("ARROWS MOVE  X SLOW  " + kfo_key_label("breath") + " HOLD BREATH  " + kfo_key_label("charge") + " CHARGE  " + kfo_key_label("use") + " PICK / HOLD: USE  " + kfo_key_label("hold") + " HOLD SLOT", 380), c_ltgray);
-    kbr_hud_text(_x0 + 10, _y0 + _h - 15, kbr_fit(kfo_key_label("tgl") + " / " + kfo_key_label("tgr") + " TARGET MODE  " + kfo_key_label("tgn") + " OR 1-8 CHOOSE A PLAYER  T CHAT  BACKSPACE GIVE UP", 380), c_ltgray);
+    kbr_hud_text(_x0 + 10, _y0 + _h - 15, kbr_fit(kfo_key_label("tgl") + " / " + kfo_key_label("tgr") + " TARGET MODE  " + kfo_key_label("tgn") + " OR 1-8 CHOOSE A PLAYER  T CHAT  " + kfo_key_label("quit") + (kfo_host_can_end_round() ? " GIVE UP / END ROUND" : " GIVE UP"), 380), c_ltgray);
     kbr_hud_text(_x0 + 10, _y0 + 8, "PLAYER", c_gray);
     kbr_hud_text(_x0 + 150, _y0 + 8, "HP", c_gray);
     kbr_hud_text(_x0 + 230, _y0 + 8, "GAUGE", c_gray);

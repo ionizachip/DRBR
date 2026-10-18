@@ -1,6 +1,9 @@
 KNIGHT HUB v2 - WHAT WAS TESTED AND WHAT WAS NOT
 ================================================
-THE NEWEST UPDATE IS AT THE END: "BUILD 51 UPDATE 12" (DRBR 1.0.2: Flowery's board no longer stops the game, the skills'
+THE NEWEST UPDATE IS AT THE END: "BUILD 51 UPDATE 13" (DRBR 1.0.3: going OUT is always the GAME OVER then watching, watching
+shows the player's side, END ROUND for the host, the bosses' sends in the sender's colour and sized to the box, bots shoot and
+show their skills, Flowery's tower, Jevil's own voice clips).
+Before it: "BUILD 51 UPDATE 12" (DRBR 1.0.2: Flowery's board no longer stops the game, the skills'
 key shown on the yellow and orange SOULs, Jevil's Devilsknife voice, a release under the wrong tag still updates).
 Before it: "BUILD 51 UPDATE 11" (DRBR 1.0.1: the bots play the bosses' SOUL modes, DELTARUNE-size menus, your music over the
 bosses, one-file releases, the launcher's self-update fixed; 1.0.0 and 1.0.1 share rooms).
@@ -3050,3 +3053,162 @@ TESTS (on the final 1.0.2 code and the real DRBR.zip)
                     18/18) were on 1.0.1's programs.
    The release: DRBR.zip 247,903,610 bytes, SHA-256 deecc0ca3de57a6c04c44a8adfb9a8dd5952b8a95011f7287c8d3a06262cba61; an
    update from 1.0.1 or 1.0.0 downloads about 100 MB (the game patch, DRBR Launcher, DRBR Updater - the music is kept).
+================================================================================================================
+BUILD 51 UPDATE 13 - DRBR 1.0.3: OUT IS ALWAYS THE GAME OVER THEN WATCHING, WATCHING SHOWS THE PLAYER'S SIDE, END ROUND,
+THE BOSSES' SENDS IN THE SENDER'S COLOUR AND SIZED TO THE BOX, BOTS SHOOT AND SHOW THEIR SKILLS, FLOWERY'S TOWER, JEVIL'S VOICE
+Game build 51.13 (the multiplayer build is still 51: 1.0.2 and 1.0.3 players can share a room). From the reports on 1.0.2:
+"the Devilsknife bug was not fixed ... uses the wrong voiceline", "Flowery's background is bugged out", "run through Jevil's
+attacks to make sure everything loads", "bots aren't shooting or visibly using skins", "sent skills need to visibly fit in
+the box", "add an end round button for the host", "kicked me out the room, round is still ongoing but it said out" (with a
+screenshot of the OUT box), "make the sent attacks from the other bosses be tinted your soul color ... like the actual
+graphic of the thing being sent", "it needs to be the game over thing and let us spectate after", "whoever you're
+spectating it needs to show their character and stuff". (A report about the mouse and the DOWN key was the reporter's
+keyboard - nothing changed for it.)
+Statuses as before: EMULATED = the real merged GML in the emulator (NOT the real game); EMULATED WINDOWS = the real Windows
+programs under Wine + wine-mono (NOT real Windows); CORE = the C# code on .NET / Linux with the real vanilla data.win, patch,
+provided save and signing key; STATIC = checked in the built data.win; NOT RUN / BLOCKED = not tested.
+
+WHAT CHANGED (GAME)
+1. OUT IN THE MIDDLE OF A ROUND (the OUT box, "Back to the room"). Reproduced: after a hit put you OUT (your SOUL hidden, 1 HP
+   kept so the battle never sees the party fall), a piece that sets the invincibility itself (Spamton NEO's final forme
+   grabbing the SOUL, his heart attack) still touched the hidden SOUL; the room's rules took nothing from that hit (0), but
+   Chapter 3's damage scripts make every hit at least 1 - the last HP went, the game's party-down check ended the run and the
+   OUT box sent you back to the room while the round went on. The same while typing in the chat (the watcher's
+   invincibility stopped there). Now a hit the room's rules make 0 costs no HP (a SHIELD's too), the watcher is untouchable
+   while typing, Spamton NEO's finale's proportional hits are online hits, and the party falling any other way in a running
+   match (scr_gameover / knight_defeat_begin) is an OUT like any other: the SOUL breaks, the GAME OVER, then you watch. The
+   OUT note in knightfights_debug.log names the piece that hit.
+2. WATCHING SHOWS THE PLAYER'S SIDE. While you watch someone: their character stands in your hero's place (their skin: the
+   game's own battle pose for Kris / Susie / Ralsei / Noelle / Flowery, an online look's own art), blinking when they are
+   hit; the HP panel is theirs (their head and character name, their HP and max HP, their colour, their SHIELD); the TP bar
+   is their gauge; the watching card shows their four skill slots and the HOLD slot as diamonds with the skills' pictures
+   (the picked one framed, its name beside them) - and still their name, HP, the room's counts and the camera.
+3. END ROUND (the host): in the host's GIVE UP box (BACKSPACE) and as a row on the room's page while a match runs; it asks
+   again ("END THE ROUND?": Keep playing / End the round); the round ends in every game with the most HP winning (as at
+   TIME), the feed and the room's chat say the host ended it.
+4. THE BOSSES' SENDS IN THE SENDER'S COLOUR. Every picture a piece of a Jevil / Gerson / Spamton NEO / Pink / Flowery send draws
+   is drawn once more right over itself as a silhouette in the sender's SOUL colour at half its alpha (the game's gpu fog, as
+   its hit flashes): the art takes that colour and keeps its lines and shading. The bosses' Draw events draw through
+   kbr_ov_* (sent_tint.py: 106 events, 326 draw calls - for anything but a send's piece the call is unchanged); pieces drawn
+   the default way (obj_regularbullet, obj_collidebullet, obj_afterimage, a boss's pieces with no Draw) get it from a new
+   drawer object just above their depth (obj_knight_saov). Not over a piece's own fog flash, glow (another blend mode) or
+   shader. The boss's phantom beside the box too. The knights' sends keep their light mix (image_blend), as before.
+5. A BOSS'S SEND FITS THE BOX: a piece bigger than the box allows is scaled down once (its picture and hitbox); Gerson's bells
+   stand at the box's sides, the BIG SHOT's orb and beam are half his own, Pink's warning crosses and fuse bombs stay inside
+   the box, the phantoms are at their own size or smaller, close to the box.
+6. BOTS SHOOT AND SHOW THEIR SKILLS: on Spamton NEO's yellow SOUL the host's bots fire (shots and, now and then, a BIG SHOT);
+   the SOULs' list carries each SOUL's shot counts and every game draws the new shots flying from that SOUL with the game's
+   own shot sprites ("p" and "ps" carry them). Every skill a bot or a player uses is told to every game ("su") and drawn at
+   that SOUL (its short name, a ring; an attack's diamond with the skill's picture flying to its target). The bots wear
+   their own skins (LANCER Susie, ROUXLS Ralsei, BERDLY his own, ...) and walk behind the host in the cold place ("(BOT)").
+7. FLOWERY'S TOWER: Chapter 5 drew it at x 320 - the middle of ITS battle room's view; here the battle's camera starts at x
+   2063, so the tower was drawn about 1750 pixels left of the screen. Now at the camera's middle.
+8. JEVIL'S VOICE: the build's snd_joker_metamorphosis is the Cyan Knight mod's clip (417 KB), not Chapter 1's "METAMORPHOSIS!"
+   (134 KB), and snd_joker_laugh0 is Chapter 3's own clip - found by hashing every sound. Chapter 1's clips are now imported
+   under names of their own (snd_jv_joker_metamorphosis, snd_jv_joker_laugh0) and his code plays those. All 16 of his
+   attacks were run and drawn at the real arena camera (x 2063): every piece and sound loads, no error.
+9. drbr_profile\last_start.ini gives build 51.13.
+
+FOUND IN THIS UPDATE'S TESTING
+- THE OUT BOX MID-ROUND, REPRODUCED (t_out103): on 1.0.2's code 15 of its 22 checks fail - the run lost and the OUT box up
+  while the round goes on; all 22 pass on 1.0.3's.
+- FLOWERY'S TOWER (t_flowery103): on 1.0.2's code the tower's surfaces are drawn at x -1865 .. -1621 from the camera (the
+  screen is 0 .. 640) and do not follow it; on 1.0.3's at 198 .. 442, centred on 320, following the camera.
+- THE SENDS' OLD TINT: the knights' light mix (image_blend at 42%) reached most boss pieces (the emulator's look at all 24
+  of their sends) but barely shows on coloured art (Gerson's dark hammer, Spamton NEO's heads, the wire heart); some
+  pieces drew in their own colours only (Jevil's Diamond Rain, Gerson's bells, spears, shield and swing, Pink's bombs and
+  fans' trails, Spamton NEO's pipis eggs and wall track). Now every picture gets the sender's colour.
+- A DARK SOUL COLOUR: a send in black or navy would have darkened its pieces on the dark battle: its colour is lifted the way
+  a name in that colour is (kfo_col_text), so it stays easy to see.
+- THE EMULATOR AND THE RECORDER (test tools, not the game): shader_current() answered 0 (the game: -1 with no shader) and
+  gpu_get_fog() was missing - both now answer as the runner does; the recorder marked fog only on draw_sprite /
+  draw_sprite_ext, now on the part / stretched draws too.
+
+TESTS (on the final 1.0.3 code and the real DRBR.zip)
+   PASS (EMULATED)  THE BOSSES' SENDS IN YOUR COLOUR (t_tint103, new, 95/95): a practice match against the Normal Knight at the
+                    real arena camera, every boss's attack skill landed in your box from a bot whose SOUL colour is forced,
+                    every frame stepped and, on four frames each, drawn the game's way (draw_self too): Jevil 6, Gerson 6,
+                    Spamton NEO 6 and Pink 6 sends - every picture of every piece has the sender's silhouette right over it
+                    (by the piece's own Draw or the drawer at its depth), at no more than half its alpha, no error; the
+                    phantoms (Gerson, Spamton NEO, Pink) too; Flowery's 7 sends on his board in a Flowery match the same;
+                    a black SOUL's send lifted to a visible grey; the knights' sends keep their own light mix and get no
+                    silhouette; Jevil's, Spamton NEO's, Pink's and Gerson's own pieces in their own fights (1386 pictures)
+                    never coloured.
+   PASS (EMULATED)  OUT, THE GAME OVER, THEN WATCHING THEIR SIDE (t_watch103, new, 41/41): a practice room with 3 bots wearing
+                    their skins (LANCER: Susie, ROUXLS: Ralsei, BERDLY: his own): playing - your own hero and HP; a hit at
+                    1 HP - OUT, no OUT box, the GAME OVER (Chapter 3's picture, "THE BATTLE GOES ON - YOU WILL WATCH THE
+                    REST"), then watching a player; watching each bot: their character's battle pose in your hero's
+                    place (spr_susieb_idle, spr_ralseib_idle, Berdly's), your hero hidden, the HP panel's head / name
+                    (spr_headsusie + spr_bnamesusie, ...), HP, colour, the TP bar their gauge, the card's five diamonds
+                    with their skills' pictures and their name / HP / camera; a hit on them - their character blinks; their
+                    SHIELD on their HP bar; RIGHT - all of it switches; the game's own GAME OVER call (scr_gameover) in a
+                    running match - OUT, the GAME OVER, watching.
+   PASS (EMULATED)  THE OUT BOX MID-ROUND (t_out103, new, 22/22): OUT by a hit then 900 frames of Spamton NEO's attacks
+                    touching the hidden SOUL (three attacks): still watching, HP 1, no OUT box, the debug log names the
+                    piece; the same while typing in the chat; a SHIELD's hit costs no HP; HOW TO PLAY's last HP stays; his
+                    finale's proportional hits are online hits (at 1 HP: OUT and watching); the party-down check: OUT and
+                    watching, again while watching: still watching.
+   PASS (EMULATED)  END ROUND (t_endround103, new, 21/21): a room of three games (the simulated network) and a practice room
+                    with bots: the host's GIVE UP box has END ROUND (a player's has not), it asks again, Keep playing goes
+                    on, End the round ends it in every game with the most HP winning, the feed says the host ended it, the
+                    room is back in the lobby; the room page's END ROUND row only for the host while a match runs.
+   PASS (EMULATED)  BOTS SHOOT AND SHOW THEIR SKILLS (t_bots103, new, 21/21): on Spamton NEO's yellow SOUL every bot fires (and
+                    BIG SHOTs), the SOULs' list carries the counts, this game draws the shots from their SOULs with the
+                    game's own sprites; every skill use told to every game and drawn (name, ring, the attack's diamond);
+                    SHOW OTHER SOULS off hides them; the bots' skins, in the cold place with "(BOT)".
+   PASS (EMULATED)  SENDS FIT THE BOX (t_sendfit103, new, 330/330): every boss send in a plain 167-pixel box, every frame: no
+                    piece bigger than the box allows, the phantoms at their own size or smaller close to the box, Gerson's
+                    bells at the box's sides, the BIG SHOT's laser sized for the box, Pink's crosses and explosions inside,
+                    every send still builds its pieces, no error.
+   PASS (EMULATED)  JEVIL'S VOICE (t_jevil103, new, 20/20): Devilsknife and Devilsknife Swing twice each - Chapter 1's
+                    "METAMORPHOSIS!" (snd_jv_joker_metamorphosis) alone as his body turns, his four Devilsknives come, fade
+                    in, swing and hurt, with their sounds; BYE-BYE once; Ring-Around keeps one voice (snd_jv_joker_laugh0);
+                    the DEVILSKNIFE skill lands with Chapter 1's "METAMORPHOSIS!".
+                    And his 16 attacks run and drawn at the real arena camera (x 2063) with BR_COLLIDE motion (boss_run.py,
+                    not a suite): every attack's pieces and sounds, no error, no picture missing that the game has.
+   PASS (EMULATED)  FLOWERY'S TOWER (t_flowery103, new, 6/6; 3 of its checks fail on 1.0.2's code): at the real arena camera his
+                    tower is drawn on the screen, centred on its middle, and follows the camera.
+   PASS (EMULATED)  1.0.2 AND 1.0.3 IN ONE ROOM (t_mixver103, new, 58/58): each emulated game runs its own version's code (1.0.2's
+                    as its generator made it): a 1.0.3 host, a 1.0.2 game and a 1.0.3 game in a knights match and one each
+                    against Gerson, Flowery and Pink - the same cycles, arena and bullets, no error; watching the PERFECT
+                    bot both ways round in Gerson's, Flowery's and Pink's modes; and 1.0.3's additions with a 1.0.2 game in
+                    the room - bots with skills on Spamton NEO's yellow SOUL ("su", 9-number "ps", "p" with ys / yb) for
+                    1500 frames, then the host's END ROUND: no error in the 1.0.2 game, the round over in every game with the
+                    same winner; a 1.0.2 host with two 1.0.3 games: no error.
+   PASS (EMULATED)  the full emulator regression on the 1.0.3 code (logs103, 58 suites; the container restarted with 6 of them
+                    left - those ran on the final code, logs103b): t_ui 83/83, t_uilayout 17281/17281, t_kmenu 17/17,
+                    t_qol41 133/133, t_presets 23/23, t_loadouts 1911/1911, t_botmodes101 19/19, t_bossbots53 32/32,
+                    t_gerson53 244/244, t_gerson53 mixed 244/244, t_pink53 456/456, t_flowery53 156/156, t_flowery53_multi
+                    15/15, t_flboard102 83/83, t_soulskills102 39/39, t_spamton53 375/375, t_jevil52 112/112, t_jevil52
+                    mixed 10/10, t_spec52 13/13, t_rematch52 17/17, t_mixed53 83/83, t_online 65/65, t_steam_gml 52/52,
+                    t_drbr_save54 58/58, t_online_ui47 63715/63715, t_invite49 477/477, t_pages50 23/23, t_realpath49 21/21,
+                    t_songs47 136/136, t_kfsong50 30/30, t_music50 16/16, t_mus41 136/136, t_rushsong50 10/10, t_lyrics50
+                    16/16, t_view47 88/88, t_room47 35/35, t_keys47 150/150, t_chat48 42/42, t_tut51 74/74, t_hud50 117/117,
+                    t_hud51 38/38, t_feed51 21/21, t_bots49 37/37, t_lineup 1634/1634, the sends (t_jevil52_send 38/38,
+                    t_gerson53_send 44/44, t_pink53_send 47/47, t_flowery53_send 46/46, t_spamton53_send 45/45), and the
+                    new 1.0.3 suites above.
+                    FOUND BY IT: t_online_ui47 failed 16 of 63703 checks on the first 1.0.3 code - the watching card is 12
+                    pixels taller (the diamonds) and its last line ran under MATCH STATS (I) when it was open. MATCH STATS
+                    now opens under the card; on the final code t_online_ui47 63715/63715, and the suites that draw the
+                    watching HUD again (t_uilayout, t_hud50, t_hud51, t_ui, t_watch103, t_spec52): all pass.
+   PASS (STATIC)    the built data.win (game build 51.13): runner check 5227 functions / 91 variables, 0 missing; round trip
+                    1525/1525 (one more entry: the drawer's Draw); unresolved names 0, name collisions 0, accessors on
+                    expressions 0, raw asset numbers 0, runner builtins missing 0; the patch applied to the vanilla data.win
+                    gives the DRBR data.win; t_validate53 on its fresh decompile 319/319 (the same 10 warnings as 1.0.2);
+                    the fixes are in the built code (kbr_ov_* and the 106 boss events through them, obj_knight_saov's Draw,
+                    the HP panel's 25 reads through kbr_cb_hp, the stats overlay under the card, Jevil's
+                    snd_jv_joker_metamorphosis, the tower at the camera's middle).
+   PASS (CORE)      109/109 core tests on the final 1.0.3 payload. (A first run stopped at 102: the TEST MACHINE's disk was
+                    nearly full - "DRBR needs about 769.0 MB and the drive has 675.9 MB" - old Wine work folders were
+                    removed and the run repeated: 109/109.)
+   PASS (EMULATED WINDOWS)  the real update a player gets, under Wine: 1.0.1's DRBR-Setup.exe installed, then the launcher's
+                    UPDATE NOW to 1.0.3 from a local server that answers like GitHub - 18/18 (the check reads only the end of
+                    DRBR.zip, the update only the changed files: 112,914,101 bytes for the game patch, DRBR Launcher and DRBR
+                    Updater; the music and Steam files not downloaded again; the new launcher swapped in by the updater and
+                    restarted; the install verifies; PLAY starts in the starting room - the Wine test's stand-in game, not
+                    DELTARUNE); the same from 1.0.2's DRBR-Setup.exe - 18/18;
+                    a fresh install of 1.0.3 (wine_e2e) - 51/51.
+   NOT RUN          the real game. Everything above is the emulator, Wine or static checks: please report anything odd.
+   The release: DRBR.zip 255,918,456 bytes, SHA-256 03317399fcda6f4c6c9fc0f90670c834099883d3d028aedf02c46a9db8fe563f; an
+   update from 1.0.2 or 1.0.1 downloads about 113 MB (the game patch, DRBR Launcher, DRBR Updater - the music is kept). Put it up
+   under the tag v1.0.3 exactly: 1.0.1 launchers can only download it from that tag.

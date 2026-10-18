@@ -380,6 +380,30 @@ GENERAL > SPECTATORS lets room members watch, WATCH PLACES 0-4 extra places for 
 480 ("Spacewar"): kf_steam.dll, steam_api64.dll and steam_appid.txt stay in chapter3_windows; Steam must be running and
 signed in. The relay: knightfights_server.zip (Node.js 18+, TCP 7777); everyone types its address in MORE OPTIONS > SERVER.
 
+DRBR 1.0.3 (build 51 update 13)
+-------------------------------
+- OUT IS ALWAYS THE GAME OVER, THEN WATCHING: whatever takes your last HP while the round runs (a hit, a piece that takes HP
+  by itself, the party falling another way), your SOUL breaks, the GAME OVER shows over the battle and you watch the rest.
+  1.0.2 could show the OUT box ("Back to the room") in the middle of a round: a hit on your hidden SOUL after you were
+  already OUT still took the last 1 HP (Chapter 3 makes every hit at least 1), also while you typed in the chat.
+- WATCHING SHOWS THEIR SIDE: their character stands where your hero was (their skin - Susie, Ralsei, Berdly...), the HP
+  panel is theirs (their head, character name, HP, colour and SHIELD), the TP bar is their gauge, and the watching card
+  shows their skill slots as diamonds with the skills' pictures (the picked one framed, its name beside them). Their
+  character blinks when they are hit. < > switches all of it to the next player.
+- END ROUND (the host): BACKSPACE in a match - END ROUND (it asks again) ends the running round for everyone, the most HP
+  winning (as at TIME); also the END ROUND row on the room's page while a match runs.
+- A BOSS'S SENDS IN THE SENDER'S COLOUR: every piece of a Jevil / Gerson / Spamton NEO / Pink / Flowery send (and the boss's
+  phantom beside your box) is drawn in the sender's SOUL colour over its own art - its lines and shading stay. The boss's
+  own pieces never are, so a send is always told apart. A boss's send also fits your box (no oversized pieces).
+- BOTS SHOOT AND SHOW THEIR SKILLS: on Spamton NEO's yellow SOUL every bot fires its shots (and BIG SHOTs), and every game
+  draws them; a skill a bot (or a player) uses shows over their SOUL (its name, a ring; an attack's diamond flies to its
+  target). The bots wear their own skins, in the cold place too ("(BOT)").
+- FLOWERY'S TOWER is back behind his battle (it was drawn far left of the screen).
+- JEVIL'S DEVILSKNIFE VOICE: Chapter 1's own "METAMORPHOSIS!" now (the build's sound of that name was the Cyan Knight mod's
+  longer clip - the wrong voice line), and Chapter 1's own laugh. All 16 of his attacks were run at the real arena camera.
+- 1.0.2 and 1.0.3 share rooms (multiplayer build 51); in a mixed room a 1.0.2 game does not draw the bots' shots, the skill
+  marks or the watched player's side (it ignores those messages).
+
 DRBR 1.0.2 (build 51 update 12)
 -------------------------------
 - FLOWERY'S BOARD no longer stops the game when a part of it is gone in the middle of an attack (1.0.1: "ERROR ... Draw Event

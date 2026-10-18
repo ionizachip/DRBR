@@ -95,6 +95,8 @@ function kbr_log(_t, _col)
 // ---------- every step of the battle ----------
 function kbr_me_tick()
 {
+    // (DRBR 1.0.3: a hit's "took nothing" mark lives for the step it was made in)
+    global.kbr_nohurt = false;
     var _M = kbr_match();
     if (is_undefined(_M) || !kbr_on())
         return 0;
@@ -282,9 +284,38 @@ function kbr_hit_dmg(_kind, _nm)
     return [16, 30];
 }
 
+// DRBR 1.0.3: who / what the hit was, for the OUT note (self: the piece whose hit is being taken)
+function kbr_hit_from()
+{
+    var _s = " (" + object_get_name(object_index);
+    if (variable_instance_exists(id, "kbr") && kbr != 0 && variable_instance_exists(id, "kbrf") && kbrf >= 0)
+        _s += ", a skill from player " + string(kbrf);
+    return _s + ")";
+}
+
 // scr_damage -> knight_scale_taken -> here (online): the HP a hit takes. A hit that would end you leaves 1 HP and makes you
 // OUT instead (you keep watching), so the battle never sees the party fall.
 function kbr_dmg_taken(_d)
+{
+    return kbr_nohurt_mark(kbr_dmg_taken_ex(_d));
+}
+
+// DRBR 1.0.3: a hit the room's rules took nothing from costs no HP at all (knight_infhp_cut reads this, the same step)
+function kbr_nohurt_mark(_v)
+{
+    global.kbr_nohurt = (_v <= 0);
+    return _v;
+}
+
+function kbr_nohurt_take()
+{
+    if (!variable_global_exists("kbr_nohurt") || !global.kbr_nohurt)
+        return false;
+    global.kbr_nohurt = false;
+    return true;
+}
+
+function kbr_dmg_taken_ex(_d)
 {
     var _M = kbr_match();
     if (is_undefined(_M) || _M.out || !_M.me)
@@ -335,19 +366,23 @@ function kbr_dmg_taken(_d)
         // build 52: DETERMINATION - left at 1 HP instead of OUT
         if (kbr_det_save(_M))
             return _left;
-        kbr_local_death();
+        // (what hit: the piece taking the hit is self here)
+        kbr_local_death((_e.ohko ? "a hit with ONE HIT OUT on" : "a hit emptied your HP") + kbr_hit_from());
         return _left;
     }
     return _dmg;
 }
 
 // your HP ran out: OUT. The battle goes on - you watch the others (the SOUL stays, unseen and untouchable).
-function kbr_local_death()
+// (DRBR 1.0.3: _why - what took you out, for knightfights_debug.log: the hit's piece, or the party falling another way)
+function kbr_local_death(_why)
 {
     var _M = kbr_match();
     if (is_undefined(_M) || _M.out)
         return 0;
-    kfo_out_note(_M, _M.eff.ohko ? "a hit with ONE HIT OUT on" : "a hit emptied your HP");
+    if (is_undefined(_why))
+        _why = _M.eff.ohko ? "a hit with ONE HIT OUT on" : "a hit emptied your HP";
+    kfo_out_note(_M, _why);
     _M.out = true;
     _M.died_t = round(kbr_now());
     _M.died_k = _M.R.k;
@@ -385,7 +420,7 @@ function kbr_send_state(_force)
         // DRBR: on Flowery's board also its dash (d) and the board's dash speed (fa, tenths): a watcher's board follows it
         var _fo = kbr_fl_pos_extra();
         kfo_up_fast({ k: "p", mid: _M.mid, x: round((_h.x - kbr_ox()) * 10), y: round((_h.y - kbr_oy()) * 10), c: _M.R.k, h: _M.hold ? 1 : 0, d: _fo[0], fa: _fo[1],
-            gs: kbr_hj_my_dir() });
+            gs: kbr_hj_my_dir(), ys: kbr_sn_shots(false), yb: kbr_sn_shots(true) });
     }
     if (_force || _now - _M.t_st >= 500)
     {
@@ -445,6 +480,8 @@ function kbr_on_ps(_m)
         _p.ffa = (array_length(_e) > 5 && is_numeric(_e[5])) ? (_e[5] / 10) : 0;
         // DRBR 1.0.1: Gerson's green shield (its direction, -1: none)
         _p.gd = (array_length(_e) > 6) ? kbr_hj_dir_ok(_e[6]) : -1;
+        // DRBR 1.0.3: the YELLOW SOUL's shots (counts): the new ones fly from that SOUL here too
+        kbr_gshot_seen(_M, _p, _e[0], (array_length(_e) > 7 && is_numeric(_e[7])) ? _e[7] : -1, (array_length(_e) > 8 && is_numeric(_e[8])) ? _e[8] : -1, _ex, _ey);
     }
     return 1;
 }

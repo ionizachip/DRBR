@@ -300,6 +300,11 @@ def main():
         F[n], k2 = re.subn(r'\bobj_sn_wallctrl\.', 'ctrl.', F[n])
         nwc += k1 + k2
     F['gml_Object_obj_sn_wallcell_Step_0.gml'] = sub(F['gml_Object_obj_sn_wallcell_Step_0.gml'], 'if (wallcontroller > -1)\n', 'if (wallcontroller > -1 && kbr_sn_wc_ok())\n', 1, 'wall lead cell')
+    # DRBR 1.0.3: the arm laser sizes itself in its Draw (its orb, its beam's thickness): a SENT one is made to fit the box it
+    # lands in by its kbrsz (kbr_fitv(): 1 for his own) - the BIG SHOT skill's white orb and beam were twice the box's height
+    bl = 'gml_Object_obj_sn_biglaser_Draw_0.gml'
+    F[bl] = sub(F[bl], 'draw_circle(x, y, max(2, (orbsize / 2) + (sin(siner / 2) * 2)), 0);', 'draw_circle(x, y, max(2, ((orbsize / 2) + (sin(siner / 2) * 2)) * kbr_fitv()), 0);', 1, 'laser orb')
+    F[bl] = sub(F[bl], '    if (image_yscale < 0.5)\n    {\n        image_yscale = scr_movetowards(image_yscale, 0.5, 0.1);', '    if (image_yscale < (0.5 * kbr_fitv()))\n    {\n        image_yscale = scr_movetowards(image_yscale, 0.5 * kbr_fitv(), 0.1);', 1, 'laser beam')
     # (a red crew member shot takes its wall with it: its own wall - the same number AND the same controller)
     w10 = 'gml_Object_obj_sn_wallcell_Other_10.gml'
     F[w10] = sub(F[w10], '        with (obj_sn_wallcell)\n        {\n            if (wallnumber == other.wallnumber)\n', '        with (obj_sn_wallcell)\n        {\n            if (wallnumber == other.wallnumber && kbr_sn_same_ctrl(other.id))\n', 1, 'red crew wall')

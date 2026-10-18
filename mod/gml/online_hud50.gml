@@ -16,7 +16,16 @@ function kbr_tp_hook()
     if (!kbr_on())
         return false;
     var _M = kbr_match();
-    if (is_undefined(_M) || !_M.me || _M.out || !_M.eff.skills)
+    if (is_undefined(_M) || !_M.eff.skills)
+        return false;
+    // DRBR 1.0.3: watching someone - the bar is theirs (their gauge, as the standings say)
+    var _wp = kbr_cb_watched_p(_M);
+    if (is_struct(_wp))
+    {
+        kbr_tp_draw_g(_M, clamp(kfo_jn(_wp, "g", 0), 0, 100), 0, undefined);
+        return true;
+    }
+    if (!_M.me || _M.out)
         return false;
     kbr_tp_draw(_M);
     return true;
@@ -25,6 +34,13 @@ function kbr_tp_hook()
 function kbr_tp_draw(_M)
 {
     var _S = _M.sk;
+    return kbr_tp_draw_g(_M, clamp(_M.g, 0, 100), _S.charging ? floor(_S.charge) : 0, _S);
+}
+
+// the bar for gauge _g (0-100) with charge _ch held (0: none); _S the player's skills (YOU DREW A SKILL!), undefined when
+// it is someone you watch
+function kbr_tp_draw_g(_M, _g, _ch, _S)
+{
     // the game's own TP bar art for the knight that is fighting (as obj_tensionbar's Draw picks it): Kaizo's, Elecknight's
     // (blue when its bar is), the Violet Knight's side B, the Chapter 3 bar for the others
     var _kv = global.knight_variant;
@@ -47,7 +63,6 @@ function kbr_tp_draw(_M)
         _bg = spr_tensionbar_c;
     var _w = sprite_get_width(_fg);
     var _h = sprite_get_height(_fg);
-    var _g = clamp(_M.g, 0, 100);
     var _need = clamp(kbr_skill_need(), 1, 100);
     var _need2 = clamp(kbr_skill_need2(), _need, 100);
     if (!variable_instance_exists(id, "kbrtp_red"))
@@ -61,7 +76,6 @@ function kbr_tp_draw(_M)
     }
     kbrtp_t++;
     // crossing the line: the bar reaching the draw cost, the held charge reaching it, the charge reaching two skills
-    var _ch = _S.charging ? floor(_S.charge) : 0;
     if ((kbrtp_was < _need && _g >= _need) || (kbrtp_cwas < _need && _ch >= _need) || (kbrtp_cwas < _need2 && _ch >= _need2))
         kbrtp_fl = 24;
     kbrtp_was = _g;
@@ -118,7 +132,7 @@ function kbr_tp_draw(_M)
         }
     }
     // the red preview: what letting go of CHARGE takes off the bar (nothing is drawn below the cost: dim then)
-    if (_S.charging && _ch > 0)
+    if (_ch > 0)
     {
         draw_set_alpha((_ch >= _need) ? 1 : 0.4);
         draw_set_color(c_red);
@@ -158,7 +172,8 @@ function kbr_tp_draw(_M)
         draw_text(x - 20, y + 110, string_hash_to_newline(stringsetloc("X", "obj_tensionbar_slash_Draw_0_gml_27_0")));
     }
     draw_set_color(c_white);
-    kbr_tp_pop(_S, x + _w + 6, y + _yc);
+    if (is_struct(_S))
+        kbr_tp_pop(_S, x + _w + 6, y + _yc);
     return 1;
 }
 
@@ -199,6 +214,32 @@ function kbr_shield_col()
     return make_color_rgb(70, 140, 255);
 }
 
+// DRBR 1.0.3: the SHIELD of the one you watch on your (their) box: their hits left (the standings' sd), as it stands
+function kbr_shield_draw_of(_x, _y, _p)
+{
+    var _sh = kbr_shield_hp(kfo_jn(_p, "sd", 0));
+    if (_sh <= 0)
+        return 0;
+    var _hp = max(0, round(kfo_jn(_p, "hp", 0)));
+    var _mh = max(1, round(kfo_jn(_p, "mh", 1)));
+    var _bx0 = _x + 128;
+    var _by0 = _y + 11;
+    var _by1 = _y + 19;
+    var _col = kbr_shield_col();
+    var _tot = _hp + _sh;
+    draw_set_color(_col);
+    if (_tot <= _mh)
+        draw_rectangle(_bx0 + max(0, ceil((_hp / _mh) * 75)), _by0, _bx0 + ceil((_tot / _mh) * 75), _by1, false);
+    else
+        draw_rectangle(_bx0 + floor((_hp / _tot) * 75), _by0, _bx0 + 75, _by1, false);
+    draw_set_font(global.hpfont);
+    var _txt = "+" + string(_sh);
+    draw_set_halign(fa_right);
+    draw_text(max(_x + 107 + string_width(_txt), (_x + 160) - string_width(string(_hp)) - 3), _y - 2, _txt);
+    draw_set_halign(fa_left);
+    return 1;
+}
+
 // from scr_charbox (det_sent.py adds the call after the HP bar): _x the box's left (xx + xchunk), _y its top line
 // (bpoff + b_offset + mmy), _c the party slot's character - 1
 function kbr_shield_draw(_x, _y, _c)
@@ -206,6 +247,13 @@ function kbr_shield_draw(_x, _y, _c)
     if (global.kbr_san <= 0 || !kbr_on())
         return 0;
     var _M = kbr_match();
+    // DRBR 1.0.3: watching someone - your box is theirs: their SHIELD on their HP
+    if (!is_undefined(_M) && (_c + 1) == kbr_char())
+    {
+        var _wp = kbr_cb_watched(_c + 1);
+        if (is_struct(_wp))
+            return kbr_shield_draw_of(_x, _y, _wp);
+    }
     if (is_undefined(_M) || !_M.me || _M.out || (_c + 1) != kbr_char())
         return 0;
     var _S = _M.sk;

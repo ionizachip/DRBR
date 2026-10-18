@@ -127,7 +127,7 @@ def make_sim(seed=1,load_vanilla=('scr_flag_set','scr_ini_chapter')):
     for a in _ba:
         try: sim.define_asset(a)
         except Exception: pass
-    for p in sorted([p for p in glob.glob(M+'gml_Object_obj_knight_*.gml') if re.search(r'obj_knight_(menu|prompt|ctrl|ghost)',p)]):
+    for p in sorted([p for p in glob.glob(M+'gml_Object_obj_knight_*.gml') if re.search(r'obj_knight_(menu|prompt|ctrl|ghost|saov)',p)]):
         sim.load_file(p,entry=os.path.basename(p)[:-4])
     for r in ('room_dw_snow_zone','room_town_krisyard_dark'):
         sim.define_room(r)

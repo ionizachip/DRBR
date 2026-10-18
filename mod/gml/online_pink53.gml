@@ -1237,11 +1237,36 @@ function kbr_pk_sa_cat(_G, _x, _y, _dir, _spd)
 }
 
 // her phantom beside your box while she sends it (the knights' sends show their sender's knight the same way)
+// DRBR 1.0.3: how far her mega bomb's warning cross and explosions reach (0 left, 1 top, 2 right, 3 bottom): the screen for
+// her own bomb, the box it landed in for a SENT one (self: the bomb)
+function kbr_pk_lim(_k)
+{
+    if (variable_instance_exists(id, "kbrx") && kbrx > 0 && instance_exists(obj_growtangle))
+    {
+        var _b = instance_find(obj_growtangle, 0);
+        switch (_k)
+        {
+            case 0: return _b.bbox_left;
+            case 1: return _b.bbox_top;
+            case 2: return _b.bbox_right;
+        }
+        return _b.bbox_bottom;
+    }
+    switch (_k)
+    {
+        case 0: return camera_get_view_x(view_camera[0]);
+        case 1: return camera_get_view_y(view_camera[0]);
+        case 2: return camera_get_view_x(view_camera[0]) + 640;
+    }
+    return camera_get_view_y(view_camera[0]) + 480;
+}
+
 function kbr_pk_sa_ghost(_G, _B, _d)
 {
-    var _T = kbr_sa_tel(_G, "spr", _B[0] + _B[2] + 50, _B[1] - _B[3] - 40, _d, 0);
+    // (DRBR 1.0.3: her own size, close to the box)
+    var _T = kbr_sa_tel(_G, "spr", _B[0] + _B[2] + 34, _B[1] - _B[3] - 20, _d, 0);
     _T.spr = spr_pk_pink_front_ohoho;
-    _T.xs = 2;
+    _T.xs = 1;
     return _T;
 }
 
