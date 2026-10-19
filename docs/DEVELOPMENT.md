@@ -69,6 +69,16 @@ files what the DRBR build's start does (checks the template, copies it, writes `
 can be tested under Wine. It is never shipped. Results from it say nothing about the real game. The real game code's
 start is tested in the emulator (`t_drbr_save54.py`).
 
+**Real-runner tests (1.0.4).** `mod/tests/realrunner/` runs a private test build of the game in the real DELTARUNE game
+program (your own `DELTARUNE.exe`, never part of this repository) under Wine with software rendering: a hook added to a
+copy of the code starts a practice match, forces the attacks you list, logs every piece and saves screenshots. See its
+README. They were added because the emulator missed a bug the real game had (Jevil's Devilsknives, 1.0.4).
+
+**The compiled-name check.** In a GameMaker 2.3+ game a bare name that is a global function compiles to the function,
+even where an instance has a variable of that name. `mod/scripts/fnclash.py` renames such variables in imported boss code,
+`mod/scripts/fnclash_scan.csx` checks the built `data.win` for any left (the build check writes `fnclash51.out`; the game
+package, `pkg51.sh`, is refused without `FNCLASH: 0`), and the emulator raises on such a read (`sim.fn_shadow_check`, on in the mod's test harness).
+
 ## Debugging
 
 | Where to look | What it holds |

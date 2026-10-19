@@ -380,6 +380,19 @@ GENERAL > SPECTATORS lets room members watch, WATCH PLACES 0-4 extra places for 
 480 ("Spacewar"): kf_steam.dll, steam_api64.dll and steam_appid.txt stay in chapter3_windows; Steam must be running and
 signed in. The relay: knightfights_server.zip (Node.js 18+, TCP 7777); everyone types its address in MORE OPTIONS > SERVER.
 
+DRBR 1.0.4 (build 51 update 14)
+-------------------------------
+- JEVIL'S DEVILSKNIFE WORKS: when he turns into the Devilsknife, his four Devilsknives now come and swing round your box, in
+  and out through it - in the Devilsknife, the Devilsknife Swing (with its red blade) and the DEVILSKNIFE skill. Before,
+  they swung round a point about 100,000 pixels away, so nothing came: Chapter 3 has built-in helpers named centerx /
+  centery, and the Devilsknives (from Chapter 1) kept their middle in variables of the same names - the built game read
+  the helpers instead. Checked in the real DELTARUNE game program this time (all of Jevil's attacks and the other bosses').
+- SPAMTON NEO'S NEO FINALE no longer stops the game ("ERROR ... Draw Event for object obj_sn_playback: draw_sprite
+  argument 1 incorrect type (undefined)"): his playback bar looked its picture up the Chapter 2 way, which Chapter 3 does not
+  know. Found by the same real-game run, before anyone reported it.
+- 1.0.2, 1.0.3 and 1.0.4 share rooms (multiplayer build 51). Each game builds the attacks sent at it: on 1.0.4 every
+  DEVILSKNIFE works, whoever sends it.
+
 DRBR 1.0.3 (build 51 update 13)
 -------------------------------
 - OUT IS ALWAYS THE GAME OVER, THEN WATCHING: whatever takes your last HP while the round runs (a hit, a piece that takes HP

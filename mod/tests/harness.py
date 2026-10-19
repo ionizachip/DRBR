@@ -87,8 +87,28 @@ def obj_index_table():
         _p=_ln.rstrip('\n').split('\t')
         if len(_p)==3 and _p[0]=='obj': out[_p[2]]=int(_p[1])
     return out
+_GAME_FN=[]
+def game_functions():
+    """DRBR 1.0.4: every global function name of the built game - Chapter 3's (its SCPT chunk) and DRBR's own (the templates);
+    cached in idx/game_functions.txt (rebuilt when a template is newer)"""
+    if not _GAME_FN:
+        import glob as _g
+        c='/home/claude/work/idx/game_functions.txt'
+        tp=_g.glob('/home/claude/scripts/gml_templates_v6/*.gml')
+        if not os.path.exists(c) or any(os.path.getmtime(x)>os.path.getmtime(c) for x in tp):
+            sys.path.insert(0,'/home/claude/scripts')
+            import fnclash
+            open(c,'w').write('\n'.join(sorted(fnclash.target_functions()))+'\n')
+        _GAME_FN.append(set(l.strip() for l in open(c) if l.strip()))
+    return _GAME_FN[0]
 def make_sim(seed=1,load_vanilla=('scr_flag_set','scr_ini_chapter')):
     sim=Sim(seed=seed)
+    # DRBR 1.0.4: a read of an instance variable named like one of the game's global functions is an error here, as it is a
+    # bug in the game (the compiled code reads the FUNCTION there: Jevil's Devilsknives, centerx / centery). KH_FNSHADOW=0: off
+    if os.environ.get('KH_FNSHADOW','1')!='0': sim.fn_shadow_check=game_functions()
+    # DRBR 1.0.4: and a sprite draw with an argument that is not a number stops the test as it stops the game (Spamton NEO's
+    # playback sprite, looked up through Chapter 3's map: undefined). KH_STRICTDRAW=0: off
+    if os.environ.get('KH_STRICTDRAW','1')!='0': sim.strict_draw=True
     if os.environ.get('KH_MERGED'):
         # build 46, the round trip (code decompiled from the built data.win): the decompiler writes a 0 compared with a
         # sprite as the name of sprite 0 (IMAGE_LOGO in Chapter 3); the same value

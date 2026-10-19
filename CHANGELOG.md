@@ -1,5 +1,35 @@
 # Changelog
 
+## 1.0.4
+
+### In the game
+
+- **Jevil's Devilsknife works.** When Jevil turned into the Devilsknife, his four Devilsknives never came onto the screen:
+  they were swinging round a point about 100,000 pixels away. The cause: Chapter 3 has built-in helpers called `centerx`
+  and `centery`, and the Devilsknives (taken from Chapter 1) kept the middle of their swing in variables with those same
+  names, so in the built game every read of them got Chapter 3's helper instead of the number. The variables have names of
+  their own now. Fixed for all three uses: **Devilsknife**, **Devilsknife Swing** (its red blade too) and the
+  **DEVILSKNIFE** skill sent at you. They swing round your box again, in and out through it, as in Chapter 1.
+- **Fixed a crash in Spamton NEO's NEO Finale** ("ERROR in action number 1 of Draw Event for object
+  obj_sn_playback: draw_sprite argument 1 incorrect type (undefined)"). His playback bar looked its picture up the way
+  Chapter 2 does, and Chapter 3 does not know Chapter 2's pictures that way, so the game stopped when it tried to draw it.
+  It uses the picture directly now. Found by the new real-game run below, before anyone reported it.
+- Checked in the real game this time: the DELTARUNE game program itself ran DRBR (under Wine, see the testing report) through
+  all 16 of Jevil's attacks, the DEVILSKNIFE skill and every other boss's attacks.
+
+### For the next ports
+
+- The build is now checked for this whole kind of mistake: every piece of the built game's code is disassembled, and the
+  build is refused if any variable is read as a function or an asset of the same name. The test emulator also treats such a
+  read as an error now (it used to read the variable, which is why the tests never saw the bug), and it stops on a picture
+  draw with a missing picture, as the real game does.
+
+### Compatibility
+
+- 1.0.2, 1.0.3 and 1.0.4 can play in the same room (multiplayer build 51). Each game builds the attacks sent at it with
+  its own code: on 1.0.4 every DEVILSKNIFE works, whoever sent it; a player still on 1.0.2 or 1.0.3 keeps the old bug until
+  they update.
+
 ## 1.0.3
 
 ### In the game

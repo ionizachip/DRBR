@@ -89,9 +89,12 @@ class Recorder:
         s.mock('draw_text_color', text_col)
         s.mock('draw_text_colour', text_col)
         s.mock('draw_text_transformed_color', text_tr_col)
+        from gmlsim.lib_mocks import check_draw_args as _cda
         def spr(sim, sp, im, x, y):
+            _cda(sim, 'draw_sprite', (sp, im, x, y))
             R.ops.append(('spr', R.name_of(sp), im, x, y, 1, 1, 0, R.fogc(16777215), R.st['alpha'], None, None)); return 0
         def spr_ext(sim, sp, im, x, y, xs, ys, rot, col, al):
+            _cda(sim, 'draw_sprite_ext', (sp, im, x, y, xs, ys, rot, col, al))
             R.ops.append(('spr', R.name_of(sp), im, x, y, xs, ys, rot, R.fogc(col), al, None, None)); return 0
         # build 47: gpu_set_fog(true, col, 0, 0) draws sprites as flat silhouettes (the online SOUL colours)
         R.st['fog'] = None
@@ -99,12 +102,16 @@ class Recorder:
             R.st['fog'] = int(col) if en else None; return 0
         s.mock('gpu_set_fog', fog)
         def spr_st(sim, sp, im, x, y, w, h):
+            _cda(sim, 'draw_sprite_stretched', (sp, im, x, y, w, h))
             R.ops.append(('spr', R.name_of(sp), im, x, y, 1, 1, 0, R.fogc(16777215), R.st['alpha'], (w, h), None)); return 0
         def spr_st_ext(sim, sp, im, x, y, w, h, col, al):
+            _cda(sim, 'draw_sprite_stretched_ext', (sp, im, x, y, w, h, col, al))
             R.ops.append(('spr', R.name_of(sp), im, x, y, 1, 1, 0, R.fogc(col), al, (w, h), None)); return 0
         def spr_part(sim, sp, im, l, t, w, h, x, y):
+            _cda(sim, 'draw_sprite_part', (sp, im, l, t, w, h, x, y))
             R.ops.append(('spr', R.name_of(sp), im, x, y, 1, 1, 0, R.fogc(16777215), R.st['alpha'], None, (l, t, w, h))); return 0
         def spr_part_ext(sim, sp, im, l, t, w, h, x, y, xs, ys, col, al):
+            _cda(sim, 'draw_sprite_part_ext', (sp, im, l, t, w, h, x, y, xs, ys, col, al))
             R.ops.append(('spr', R.name_of(sp), im, x, y, xs, ys, 0, R.fogc(col), al, None, (l, t, w, h))); return 0
         s.mock('draw_sprite', spr)
         s.mock('draw_sprite_ext', spr_ext)

@@ -8,10 +8,31 @@ from .values import GMArray
 _RECORDING = {}
 
 
+_SPRITE_DRAWS = set("""draw_sprite draw_sprite_ext draw_sprite_part draw_sprite_part_ext draw_sprite_stretched
+draw_sprite_stretched_ext draw_sprite_pos draw_sprite_tiled draw_sprite_tiled_ext draw_sprite_general""".split())
+
+
+def check_draw_args(sim, name, args):
+    """GameMaker's runner checks a sprite draw's arguments: every one is a number, and anything else (undefined - a sprite
+    looked up and not found -, a string ...) stops the game: "draw_sprite argument 1 incorrect type (undefined) expecting a
+    Number (YYGI32)". sim.strict_draw: say so here too (off by default)"""
+    if not getattr(sim, 'strict_draw', False):
+        return
+    from .values import GMInt64
+    from .errors import GMError
+    for i, v in enumerate(args):
+        if v is None or v.__class__ not in (int, float, bool, GMInt64):
+            tn = 'undefined' if v is None else ('string' if isinstance(v, str) else v.__class__.__name__)
+            raise GMError('%s argument %d incorrect type (%s) expecting a Number (YYGI32)' % (name, i + 1, tn), 'draw_arg')
+
+
 def _make(name, ret):
     from .sim_log import record
+    sprite = name in _SPRITE_DRAWS
 
     def fn(sim, *args):
+        if sprite:
+            check_draw_args(sim, name, args)
         record(sim, name, args)
         return ret(sim, args) if callable(ret) else ret
     return fn

@@ -867,9 +867,17 @@ class Compiler:
 
         def rself2(f):
             try:
-                return f.self.vars[name]
+                v = f.self.vars[name]
             except KeyError:
                 return f.sim.lookup_name(name, f)
+            # GameMaker 2.3+ compiles a bare name that is a global function to the FUNCTION (push.i [function]) even where the
+            # instance has a variable of that name - the game never reads the variable there (sim.fn_shadow_check: say so)
+            sim = f.sim
+            fs = sim.fn_shadow_check
+            if fs and ((fs is not True and name in fs) or name in sim.script_entries or name in sim.scripts):
+                raise GMError("variable %s is read here, but %s is also a global function: the compiled game reads the FUNCTION "
+                              "(a reference, about 100000 as a number) - rename the variable" % (name, name), "fn_shadow")
+            return v
         return rself2
 
     def x_arr(self, n):

@@ -9,6 +9,8 @@ What it writes (idempotent, every build):
       * randomness of the attacks through the attack stream (det_rewrite: kbr_random & co.) - every game makes the same pattern;
         Jevil's body (a drawing only) keeps the plain generator;
       * scr_84_get_sound("snd_x") -> snd_x;
+      * an instance variable named like one of Chapter 3's global functions -> jv_<name> (DRBR 1.0.4, fnclash.py: Chapter 3's
+        compiled code reads such a name as the FUNCTION - the Devilsknives' centerx / centery put them ~100000 px off the screen);
       * the laser scythe's own hit ("everyone loses 30% HP") -> a normal hit (the room's damage table, like every bullet);
       * Jevil's body no longer fades the party out (the online look hides / draws the hero itself);
       * obj_jv_dbc: Chapter 1's obj_dbulletcontroller with only Jevil's 17 types (Chapter 3 has its own obj_dbulletcontroller).
@@ -19,6 +21,7 @@ Usage: python3 make_jevil.py"""
 import os, re, json, sys, glob
 sys.path.insert(0, '/home/claude/scripts')
 import det_rewrite
+import fnclash
 
 C1 = '/home/claude/work/jevil/c1dump/'
 OUT = '/home/claude/scripts/jevil_gen/'
@@ -114,6 +117,8 @@ def jevil_dbc_create():
 def fix(t, obj, det):
     t = re.sub(r'\nenum e__VW\s*\{[^}]*\}\s*', '\n', t)
     t = re.sub(r'scr_84_get_sound\("(snd_\w+)"\)', r'\1', t)
+    # (DRBR 1.0.4: and a sprite looked up by name - Chapter 3's map knows only its own sprites; Jevil's code has none)
+    t = re.sub(r'scr_84_get_sprite\("(spr_\w+)"\)', r'\1', t)
     for a, b in OBJ.items():
         t = re.sub(r'\b%s\b' % re.escape(a), b, t)
     t = re.sub(r'\b(spr_\w+|jokerscythebig_mask)\b', lambda m: m.group(1) if m.group(1) in KEEP_SPR else jv_spr(m.group(1)), t)
@@ -247,6 +252,14 @@ def main():
     for n in list(files):
         for s0, s1 in OWN_SND.items():
             files[n] = re.sub(r'\b%s\b' % s0, s1, files[n])
+    # DRBR 1.0.4: Chapter 1's instance variables that Chapter 3 has a global FUNCTION of the same name for get names of their
+    # own: the Devilsknives' centerx / centery were read as Chapter 3's centerx() / centery() in the built game (a function
+    # reference, about 100000 as a number) - the four of them swung round a point far off the screen and never showed
+    ren = {c: 'jv_' + c for c in sorted(fnclash.clashes(list(files.values())))}
+    for n in list(files):
+        files[n] = fnclash.rename(files[n], ren)
+    assert not fnclash.clashes(list(files.values())), 'function-name clash left'
+    print('jevil: variables renamed for Chapter 3 function names: %r' % ren)
     for n, t in files.items():
         left = re.findall(r'\bobj_(?:joker|carouselbullet|spadering|suitbomb|centerscythe|laserscythe|bigscythe|heartbomb_blast|clubsbullet_dark|dbullet_vert|regularbullet_permanent|jokerbg)\w*', t)
         assert not left, (n, left)

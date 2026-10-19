@@ -8,6 +8,22 @@ KEYI = {'base': 0, 'kaizo': 1, 'elec': 2, 'violet': 3, 'thorn': 4, 'cyan': 5}
 OBJ = {1: 'obj_herokris', 2: 'obj_herosusie', 3: 'obj_heroralsei', 4: 'obj_heronoelle'}
 
 
+
+_CH3_SPRMAP = []
+
+
+def _ch3_get_sprite(s, name, *r):
+    if not _CH3_SPRMAP:
+        import harness as _h
+        _CH3_SPRMAP.append(set(re.findall(r'ds_map_add\(sm, "(\w+)", [\w-]+\)', open(_h.B + 'gml_GlobalScript_scr_84_init_localization.gml', encoding='utf8').read())))
+    if name in _CH3_SPRMAP[0]:
+        try:
+            return s.asset_index(name)
+        except Exception:
+            return s.define_asset(name)
+    return None
+
+
 def lu_battle(host, party=(1, 2, 3), combo=1, partner='thorn', hp=140, extra_cfg='', world=False, pre=None):
     """world=True: the battle room's own objects are there too, made under the host's variant as in the real game (the arena
     cutscene obj_ch3_PTB02 waiting for the battle to end, the sign, the dark world controller, the tension bar), so a partner's
@@ -18,9 +34,13 @@ def lu_battle(host, party=(1, 2, 3), combo=1, partner='thorn', hp=140, extra_cfg
         pre(sim)
     if world:
         sim.run('global.knight_variant=%d;' % KEYI[host])
-    for _m in ['scr_84_get_sprite', 'scr_84_get_font', 'scr_battletext', 'scr_speaker', 'scr_endcombat', 'scr_nextact', 'scr_attackphase',
+    for _m in ['scr_84_get_font', 'scr_battletext', 'scr_speaker', 'scr_endcombat', 'scr_nextact', 'scr_attackphase',
                'scr_enemyblcon', 'snd_stop', 'mus_volume', 'scr_spellmenu_setup']:
         sim.mock(_m, 0)
+    # DRBR 1.0.4: Chapter 3's scr_84_get_sprite is a look-up in its own map (scr_84_init_localization: its 77 localized
+    # pictures) - any other name is undefined in the game, and drawing it stops the game (Spamton NEO's playback bar, from
+    # Chapter 2); the same here (it answered 0 - a real picture - for every name)
+    sim.mock('scr_84_get_sprite', _ch3_get_sprite)
     sim.played = []
     sim.mock('snd_play', lambda s, a, *r: (s.played.append(a), 0)[1])
     for ev in ('Draw_0',):

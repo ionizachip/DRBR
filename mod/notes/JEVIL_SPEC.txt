@@ -37,7 +37,10 @@ THE REQUEST, IN THOSE TERMS
    own objects (obj_jv_*: Chapter 3 has some of these names for other things), with their sprites and Jevil's voice
    sounds, and their code changed only where Chapter 3 differs: the SOUL's middle is +10 (Chapter 1: +8), randomness
    through the attack stream, obj_joker -> Jevil's battle object, damage through the room's table (the laser scythe's
-   "take 30% of everyone's HP" becomes a normal hit).
+   "take 30% of everyone's HP" becomes a normal hit). DRBR 1.0.4: an instance variable named like one of Chapter 3's
+   global functions gets a name of its own (jv_<name>): Chapter 3's compiled code reads such a name as the FUNCTION - the
+   Devilsknives' centerx / centery (the middle they swing round) made them swing round a point about 100000 pixels off the
+   screen in the real game until then (fnclash.py; the build refuses any such name: fnclash_scan.csx).
    Jevil's look: obj_joker_body's drawing (idle, dance, tired, the shadow-dance, sinking into the box for the attacks that
    need it, coming back, turning into the devilsknife), its sounds (CHAOS, CHAOS!, I CAN DO ANYTHING!, BYE-BYE!, the oh's).
    The background: obj_jokerbg_triangle_real as Chapter 1 draws it - the carousel picture in 32 strips (a turning drum),

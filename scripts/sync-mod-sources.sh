@@ -26,6 +26,8 @@ done
 printf 'Not here (the games'"'"' own code with a hook added - a local build has them from its toolkit):\nfirehex_Create_0.gml firehex_Step_0.gml firespell_Create_0.gml firespell_Draw_0.gml heart_Draw_0.gml\n' > "$M/gml/events/NOT_INCLUDED.txt"
 cp "$W"/tests/*.py "$W"/tests/*.sh "$M/tests/" 2>/dev/null || true
 mkdir -p "$M/tests/data" && cp "$W/tests/data/ow_dump.tsv" "$M/tests/data/"
+# DRBR 1.0.4: the real-runner tests - their scripts and hook only (the game program they run is the player's own copy)
+mkdir -p "$M/tests/realrunner" && cp "$W"/tests/realrunner/*.py "$W"/tests/realrunner/*.gml "$W"/tests/realrunner/README.md "$M/tests/realrunner/"
 cp "$W"/runbuild51.sh "$W"/runchk51.sh "$W"/runverify51.sh "$W"/runrt51.sh "$W"/verify51.csx "$W"/funcdump51.csx "$W"/vardump51.csx \
    "$W"/check_runner51.py "$W"/rtdump.csx "$W"/assetidx.csx "$W"/objinfo.csx "$W"/pkg51.sh "$W"/make_tp51.sh "$M/build/" 2>/dev/null || true
 cp "$W"/installer/make_package.sh "$W"/installer/make_manifest.py "$W"/installer/run_e2e51.sh "$M/installer/" 2>/dev/null || true
@@ -41,7 +43,8 @@ rm -rf "$M/online-server/node_modules"
 cp -r "$E" "$HERE/tools/gmlsim"
 find "$HERE/mod" "$HERE/tools" -name __pycache__ -type d -prune -exec rm -rf {} +
 # nothing that must not be published
-if find "$M" "$HERE/tools" \( -name '*.win' -o -name 'filech*' -o -name '*.pem' -o -name '*_gen' -o -name 'knight_hub.ini' -o -name 'knightfights_online.ini' \) | grep -q .; then
+if find "$M" "$HERE/tools" \( -name '*.win' -o -name 'filech*' -o -name '*.pem' -o -name '*_gen' -o -name 'knight_hub.ini' -o -name 'knightfights_online.ini' \) | grep -q . \
+   || find "$M/tests" \( -iname '*.exe' -o -iname '*.dll' -o -iname '*.dat' -o -name 'kat_log.txt' -o -name 'kat_*.png' \) | grep -q .; then
   echo "REFUSED: a file that must not be in the repository was copied:"; find "$M" "$HERE/tools" \( -name '*.win' -o -name 'filech*' -o -name '*.pem' -o -name '*_gen' \); exit 1
 fi
 du -sh "$M" "$HERE/tools/gmlsim"

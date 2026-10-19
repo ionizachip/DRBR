@@ -145,6 +145,12 @@ class Sim:
         self.prepared = set()
         self.global_inits = []
         self.auto_assets = True
+        # a read of an instance variable that shares its name with a global function raises (the compiled game reads the
+        # function there - GameMaker 2.3+): off by default; True = the functions loaded here, or a set of names (the whole
+        # game's functions, loaded or not) - those and the loaded ones
+        self.fn_shadow_check = False
+        # a sprite draw with an argument that is not a number (undefined ...) raises, as the runner does: off by default
+        self.strict_draw = False
         self.max_depth = 400
         self.fps = fps
         self.raise_on_game_end = False

@@ -129,6 +129,10 @@ class Boss:
     def fix(self, t, det=True):
         t = re.sub(r'\nenum e__VW\s*\{[^}]*\}\s*', '\n', t)
         t = re.sub(r'scr_84_get_sound\("((?:snd|motor)_\w+)"\)', r'\1', t)
+        # DRBR 1.0.4: and its sprite lookup - Chapter 3's scr_84_get_sprite only knows Chapter 3's localized sprites
+        # (global.chemg_sprite_map): another chapter's sprite came back undefined and its draw stopped the real game
+        # ("draw_sprite argument 1 incorrect type (undefined)": Spamton NEO's obj_sn_playback, in his NEO Finale)
+        t = re.sub(r'scr_84_get_sprite\("(spr_\w+)"\)', r'\1', t)
         t = self.rename(t)
         # Chapter 4 / 5's scr_oflash leaves its flash in the caller's instance variable _oflash (Chapter 3's returns it only)
         t = re.sub(r'^([ ]*)scr_oflash\(\);', r'\1_oflash = scr_oflash();', t, flags=re.M)
@@ -218,6 +222,17 @@ class Boss:
         return n_cr, n_in, n_tt, n_g
 
     def write(self, out):
+        # DRBR 1.0.4: an instance variable of the source chapter's that Chapter 3 has a global function of the same name for
+        # is READ as that function in the built game (Jevil's Devilsknives: centerx / centery) - renamed (fnclash.py)
+        import fnclash
+        ren = {c: '%s_%s' % (self.prefix, c) for c in sorted(fnclash.clashes(list(self.files.values())))}
+        for n in list(self.files):
+            self.files[n] = fnclash.rename(self.files[n], ren)
+        assert not fnclash.clashes(list(self.files.values())), 'function-name clash left'
+        left = [n for n, t in self.files.items() if 'scr_84_get_sprite(' in t]
+        assert not left, ('a chapter sprite lookup left (Chapter 3 does not know the sprite)', left)
+        if ren:
+            print('%s: variables renamed for Chapter 3 function names: %r' % (self.key, ren))
         os.makedirs(out, exist_ok=True)
         for f in glob.glob(out + '*.gml'):
             os.remove(f)
