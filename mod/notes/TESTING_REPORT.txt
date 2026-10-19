@@ -1,6 +1,8 @@
 KNIGHT HUB v2 - WHAT WAS TESTED AND WHAT WAS NOT
 ================================================
-THE NEWEST UPDATE IS AT THE END: "BUILD 51 UPDATE 13" (DRBR 1.0.3: going OUT is always the GAME OVER then watching, watching
+THE NEWEST UPDATE IS AT THE END: "BUILD 51 UPDATE 14" (DRBR 1.0.4: Jevil's Devilsknife works in the real game, Spamton
+NEO's finale no longer stops it, the first tests in the real game program).
+Before it: "BUILD 51 UPDATE 13" (DRBR 1.0.3: going OUT is always the GAME OVER then watching, watching
 shows the player's side, END ROUND for the host, the bosses' sends in the sender's colour and sized to the box, bots shoot and
 show their skills, Flowery's tower, Jevil's own voice clips).
 Before it: "BUILD 51 UPDATE 12" (DRBR 1.0.2: Flowery's board no longer stops the game, the skills'
@@ -19,8 +21,10 @@ Before that, "BUILD 48" - the other SOULs really shown (the root cause: fog), SO
 rows, chat, Tetris 99-style targeting with shards, the Knight's Roaring at the final two and after 3 minutes, SOULs
 breaking like Chapter 3's GAME OVER, twelve new songs + Guardian + a song list. Its test table is at the very end.
 (BUILD 47, 46 and 45 above it.)
-Be aware: the mod has NOT been played in the real game by the author. Everything below is simulator
-or static checking. Please report anything odd.
+Be aware: the mod has NOT been played in the real game by a person. Up to update 13 everything below is simulator or
+static checking; from update 14 some of it ran in the real game program (REAL RUNNER (WINE): the real DELTARUNE.exe
+running the real build under Wine, driven by a test hook - not real Windows, not a person playing). Please report
+anything odd.
 
 RUNTIME-TESTED (in a GML simulator, real hub code, mocked game engine)
   - Attack sweep with the merged code (build 17, gmlsim, trio party): every attack of every phase/turn for Normal, Elec, Violet,
@@ -3212,3 +3216,152 @@ TESTS (on the final 1.0.3 code and the real DRBR.zip)
    The release: DRBR.zip 255,918,456 bytes, SHA-256 03317399fcda6f4c6c9fc0f90670c834099883d3d028aedf02c46a9db8fe563f; an
    update from 1.0.2 or 1.0.1 downloads about 113 MB (the game patch, DRBR Launcher, DRBR Updater - the music is kept). Put it up
    under the tag v1.0.3 exactly: 1.0.1 launchers can only download it from that tag.
+
+
+BUILD 51 UPDATE 14 - DRBR 1.0.4: JEVIL'S DEVILSKNIFE WORKS IN THE REAL GAME, SPAMTON NEO'S FINALE NO LONGER STOPS IT;
+THE FIRST TESTS IN THE REAL GAME PROGRAM
+Game build 51.14 (the multiplayer build is still 51: 1.0.2, 1.0.3 and 1.0.4 players can share a room). From the report on
+1.0.3: "DEVILSKNIFE ATTACK IS STILL BUGGED" (on 1.0.2: "the Devilsknife bug was not fixed, the attack where the scythes come
+in at you, it's still bugged and broken"; on 1.0.1: "devils knife bug ... doesnt play").
+Statuses: REAL RUNNER (WINE) = NEW: the real DELTARUNE game program (the player's own DELTARUNE.exe - GameMaker's runner)
+running the real built data.win, under Wine 9 with software rendering (Xvfb + Mesa llvmpipe), in DRBR mode (the provided
+starting save), with a test hook added to a private copy of the build (tests/realrunner: it starts a practice match, forces
+the attacks, logs every piece, saves screenshots) - NOT real Windows, NOT played by a person; EMULATED = the real merged GML in
+the emulator (NOT the real game); EMULATED WINDOWS = the real Windows programs under Wine + wine-mono (NOT real Windows);
+CORE = the C# code on .NET / Linux with the real vanilla data.win, patch, provided save and signing key; STATIC = checked in
+the built data.win; NOT RUN / BLOCKED = not tested.
+
+WHAT WAS WRONG
+Run in the real game program for the first time (REAL RUNNER (WINE), the 1.0.3 build): Jevil turned into the Devilsknife -
+and nothing came. The log of every frame said why: the four Devilsknives were there, fading in, spinning and swinging, but
+round the point x 100047, y 100087 - about 97,000 pixels right of the screen and 100,000 below it (the camera was at x 2230).
+The middle they swing round is kept in the variables centerx / centery (Chapter 1's obj_centerscythe). Chapter 3 has global
+functions of exactly those names (centerx(), centery() - helpers of Toby's), and in a GameMaker 2.3+ game a bare name that
+is a global function compiles to the FUNCTION: in the built data.win every read of centerx / centery was
+"push.i [function]gml_Script_centerx" (a function reference - about 100000 as a number), while the writes ("centerx = ...")
+still set the variable. So the Devilsknife (attack 3), the Devilsknife Swing (11, its red blade too: it is made at
+centerx + 150) and the DEVILSKNIFE skill all swung far off the screen, in every version since Jevil came (build 52). The
+emulator looks a name up when it runs, the variable first, and saw them swing round the box: every emulated test passed.
+
+WHAT CHANGED
+1. THE DEVILSKNIVES: their variables are jv_centerx / jv_centery (make_jevil.py, through the new fnclash.py: an imported
+   piece's instance variable named like a global function of the built game is renamed; the other boss imports go through
+   the same check in make_boss.py - none of theirs had one). The four Devilsknives swing round the box again, in and out
+   through it, the Swing's red blade comes beside the box, the DEVILSKNIFE skill swings round your box.
+2. THE WHOLE BUILD IS CHECKED FOR THIS KIND OF BUG: fnclash_scan.csx disassembles every code entry of the built data.win and
+   lists every name read as a global function (or an asset) where object / room code assigns a variable of that name. The
+   build check (runchk51.sh) writes fnclash51.out and the game package (pkg51.sh) is refused unless it says FNCLASH: 0. On
+   the 1.0.3 build it finds exactly the two (centerx, centery in obj_jv_cscythe); on 1.0.4's, none.
+3. THE EMULATOR READS SUCH A NAME AS THE GAME DOES: a bare read of an instance variable whose name is also a global function
+   of the game is an error ("variable centerx is read here, but centerx is also a global function: the compiled game reads
+   the FUNCTION ...") - gmlsim's fn_shadow_check, on in the test harness for every suite (the game's 3677 function names).
+   On 1.0.3's code the Devilsknife test now stops on it; every suite runs with it on.
+4. SPAMTON NEO'S NEO FINALE (found by the real-game run of every boss attack, not yet reported): it stopped the real game -
+   "ERROR in action number 1 of Draw Event for object obj_sn_playback: draw_sprite argument 1 incorrect type (undefined)
+   expecting a Number (YYGI32) at gml_Script_kbr_ov_ds". His final forme's playback bar takes its picture from Chapter 2's
+   look-up, scr_84_get_sprite("spr_sneo_playback"); Chapter 3's scr_84_get_sprite is a look-up in Chapter 3's own map of
+   localized pictures (scr_84_init_localization: about 75 names) and gives undefined for anything else, and the real runner stops
+   on a draw of undefined. The imports now take the picture itself (make_boss.py: scr_84_get_sprite("spr_x") -> spr_x; the
+   generator refuses to leave one), so the bar is spr_sneo_playback (Chapter 3 has that picture). The emulator hid it twice:
+   its battle harness answered 0 (a real picture) to every scr_84_get_sprite, and its draw functions took anything. Now
+   the harness answers as Chapter 3 does (its map's names, undefined for the rest) and a sprite draw with an argument that
+   is not a number is an error as in the runner (gmlsim's strict_draw, on in the harness).
+5. NEW: TESTS IN THE REAL GAME PROGRAM (tests/realrunner): rr_build.py makes a private test build (the merged code plus the
+   autotest hook - never in a release), rr_run.py runs it in the player's own DELTARUNE.exe under Wine, rr_check.py checks
+   the log. The game program is the player's own copy and is never part of DRBR or the repository.
+6. drbr_profile\last_start.ini gives build 51.14.
+
+FOUND IN THIS UPDATE'S TESTING
+- THE BUG, IN THE REAL GAME PROGRAM (REAL RUNNER (WINE), 1.0.3's code with the test hook): the Devilsknife and the Devilsknife
+  Swing - Jevil's body turns into the Devilsknife and flies up, the box stays empty for the whole attack, he comes back at its
+  end; the log of every frame: four Devilsknives, fading in, spinning and swinging - all about 97,000 px off the screen (their
+  middle at x 100047, y 100087 while the box was at x 2550, y 170). The cause in the built code: "push.i
+  [function]gml_Script_centerx" in obj_jv_cscythe's Create / Step where Chapter 1's own build has "push.v self.centerx".
+- NO OTHER NAME LIKE IT: the whole 1.0.3 build disassembled (8559 code entries; 11532 variables assigned in object / room code;
+  4582 function names read bare): centerx and centery are the only two; no variable named like an asset either.
+- SPAMTON NEO'S NEO FINALE STOPPED THE REAL GAME (not reported yet): every attack of every boss run in the real game program
+  (the hook forces them one after another), and his finale ended in the runner's error box - "ERROR in action number 1 of
+  Draw Event for object obj_sn_playback: draw_sprite argument 1 incorrect type (undefined) expecting a Number (YYGI32) at
+  gml_Script_kbr_ov_ds". See WHAT CHANGED 4.
+- EVERY OTHER BOSS ATTACK RAN TO ITS END IN THE REAL GAME PROGRAM, and the pieces it left far off the screen were the same
+  objects in the emulator (the same code; compared attack by attack where they appeared): Gerson's spare spears made at
+  -9999, -9999, his background and arc helpers at the room's corner, a chevron waiting left of the screen, a shell falling out
+  of the bottom; Flowery's controller at the room's corner, his tower's flowers (their x is an angle round the tower, not a
+  place) and his friends leaving the stage (flying off for the rest of the match, as they leave in Chapter 5); Spamton NEO's
+  heart's shots (they speed up for ever, as in Chapter 2, until the attack ends) and his BIG SHOT; Pink's background at the
+  room's corner. None of Jevil's pieces is ever more than 1000 px off the screen.
+- THE HOOK'S FIRST LABELS: when the match passed 3 minutes the timeline put a boss's finale in a cycle's place (the
+  Roaring), so a few attacks named in the first long runs were really the finale; the hook now logs the cycle's own attack,
+  and the late attacks of Gerson, Spamton NEO and Pink were run again in runs shorter than 3 minutes - every one of the 82
+  boss attacks has run in the real game program by its own name.
+
+TESTS (on the final 1.0.4 code and build)
+   PASS (REAL RUNNER (WINE))  JEVIL'S DEVILSKNIFE IN THE REAL GAME (rr_check dk, 21/21): the Devilsknife and the Devilsknife
+                    Swing twice each - four Devilsknives, the middle they swing round is the box's middle in every frame
+                    (956 of 956 positions), every one on the screen every frame it shows (952 of 952), the Swing's red blade
+                    on the screen beside the box (168 frames), no piece far off the screen; screenshots: they fade in round
+                    the box, swing in through it and out, Jevil comes back at the end. They hurt: the SOUL, left still in
+                    the middle of the box, was hit 5 times in each of the four attacks (20 hits of 24 HP; the hook gives the
+                    HP back after each).
+   PASS (REAL RUNNER (WINE))  THE BUG IN THE REAL GAME, 1.0.3'S CODE (rr_check old, 6/6): the same four attacks - the
+                    Devilsknives every one more than 1000 px off the screen in every frame (956 of 956; around x 100000,
+                    y 100000); the screenshots show the empty box; the SOUL was never hit (0 hits).
+   PASS (REAL RUNNER (WINE))  THE DEVILSKNIFE SKILL (rr_check send, 11/11): sent at the game during Jevil's Ring-Around - its
+                    four Devilsknives round the box's middle, on the screen, every frame.
+   PASS (REAL RUNNER (WINE))  ALL 16 OF JEVIL'S ATTACKS (rr_check sweep, 19/19): every one ran to its end (no error box), no
+                    piece of any of them more than 1000 px off the screen.
+   PASS (REAL RUNNER (WINE))  EVERY OTHER BOSS ATTACK: Gerson 19, Flowery 13, Spamton NEO 15, Pink 19 - every one ran to its
+                    end on 1.0.4's code (Spamton NEO's NEO Finale, Heart Attack III and Pipis Call III on the final build);
+                    the pieces far off the screen the same objects as in the emulator (FOUND above). On the code before the
+                    playback fix his NEO Finale stopped the game (the error box, screenshot kept).
+   PASS (STATIC)    JEVIL'S VOICE (the reports on 1.0.1 and 1.0.2: "uses the wrong voiceline"; fixed in 1.0.3): in the final
+                    data.win the clip his Devilsknife plays, snd_jv_joker_metamorphosis, is byte for byte Chapter 1's
+                    "METAMORPHOSIS!" (134,444 bytes, the same SHA-256), embedded in the default audio group with the same
+                    flags as in Chapter 1; so are all his other clips (snd_jv_joker_laugh0, BYE-BYE, CHAOS, HA, OH,
+                    ANYTHING, NEO CHAOS, the second laugh). Jevil's code plays only those; the build's other
+                    snd_joker_metamorphosis (417 KB) is played only by the Cyan Knight's own attack (obj_knight_pointing_cone,
+                    as in that mod). NOT RUN: hearing it in the real game program - the test machine has no sound device.
+   PASS (EMULATED)  JEVIL'S DEVILSKNIFE (t_jevil104, new, 26/26; on the 1.0.4 code before the playback fix, which changed
+                    no Jevil code): at the real arena camera with collisions - the Devilsknife and
+                    the Devilsknife Swing twice each and the DEVILSKNIFE skill: four Devilsknives, their middle the box's in
+                    every frame, every one on the screen, swinging from the middle to 150 px out; the red blade on the
+                    screen; on 1.0.3's code the emulator's new check stops at the read of centerx - reproduced.
+   PASS (EMULATED)  SPAMTON NEO'S FINALE (t_spamton104, new, 6/6): Heart Attack III, Pipis Call III and the NEO Finale, every
+                    frame drawn with the runner's argument check - no error; the playback bar and his final forme hold
+                    spr_sneo_playback; on 1.0.3's code the NEO Finale stops with the real game's own error ("draw_sprite
+                    argument 1 incorrect type (undefined)") - reproduced.
+   PASS (STATIC)    THE NAME CHECK (t_fnclash104, new, 12/12): the 1.0.4 build - FNCLASH: 0; the 1.0.3 build - exactly centerx
+                    and centery of obj_jv_cscythe; 1.0.4's Devilsknife reads jv_centerx / jv_centery as variables (no
+                    function reference); no clashing variable in any boss port's generated code; the emulator's check: an
+                    error with it on, the variable with it off, a call is the function either way.
+   PASS (STATIC)    THE BUILD (runchk51.sh): the runner check (5227 functions, 91 built-in variables, 0 missing), the round
+                    trip (1525 / 1525), FNCLASH: 0; the decompile (8559 code entries) - jv_centerx in the Devilsknife,
+                    build 51.14; validate53 on the built code 319 checks, 0 failed (the same 10 warnings as 1.0.3: music
+                    the game's own folder has, projectiles the fallback covers).
+   PASS (EMULATED)  on the final 1.0.4 code, with the emulator's two new checks on (a read of a variable named like one of the
+                    game's functions, a picture draw of something that is not a picture - both errors now, as in the real
+                    game): t_mixver103 58/58, t_lineup 1634/1634, t_tint103 95/95, t_bossbots53 32/32, t_flowery53_multi
+                    15/15, t_spamton104 6/6; on the 1.0.4 code before the playback fix: t_jevil104 26/26, t_watch103 41/41.
+   NOT RUN          the rest of the emulator regression on the 1.0.4 code (52 suites - the other bosses' suites, the sends,
+                    the menus, HUD, online, music and save suites): stopped at the author's request. They all passed on
+                    1.0.3's code (update 13), and 1.0.4's game code differs from 1.0.3's in five files only (next line).
+                    (A first run had stopped part way: the TEST MACHINE's disk filled up - "No space left on device".)
+   PASS (STATIC)    1.0.3 AND 1.0.4 IN ONE ROOM: their game code differs in five files only - the build's version text
+                    (knight_core: "51.14", the date), the Devilsknife's two variables (obj_jv_cscythe Create / Step) and the
+                    playback bar's picture (obj_sn_playback, obj_sn_forme Create) - nothing that goes between the games, so
+                    the multiplayer build stays 51. 1.0.2 with 1.0.4: t_mixver103 above, on the final code.
+   PASS (CORE)      109/109 core tests on the final 1.0.4 payload.
+   PASS (EMULATED WINDOWS)  the real update a player gets, under Wine: 1.0.3's DRBR-Setup.exe installed, then the launcher's
+                    UPDATE NOW to 1.0.4 from a local server that answers like GitHub - 18/18 (the check reads only the end of
+                    DRBR.zip, 65,578 bytes; the update only the changed files: 112,915,251 bytes for the game patch, DRBR
+                    Launcher and DRBR Updater; the music and Steam files not downloaded again; the new launcher swapped in by
+                    the updater and restarted; the install verifies; PLAY starts in the starting room - the Wine test's
+                    stand-in game, not DELTARUNE; the player's saves unchanged); the same from 1.0.2's DRBR-Setup.exe - 18/18;
+                    a fresh install of 1.0.4 (wine_e2e) - 51/51. (Its first run stopped at 12 of 51: the TEST MACHINE's disk
+                    was full - "Not enough free disk space"; old work folders were removed and it ran again: 51/51.)
+   NOT RUN          real Windows; a person playing the game; two computers in one online room; hearing the game (the real
+                    runner ran without a sound device); an update straight from 1.0.1 to 1.0.4 (1.0.1 -> 1.0.3 passed in
+                    update 13).
+   The release: DRBR.zip 255,918,936 bytes, SHA-256 825477c45a3d5ba4ecaced4f12bd859cdc2e9232da631906785989cfd1ee387e; an
+   update from 1.0.2 or 1.0.3 downloads about 113 MB (the game patch, DRBR Launcher, DRBR Updater - the music is kept). Put it
+   up under the tag v1.0.4 exactly: the signed update information points at that tag.
